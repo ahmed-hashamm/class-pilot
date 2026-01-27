@@ -1,0 +1,319 @@
+/* ===============================
+   FONT IMPORT (must be first)
+   =============================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   DESIGN TOKENS (LIGHT MODE)
+   =============================== */
+@layer base {
+  :root {
+    /* ---------- Base surfaces ---------- */
+
+    /* Page background – pure white */
+    --background: 0 0% 100%;
+
+    /* Primary text – near black / dark gray */
+    --foreground: 0 0% 3.9%;
+
+    /* Card background – white */
+    --card: 0 0% 100%;
+
+    /* Card text – dark gray */
+    --card-foreground: 0 0% 3.9%;
+
+    /* Popover / dropdown background */
+    --popover: 0 0% 100%;
+
+    /* Popover text */
+    --popover-foreground: 0 0% 3.9%;
+
+
+    /* ---------- Brand colors ---------- */
+
+    /* PRIMARY BRAND COLOR — Deep Navy Blue (#043873) */
+    --primary: 0 0% 9%;
+
+    /* Text on primary background */
+    --primary-foreground: 0 0% 98%;
+
+    /* ACCENT COLOR — Soft Yellow (#FFE492) */ 
+    --accent: 48 100% 70%;
+
+    /* Text on accent (dark text for contrast) */ 
+    --accent-foreground: 212 93% 18%; 
+
+
+    /* ---------- Secondary UI colors ---------- */
+
+    /* Light gray background sections */
+    --secondary: 0 0% 96.1%;
+
+    /* Text on secondary background */
+    --secondary-foreground: 0 0% 9%;
+
+    /* Muted backgrounds (cards, subtle sections) */
+    --muted: 0 0% 96.1%;
+
+    /* Muted text (descriptions, hints) */
+    --muted-foreground: 0 0% 45.1%;
+
+
+    /* ---------- Feedback colors ---------- */
+
+    /* Destructive / error color – red */
+    --destructive: 0 84.2% 60.2%;
+
+    /* Text on destructive */
+    --destructive-foreground: 0 0% 98%;
+
+
+    /* ---------- Borders & inputs ---------- */
+
+    /* Default border color */
+    --border: 0 0% 89.8%;
+
+    /* Input border color */
+    --input: 0 0% 89.8%;
+
+    /* Focus ring color (brand navy) */
+    --ring: 0 0% 3.9%;
+
+
+    /* ---------- Radius ---------- */
+
+    /* Global border radius */
+    --radius: 0.5rem;
+
+
+    /* ---------- Custom brand extensions ---------- */
+
+    /* NAVY — Main background color (#043873) */
+    --navy: 212 93% 23%;
+
+    /* NAVY LIGHT — Accent blue (#4F9CF9) */
+    --navy-light: 215 94% 65%;
+
+    /* YELLOW — Highlight color (#FFE492) */
+    --yellow: 48 100% 78%;
+
+    /* YELLOW HOVER — Slightly darker yellow */
+    --yellow-hover: 48 100% 70%;
+
+
+    /* ---------- Sidebar colors ---------- */
+
+    /* Sidebar background */
+    --sidebar-background: 0 0% 98%;
+
+    /* Sidebar text */
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    /* Sidebar primary item */
+    --sidebar-primary: 240 5.9% 10%;
+
+    /* Sidebar primary text */
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    /* Sidebar accent background */
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    /* Sidebar accent text */
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    /* Sidebar border */
+    --sidebar-border: 220 13% 91%;
+
+    /* Sidebar focus ring */
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  /* ===============================
+     DESIGN TOKENS (DARK MODE)
+     =============================== */
+  .dark {
+    /* Dark background – deep navy */
+    --background: 0 0% 3.9%;
+
+    /* Light foreground text */
+    --foreground: 0 0% 98%;
+
+    /* Card background */
+    --card: 0 0% 3.9%;
+
+    /* Card text */
+    --card-foreground: 0 0% 98%;
+
+    /* Popover background */
+    --popover: 0 0% 3.9%;
+
+    /* Popover text */
+    --popover-foreground: 0 0% 98%;
+
+
+    /* Accent becomes primary in dark mode */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+
+    /* Accent remains yellow */
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+
+
+    /* Secondary backgrounds */
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Muted surfaces */
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+
+
+    /* Destructive in dark mode */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+
+    /* Borders & focus */
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+/* ===============================
+   BASE STYLES
+   =============================== */
+@layer base {
+  /* Apply default border color */
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  /* Body defaults */
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', var(--font-geist-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* ===============================
+   COMPONENT CLASSES
+   =============================== */
+@layer components {
+
+  /* Primary CTA button */
+  .btn-primary {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.1);
+  }
+
+  /* Outline button */
+  .btn-outline {
+    border: 2px solid hsl(var(--primary-foreground));
+    color: hsl(var(--primary-foreground));
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover {
+    background-color: hsl(var(--primary-foreground));
+    color: hsl(var(--primary));
+  }
+
+  /* Navy section */
+  .section-navy {
+    background-color: hsl(var(--navy));
+    color: hsl(var(--primary-foreground));
+  }
+
+  /* White section */
+  .section-white {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  /* Decorative wave wrapper */
+  .wave-decoration {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Yellow underline highlight */
+  .underline-yellow {
+    position: relative;
+    display: inline-block;
+  }
+
+  .underline-yellow::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0.25rem;
+    background-color: hsl(var(--accent));
+    border-radius: 9999px;
+  }
+}
+
+/* ===============================
+   UTILITIES
+   =============================== */
+@layer utilities {
+
+  /* Gradient text using accent yellow */
+  .text-gradient {
+    background: linear-gradient(to right, hsl(var(--accent)), hsl(var(--yellow)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

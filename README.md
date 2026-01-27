@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-Classroom Platform
+
+A comprehensive e-classroom platform built with Next.js, TypeScript, Tailwind CSS, and Supabase. Features include AI-powered automated grading, real-time updates, group projects, and more.
+
+## Features
+
+- **Authentication**: Secure user authentication with Supabase Auth
+- **Classes Management**: Create and join classes with unique class codes
+- **Assignments**: Create assignments with due dates, points, and file attachments
+- **AI-Powered Grading**: Automated grading using OpenAI GPT-4 with detailed rubrics
+- **Rubrics System**: Create and manage grading rubrics with multiple criteria
+- **Submissions**: Students can submit assignments with text and/or file uploads
+- **Announcements**: Create and pin announcements for classes
+- **Materials**: Upload and organize class materials
+- **Group Projects**: Manage group projects and collaborations
+- **Calendar View**: View assignments and deadlines in a calendar format
+- **Real-time Updates**: Supabase Realtime for instant notifications and updates
+
+## Tech Stack
+
+- **Framework**: Next.js 14+ (App Router) with TypeScript
+- **Styling**: Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Realtime)
+- **AI Integration**: OpenAI API for automated grading
+- **State Management**: React Hooks + Zustand (optional)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ and npm
+- Supabase account
+- OpenAI API key
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd fyp
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+OPENAI_API_KEY=your_openai_api_key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Set up Supabase:
+   - Create a new Supabase project
+   - Run the migration file: `supabase/migrations/001_initial_schema.sql` in your Supabase SQL editor
+   - Create storage buckets:
+     - `assignments` (for assignment file uploads)
+     - `materials` (for class materials)
 
-## Learn More
+5. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+fyp/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (auth)/            # Auth routes (login, signup)
+│   │   ├── (dashboard)/       # Protected dashboard routes
+│   │   ├── api/               # API routes
+│   │   └── layout.tsx
+│   ├── components/            # Reusable components
+│   │   ├── ui/               # Base UI components
+│   │   ├── class/            # Class-related components
+│   │   ├── assignment/       # Assignment components
+│   │   ├── grading/          # Grading components
+│   │   └── calendar/         # Calendar components
+│   ├── lib/                  # Utilities and helpers
+│   │   ├── supabase/         # Supabase client & helpers
+│   │   ├── ai/               # AI grading logic
+│   │   └── utils/            # General utilities
+│   ├── hooks/                # Custom React hooks
+│   ├── types/                # TypeScript types
+│   └── store/                # State management
+├── supabase/
+│   └── migrations/           # Database migrations
+└── public/                   # Static assets
+```
 
-## Deploy on Vercel
+## Database Schema
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application uses the following main tables:
+- `users` - User profiles
+- `classes` - Class information
+- `class_members` - Class membership
+- `assignments` - Assignments
+- `submissions` - Student submissions
+- `rubrics` - Grading rubrics
+- `announcements` - Class announcements
+- `materials` - Class materials
+- `group_projects` - Group projects
+- `notifications` - User notifications
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `supabase/migrations/001_initial_schema.sql` for the complete schema.
+
+## Key Features Implementation
+
+### AI Grading
+
+The AI grading system uses OpenAI GPT-4 to analyze student submissions against rubric criteria. The grading process:
+
+1. Takes the submission content and attached rubric
+2. Sends to OpenAI with a detailed prompt
+3. Receives scores per criterion and overall feedback
+4. Stores results in the database
+5. Allows teachers to review and override AI grades
+
+### Real-time Features
+
+Supabase Realtime is used for:
+- New announcements
+- Assignment submissions
+- Grades posted
+- New class members
+
+## Development
+
+### Running Tests
+```bash
+npm run test
+```
+
+### Building for Production
+```bash
+npm run build
+npm start
+```
+
+## License
+
+This project is for educational purposes (Final Year Project).
+
+## Contributing
+
+This is a final year project. Contributions and suggestions are welcome!
