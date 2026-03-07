@@ -5,6 +5,7 @@ import { useState, useEffect, ReactNode } from "react";
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
 ───────────────────────────────────────────────────────────────────────────── */
+import WavePattern from "@/components/layout/WavePattern";
 type View = "teacher" | "student";
 
 interface Step {
@@ -140,8 +141,8 @@ function DiagramStudentFeed() {
             <text x="130" y="27" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="8" fill={WHITE}>My Assignments</text>
             {/* items */}
             {([
-                { title: "Cell Division Quiz", due: "Due tomorrow", urgent: true },
-                { title: "Lab Report — Osmosis", due: "Due in 3 days", urgent: false },
+                { title: "Assignment 2: Calculus", due: "Due tomorrow", urgent: true },
+                { title: "Lab Report 5: Deep Learning", due: "Due 2/3/2026", urgent: false },
             ] as { title: string; due: string; urgent: boolean }[]).map((a, i) => (
                 <g key={i}>
                     <rect x="22" y={44 + i * 52} width="216" height="40" rx="7"
@@ -170,18 +171,18 @@ function DiagramSubmit() {
             <rect x="10" y="10" width="240" height="165" rx="10" fill={WHITE} stroke={BORDER_CLR} strokeWidth="1" />
             <rect x="10" y="10" width="240" height="26" rx="10" fill={NAVY} />
             <rect x="10" y="26" width="240" height="10" fill={NAVY} />
-            <text x="130" y="27" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="8" fill={WHITE}>Cell Division Quiz — Your Work</text>
+            <text x="130" y="27" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="8" fill={WHITE}>Submit Your Work</text>
             {/* Q1 */}
-            <text x="30" y="56" fontFamily="Inter,sans-serif" fontSize="7.5" fontWeight="600" fill={MUTED_TEXT}>Q1. What triggers mitosis?</text>
+            <text x="30" y="56" fontFamily="Inter,sans-serif" fontSize="7.5" fontWeight="600" fill={MUTED_TEXT}>Text Content</text>
             <rect x="22" y="60" width="216" height="16" rx="4" fill={`${NAVY}08`} stroke={`${NAVY}22`} strokeWidth="1" />
-            <text x="30" y="71" fontFamily="Inter,sans-serif" fontSize="7" fill={NEAR_BLACK}>Growth signals and DNA replication completion…</text>
+            <text x="30" y="71" fontFamily="Inter,sans-serif" fontSize="7" fill={NEAR_BLACK}>Your text content here…</text>
             {/* Q2 */}
-            <text x="30" y="92" fontFamily="Inter,sans-serif" fontSize="7.5" fontWeight="600" fill={MUTED_TEXT}>Q2. Name the phases of mitosis.</text>
-            <rect x="22" y="96" width="216" height="16" rx="4" fill={MUTED_BG} stroke={BORDER_CLR} strokeWidth="1" />
+            <text x="30" y="92" fontFamily="Inter,sans-serif" fontSize="7.5" fontWeight="600" fill={MUTED_TEXT}>Attachments</text>
+            {/* <rect x="22" y="96" width="216" height="16" rx="4" fill={MUTED_BG} stroke={BORDER_CLR} strokeWidth="1" /> */}
             {/* attach */}
-            <rect x="22" y="122" width="140" height="18" rx="5" fill={WHITE}
+            <rect x="22" y="100" width="140" height="40" rx="5" fill={WHITE}
                 stroke={BORDER_CLR} strokeWidth="1" strokeDasharray="3 2" />
-            <text x="92" y="133" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7" fill={MUTED_TEXT}>+ Attach your work</text>
+            <text x="86" y="123" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7" fill={MUTED_TEXT}>+ Attach your work</text>
             {/* submit */}
             <rect x="22" y="150" width="216" height="20" rx="5" fill={YELLOW} />
             <text x="130" y="163" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="8.5" fontWeight="600" fill={NAVY}>Submit Assignment</text>
@@ -240,10 +241,10 @@ function DiagramAIChat() {
             {/* header */}
             <rect x="10" y="10" width="240" height="30" rx="10" fill={NAVY} />
             <rect x="10" y="28" width="240" height="12" fill={NAVY} />
-            <text x="84" y="29" fontFamily="Inter,sans-serif" fontSize="8.5" fontWeight="500" fill={WHITE}>Class AI — Biology</text>
+            <text x="76" y="29" fontFamily="Inter,sans-serif" fontSize="8.5" fontWeight="500" fill={WHITE}>Pilot AI — DSA 5th Semester</text>
             {/* "class notes only" badge */}
-            <rect x="176" y="16" width="64" height="16" rx="8" fill={YELLOW} />
-            <text x="208" y="26" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="6.5" fontWeight="600" fill={NAVY}>Class notes only</text>
+            {/* <rect x="176" y="16" width="64" height="16" rx="8" fill={YELLOW} />
+            <text x="208" y="26" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="6.5" fontWeight="600" fill={NAVY}>Class notes only</text> */}
             {/* student bubble (right) */}
             <rect x="80" y="54" width="158" height="30" rx="10" fill={`${NAVY}12`} stroke={`${NAVY}20`} strokeWidth="1" />
             <text x="159" y="65" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7.5" fill={NEAR_BLACK}>What is the role of the spindle</text>
@@ -251,7 +252,7 @@ function DiagramAIChat() {
             {/* AI bubble (left) */}
             <rect x="22" y="97" width="178" height="52" rx="10" fill={MUTED_BG} stroke={BORDER_CLR} strokeWidth="1" />
             <circle cx="35" cy="108" r="7" fill={NAVY} />
-            <text x="35" y="112" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7" fontWeight="700" fill={YELLOW}>AI</text>
+            <text x="35" y="111" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7" fontWeight="700" fill={YELLOW}>AI</text>
             <rect x="48" y="102" width="142" height="5" rx="2" fill={BORDER_CLR} />
             <rect x="48" y="112" width="122" height="5" rx="2" fill={BORDER_CLR} />
             <rect x="48" y="122" width="100" height="5" rx="2" fill={BORDER_CLR} />
@@ -266,8 +267,8 @@ function DiagramAIChat() {
 
 /** Group collaboration diagram */
 function DiagramGroupCollab() {
-    const members = ["A", "M", "J", "P"];
-    const bars = [0.85, 0.6, 0.72, 0.4];
+    const members = ["Ahmed", "Anees", "Zohaib", "Hassan"];
+    // const bars = [0.85, 0.6, 0.72, 0.4];
     return (
         <svg viewBox="0 0 260 195" fill="none" className="w-full">
             <rect x="10" y="10" width="240" height="175" rx="10" fill={WHITE} stroke={BORDER_CLR} strokeWidth="1" />
@@ -285,7 +286,7 @@ function DiagramGroupCollab() {
             <rect x="30" y="101" width="132" height="4" rx="2" fill={BORDER_CLR} />
             <rect x="30" y="110" width="100" height="4" rx="2" fill={BORDER_CLR} />
             {/* avatar row */}
-            {members.map((m, i) => (
+            {/* {members.map((m, i) => (
                 <g key={i}>
                     <circle cx={30 + i * 17} cy={148} r={9}
                         fill={i === 0 ? `${NAVY}22` : BORDER_CLR}
@@ -293,14 +294,14 @@ function DiagramGroupCollab() {
                     <text x={30 + i * 17} y={152} textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7"
                         fontWeight="600" fill={i === 0 ? NAVY : MUTED_TEXT}>{m}</text>
                 </g>
-            ))}
+            ))} */}
             {/* contribution panel */}
             <rect x="178" y="46" width="72" height="116" rx="8" fill={WHITE} stroke={BORDER_CLR} strokeWidth="1" />
-            <text x="214" y="60" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="6.5" fontWeight="600" fill={MUTED_TEXT}>Contributions</text>
+            <text x="214" y="60" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="6.5" fontWeight="600" fill={MUTED_TEXT}>Group Members</text>
             {members.map((m, i) => (
                 <g key={i}>
                     <text x="184" y={76 + i * 22} fontFamily="Inter,sans-serif" fontSize="7" fill={MUTED_TEXT}>{m}</text>
-                    <rect x="196" y={70 + i * 22} width={42 * bars[i]} height="6" rx="3" fill={NAVY_LIGHT} />
+                    {/* <rect x="196" y={70 + i * 22} width={42 * bars[i]} height="6" rx="3" fill={NAVY_LIGHT} /> */}
                 </g>
             ))}
         </svg>
@@ -374,7 +375,7 @@ const DIFF_CARDS: DiffCard[] = [
     {
         badge: "Collaboration",
         title: "Group Projects",
-        desc: "Students collaborate in a shared live workspace — writing, editing, and commenting together in real time. Teachers see individual contribution logs, so every student's effort is visible and accountable.",
+        desc: "Students collaborate in a shared live workspace — writing, editing, and commenting together in real time. Teachers see a single submission so that there is no repetition — saving them a lot of time.",
         icon: (
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                 <circle cx="8" cy="8.5" r="3" stroke="currentColor" strokeWidth="1.5" />
@@ -382,7 +383,7 @@ const DIFF_CARDS: DiffCard[] = [
                 <path d="M2.5 18c0-3 2.5-4.5 5.5-4.5h7c3 0 5.5 1.5 5.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
         ),
-    },
+    },  
     {
         badge: "AI",
         title: "Class-Specific AI Assistant",
@@ -431,14 +432,14 @@ export default function HowItWorks() {
         .cp-hero-4   { animation:cp-fadeUp .6s ease .5s both; }
       `}</style>
 
-            <main className="bg-background text-foreground font-sans overflow-x-hidden">
+            <main className="bg-background text-foreground font-sans mt-[1px] ">
 
                 {/* ── HERO  (navy bg) ─────────────────────────────────────────────── */}
-                <section className="relative bg-navy text-white text-center px-6 pt-16 pb-12 overflow-hidden">
+                <section className="relative bg-navy text-white text-center  px-6 py-12 overflow-hidden">
                     {/* subtle radial glow */}
-                    <div className="pointer-events-none absolute inset-0"
-                        style={{ background: `radial-gradient(ellipse 55% 40% at 50% 0%, rgba(79,156,249,.18) 0%, transparent 70%)` }} />
-
+                    {/* <div className="pointer-events-none absolute inset-0"
+                        style={{ background: `radial-gradient(ellipse 55% 40% at 50% 0%, rgba(79,156,249,.18) 0%, transparent 70%)` }} /> */}
+                    <WavePattern />
                     <div className="cp-hero-1">
                         <span className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[.18em]
               uppercase bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-6 text-white/80">
@@ -447,7 +448,7 @@ export default function HowItWorks() {
                         </span>
                     </div>
 
-                    <h1 className="cp-hero-2 font-black text-[clamp(36px,4vw,70px)] leading-[1.06]
+                    <h1 className="cp-hero-2 font-black text-[clamp(36px,3vw,70px)] leading-[1.06]
             tracking-tight mb-5 max-w-3xl mx-auto">
                         Your classroom,{" "}
                         <span className="relative inline-block">
@@ -455,14 +456,14 @@ export default function HowItWorks() {
                         </span>
                     </h1>
 
-                    <p className="cp-hero-3 text-white/65 text-[clamp(15px,1.8vw,18px)] font-light
+                    <p className="cp-hero-3 text-white/65 text-[clamp(15px,1vw,18px)] font-light
             leading-relaxed max-w-lg mx-auto mb-9">
                         Create classes, post assignments, collect submissions, and grade — all in one place.
                         With AI that actually understands your class.
                     </p>
 
                     <div className="cp-hero-4 flex gap-3 justify-center flex-wrap">
-                        <a href="/signup"
+                        <a href="/login"
                             className="inline-flex items-center gap-2 bg-yellow text-navy font-semibold
                 text-sm px-7 py-3 rounded-lg transition hover:bg-yellow-hover hover:-translate-y-0.5">
                             Get started free
@@ -470,7 +471,7 @@ export default function HowItWorks() {
                                 <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </a>
-                        <a href="/demo"
+                        {/* <a href="/demo"
                             className="inline-flex items-center gap-2 text-white font-normal text-sm
                 px-5 py-3 border border-white/25 rounded-lg transition hover:border-yellow/60 hover:text-yellow">
                             Watch 2-min demo
@@ -478,7 +479,7 @@ export default function HowItWorks() {
                                 <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.1" />
                                 <path d="M5.5 4.5l4 2-4 2v-4z" fill="currentColor" />
                             </svg>
-                        </a>
+                        </a> */}
                     </div>
                 </section>
 
@@ -589,12 +590,12 @@ export default function HowItWorks() {
                 <div className="bg-navy py-16 px-6 text-center cp-reveal">
                     <p className="font-bold italic text-[clamp(18px,3vw,30px)] leading-snug
             max-w-2xl mx-auto mb-4 text-white/90">
-                        "I used to spend two hours every Sunday marking. Now it takes twenty minutes
+                        "I used to spend hours everyday marking. Now it takes a fraction of the time
                         and the feedback is more specific."
                     </p>
                     <p className="text-sm text-white/50">
-                        <span className="text-yellow font-semibold">Mr D. Okafor</span>
-                        {" "}· Year 10 Biology Teacher
+                        <span className="text-yellow font-semibold">Mam Amna</span>
+                        {" "}· Ai & Ml Professor
                     </p>
                 </div>
 
@@ -684,7 +685,7 @@ export default function HowItWorks() {
                             <p className="text-[11px] font-semibold tracking-[.2em] uppercase text-navy mb-2">
                                 Spotlight
                             </p>
-                            <h2 className="font-black text-[clamp(24px,3.5vw,40px)] leading-tight tracking-tight mb-4">
+                            <h2 className="text-primary text-[clamp(24px,3.5vw,40px)] leading-tight tracking-tight mb-4">
                                 Group work,<br />fully visible
                             </h2>
                             <p className="text-[15px] text-muted-foreground leading-relaxed mb-4">
@@ -692,8 +693,7 @@ export default function HowItWorks() {
                                 in real time. No switching to external tools, no version confusion.
                             </p>
                             <p className="text-[15px] text-muted-foreground leading-relaxed">
-                                Teachers see individual contribution logs alongside the final submission, so
-                                every student's effort is accounted for — not just the group's output.
+                            Teachers see a single submission so that there is no repetition — saving them a lot of time.
                             </p>
                         </div>
                     </div>
@@ -723,30 +723,30 @@ export default function HowItWorks() {
                 </section>
 
                 {/* ── CTA (yellow bg) ──────────────────────────────────────────────── */}
-                <section className="bg-yellow py-20 px-6 text-center cp-reveal">
+                <section className="bg-secondary py-20 px-6 text-center  cp-reveal">
                     <p className="text-[11px] font-bold tracking-[.2em] uppercase text-navy/60 mb-2">
                         Ready to start?
                     </p>
                     <h2 className="font-black text-[clamp(28px,4.5vw,52px)] leading-tight tracking-tight
-            text-navy mb-4">
+            text-primary mb-4">
                         Your class is live in{" "}
                         <span className="italic">under two minutes.</span>
                     </h2>
-                    <p className="text-[15px] text-navy/65 leading-relaxed max-w-md mx-auto mb-9">
+                    <p className="text-[15px] text-muted-foreground leading-relaxed max-w-md mx-auto mb-9">
                         Create your class, invite your students, and post your first assignment today.
                         Free to try, no credit card needed.
                     </p>
                     <div className="flex gap-3 justify-center flex-wrap">
-                        <a href="/signup"
-                            className="inline-flex items-center gap-2 bg-navy text-white font-semibold
-                text-sm px-7 py-3 rounded-lg transition hover:bg-navy/90 hover:-translate-y-0.5">
+                        <a href="/login"
+                            className="inline-flex items-center gap-2 bg-navy-light text-white font-semibold
+                text-sm px-7 py-3 rounded-lg transition hover:bg-navy-light/90 hover:-translate-y-0.5">
                             Create your free class
                         </a>
-                        <a href="/demo"
+                        {/* <a href="/demo"
                             className="inline-flex items-center gap-2 text-navy font-semibold text-sm
                 px-5 py-3 border-2 border-navy/30 rounded-lg transition hover:border-navy">
                             Watch the demo
-                        </a>
+                        </a> */}
                     </div>
                 </section>
 
