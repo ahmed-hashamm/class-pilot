@@ -36,7 +36,7 @@ export default function HomePage() {
 
         <ChatFeatureSection />
         <LearningSection />
-        <TestimonialsSection />
+        {/* <TestimonialsSection /> */}
         <CTASection />
         <Footer />
       </main>

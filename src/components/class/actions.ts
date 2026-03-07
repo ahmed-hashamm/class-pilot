@@ -53,114 +53,10 @@ export async function clearStickyNotes(classId: string) {
     .eq("class_id", classId)
     .eq("user_id", user.id)
 }
-// export async function createAnnouncement(formData: FormData) {
-//   const supabase = await createClient()
-
-//   // Get the user from the current session instead of props
-//   const { data: { user } } = await supabase.auth.getUser()
-
-//   if (!user) throw new Error("You must be logged in to post")
-//   const userId = user.id // Use this ID instead of the one from formData
-
-//   const content = formData.get('content') as string
-//   const classId = formData.get('classId') as string
-//   const file = formData.get('file') as File | null
-
-//   if (!classId || classId === 'undefined') throw new Error("Missing Class ID")
-//   if (!userId || userId === 'undefined') throw new Error("Missing User ID")
-//   let filePath = null
-// // VALIDATION: This prevents the "undefined" UUID error
-// if (!classId || classId === 'undefined') throw new Error("Missing Class ID");
-// if (!userId || userId === 'undefined') throw new Error("Missing User ID");
-//   // 1. Upload file if exists
-//   if (file && file.size > 0) {
-//     const fileName = `${Math.random()}-${Date.now()}.${file.name.split('.').pop()}`
-//     const { data, error: uploadError } = await supabase.storage
-//       .from('announcements-files')
-//       .upload(`${classId}/${fileName}`, file)
-
-//     if (uploadError) throw new Error("Upload failed: " + uploadError.message)
-//     filePath = data.path
-//   }
-
-//   // 2. Insert into DB
-//   // ADJUST THESE COLUMN NAMES TO MATCH YOUR TABLE EXACTLY
-//   const { error: dbError } = await supabase
-//     .from('announcements')
-//     .insert({
-//       content: content,
-//       class_id: classId,      // Make sure column is called class_id
-//       created_by: userId,    // Make sure column is called created_by
-//       attachment_path: filePath, // Make sure column is called attachment_path
-//       title: 'Class Update',  // If your table requires a title
-//     } as any)
-
-//   if (dbError) {
-//     console.error("DB Error:", dbError)
-//     throw new Error(`Database insert failed: ${dbError.message}`)
-//   }
-
-//   revalidatePath('/') 
-//   return { success: true }
-// }
-
-// export async function createAnnouncement(formData: FormData) {
-//   const supabase = await createClient()
-//   const { data: { user } } = await supabase.auth.getUser()
-//   if (!user) throw new Error("Unauthorized")
-
-//   const title = formData.get('title') as string
-//   const content = formData.get('content') as string
-//   const classId = formData.get('classId') as string
-//   const pinned = formData.get('pinned') === 'true'
-//   const deadline = formData.get('deadline') as string | null
-//   
-//   // Get all files from the 'files' field (ensure your input has name="files")
-//   const files = formData.getAll('files') as File[]
-//   const attachmentPaths: string[] = []
-
-//   // Loop through and upload each file
-//  // inside createAnnouncement in actions.ts
-
-// // inside createAnnouncement in actions.ts
-
-// for (const file of files) {
-//   if (file.size > 0) {
-//     // We use a timestamp + original name to ensure uniqueness 
-//     // but keep the original name readable
-//     const safeName = file.name.replace(/[^a-z0-9.]/gi, '_'); // Optional: clean special chars
-//     const fileName = `${Date.now()}-${safeName}`; 
-//     
-//     const { data, error: uploadError } = await supabase.storage
-//       .from('announcements-files')
-//       .upload(`${classId}/${fileName}`, file)
-
-//     if (uploadError) throw new Error("Upload failed: " + uploadError.message)
-//     attachmentPaths.push(data.path)
-//   }
-// }
-
-//   const { error: dbError } = await supabase
-//     .from('announcements')
-//     .insert({
-//       title: title || 'Class Update',
-//       content: content,
-//       class_id: classId,
-//       created_by: user.id,
-//       attachment_paths: attachmentPaths, // Store the array
-//       pinned: pinned,
-//       deadline: deadline || null
-//     } as any)
-
-//   if (dbError) throw new Error(`Database insert failed: ${dbError.message}`)
-
-//   revalidatePath(`/classes/${classId}`) 
-//   return { success: true }
-// } 
 /* ---------------- HELPER: UPLOAD FILES ---------------- */
-/**
- * Internal helper to handle multiple file uploads to a specific bucket
- */
+
+//Internal helper to handle multiple file uploads to a specific bucket
+ 
 async function uploadFiles(files: File[], classId: string, bucket: string) {
   const supabase = await createClient()
   const paths: string[] = []
@@ -211,33 +107,6 @@ export async function createAnnouncement(formData: FormData) {
   return { success: true }
 }
 
-/* ---------------- CREATE MATERIAL ---------------- */
-// export async function createMaterial(formData: FormData) {
-//   const supabase = await createClient()
-//   const { data: { user } } = await supabase.auth.getUser()
-//   if (!user) throw new Error("Unauthorized")
-
-//   const classId = formData.get('classId') as string
-//   const files = formData.getAll('files') as File[]
-
-//   // Logic matches announcement, using 'materials' bucket
-//   const attachmentPaths = await uploadFiles(files, classId, 'materials')
-
-//   const { error: dbError } = await supabase
-//     .from('materials')
-//     .insert({
-//       title: formData.get('title') || 'Class Material',
-//       description: formData.get('description'),
-//       class_id: classId,
-//       created_by: user.id,
-//       attachment_paths: attachmentPaths,
-//     } as any)
-
-//   if (dbError) throw dbError
-
-//   revalidatePath(`/dashboard/classes/${classId}`)
-//   return { success: true }
-// }
 
 
 
@@ -284,37 +153,6 @@ export async function createMaterial(formData: FormData) {
   revalidatePath(`/dashboard/classes/${classId}`)
   return { success: true }
 }
-
-
-/* ---------------- CREATE ASSIGNMENT ---------------- */
-// export async function createAssignment(formData: FormData) {
-//   const supabase = await createClient()
-//   const { data: { user } } = await supabase.auth.getUser()
-//   if (!user) throw new Error("Unauthorized")
-
-//   const classId = formData.get('classId') as string
-//   const files = formData.getAll('files') as File[]
-
-//   // Logic matches announcement, using 'assignments' bucket
-//   const attachmentPaths = await uploadFiles(files, classId, 'assignments')
-
-//   const { error: dbError } = await supabase
-//     .from('assignments')
-//     .insert({
-//       title: formData.get('title'),
-//       description: formData.get('description'),
-//       due_date: formData.get('due_date'),
-//       points: parseInt(formData.get('points') as string) || 100,
-//       class_id: classId,
-//       created_by: user.id,
-//       attachment_paths: attachmentPaths, // Using the same array logic
-//     } as any)
-
-//   if (dbError) throw dbError
-
-//   revalidatePath(`/dashboard/classes/${classId}`)
-//   return { success: true }
-// }
 
 /* ---------------- CREATE ASSIGNMENT ---------------- */
 export async function createAssignment(formData: FormData) {
@@ -422,8 +260,6 @@ export async function saveGroup(
 
   let projectId: string;
 
-  // We cast as 'any' here to stop the 'never' type error caused by the 
-  // generated Database structure mismatch.
   const projectTable = supabase.from('group_projects') as any;
 
   if (groupId) {

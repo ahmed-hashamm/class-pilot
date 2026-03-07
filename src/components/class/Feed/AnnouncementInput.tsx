@@ -1,8 +1,6 @@
-// 
-
 'use client'
 
-import { useRef, useState } from 'react' // Removed useEffect as we'll handle previews differently
+import { useRef, useState } from 'react' 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
@@ -137,7 +135,7 @@ export default function AnnouncementInput({ classId, userId }: AnnouncementInput
               type="file" 
               ref={fileInputRef} 
               className="hidden" 
-              multiple // 4. Add multiple attribute
+              multiple 
               onChange={handleFileChange}
             />
             <Button variant="ghost" size="md" className="rounded-full" onClick={() => fileInputRef.current?.click()}>

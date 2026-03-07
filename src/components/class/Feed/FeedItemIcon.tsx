@@ -1,7 +1,6 @@
-import { CalendarClock, ClipboardList, FileText, Megaphone } from 'lucide-react'
+import { ClipboardList, FileText, Megaphone } from 'lucide-react'
 
 export const getFeedIconConfig = (item: any) => {
-  // Use the item type as the primary key
   switch (item.type) {
     case "assignment":
       return {
@@ -14,7 +13,7 @@ export const getFeedIconConfig = (item: any) => {
     case "material":
       return {
         icon: <FileText size={20} />,
-        color: "bg-emerald-500", // Emerald/Green distinguishes it from Announcements
+        color: "bg-emerald-500", 
         bg: "bg-emerald-50",
         textColor: "text-emerald-700",
       };

@@ -75,10 +75,6 @@ export default function ClassTabs({
         })}
 
 </div>
-        {/* Materials Button: 
-            Now behaves like a normal tab on mobile (flex-row and visible label), 
-            but retains the "slide-in" effect on desktop (sm: variants)
-        */}
         <button
           onClick={() => setActiveTab("materials")}
           className={`group relative inline-flex items-center gap-2 sm:gap-0 hover:space-x-2  px-4 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all duration-300 overflow-hidden
@@ -93,7 +89,6 @@ export default function ClassTabs({
             className={activeTab === "materials" ? "text-accent" : "text-navy-light"}
           />
 
-          {/* Label is always visible on mobile, uses slide-effect only on desktop (sm:hover) */}
           <span className="inline-block  sm:max-w-0 sm:overflow-hidden sm:group-hover:max-w-xs transition-all duration-500 ease-in-out">
             <span className="text-xs  sm:text-sm font-bold sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
               Materials

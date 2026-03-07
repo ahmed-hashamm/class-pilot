@@ -117,14 +117,14 @@ export default function RubricForm({ userId, initialData }: RubricFormProps) {
       if (isEditing && initialData) {
         result = (await supabase as any)
           .from("rubrics")
-          .update(payload) // Type cast to 'any' to bypass strict column-mapping checks
+          .update(payload) 
           .eq("id", initialData.id)
           .select()
           .single();
       } else {
         result = await supabase
           .from("rubrics")
-          .insert(payload as any) // Type cast to 'any'
+          .insert(payload as any)
           .select()
           .single();
       }
