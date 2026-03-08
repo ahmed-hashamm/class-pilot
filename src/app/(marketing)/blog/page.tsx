@@ -485,31 +485,9 @@ export default function BlogPage() {
         <main className="bg-background text-foreground font-sans overflow-x-hidden mt-[1px]">
 
             {/* ── HERO HEADER (navy) ────────────────────────────────────────────── */}
-            {/* <section className="bg-navy text-white px-6 py-12 text-center relative overflow-hidden">
-                <div className="pointer-events-none absolute inset-0"
-                    style={{ background: "radial-gradient(ellipse 55% 40% at 50% 0%, rgba(79,156,249,.15) 0%, transparent 70%)" }} />
-
-                <span className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[.18em]
-          uppercase bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-6 text-white/80">
-                    <span className="size-2 rounded-full bg-yellow inline-block animate-pulse" />
-                    The Class Pilot Blog
-                </span>
-
-                <h1 className="font-black text-[clamp(32px,3vw,60px)] leading-tight tracking-tight mb-4 max-w-2xl mx-auto">
-                    Ideas, insights &{" "}
-                    <span className="text-yellow">updates</span>{" "}
-                    for modern classrooms
-                </h1>
-
-                <p className="text-white/60 text-[clamp(14px,1vw,17px)] font-light
-          leading-relaxed max-w-lg mx-auto">
-                    Teaching tips, AI in education, product news, and study strategies —
-                    written by teachers and the Class Pilot team.
-                </p>
-            </section> */}
             <MarketingPagesLayout
                 pageIntro="The Class Pilot Blog"
-                href="/logic"
+                href="/login"
                 buttonText="Try Class-Pilot Free"
                 headingStart="Ideas, insights &"
                 headingHighlight="updates"
@@ -538,8 +516,7 @@ export default function BlogPage() {
                                 <line key={i}
                                     x1={100 + r1 * Math.cos(rad)} y1={100 + r1 * Math.sin(rad)}
                                     x2={100 + 42 * Math.cos(rad)} y2={100 + 42 * Math.sin(rad)}
-                                    stroke={i % 3 === 0 ? "#043873" : "#E5E5E5"}
-                                    strokeWidth={i % 3 === 0 ? 1.5 : 1}
+                                    stroke={i % 3 === 0 ? "#043873" : "#E5E5E5"} strokeWidth={i % 3 === 0 ? 1.5 : 1}
                                     strokeLinecap="round" />
                             );
                         })}
@@ -549,8 +526,8 @@ export default function BlogPage() {
                         <line x1="100" y1="100" x2="118" y2="74" stroke="#043873" strokeWidth="2" strokeLinecap="round" />
                         {/* Centre dot */}
                         <circle cx="100" cy="100" r="4" fill="#FFE492" stroke="#043873" strokeWidth="1.5" />
-                        {/* Decorative stars */}
-                        {([[28, 32], [168, 28], [172, 158], [24, 162]] as [number, number][]).map(([cx, cy], i) => (
+                        {/* Stars */}
+                        {[[28, 32], [168, 28], [172, 158], [24, 162]].map(([cx, cy], i) => (
                             <polygon key={i}
                                 points={`${cx},${cy - 6} ${cx + 1.5},${cy - 2} ${cx + 5},${cy - 2} ${cx + 2.5},${cy + 1} ${cx + 3.5},${cy + 5} ${cx},${cy + 2.5} ${cx - 3.5},${cy + 5} ${cx - 2.5},${cy + 1} ${cx - 5},${cy - 2} ${cx - 1.5},${cy - 2}`}
                                 fill="#FFE492" stroke="#043873" strokeWidth="0.8" opacity={i % 2 === 0 ? 1 : 0.5} />
@@ -560,13 +537,13 @@ export default function BlogPage() {
 
                 {/* Badge */}
                 <span className="inline-flex items-center gap-2 bg-yellow text-navy text-[11px]
-          font-bold tracking-widest uppercase rounded-full px-4 py-1.5 mb-6">
+  font-bold tracking-widest uppercase rounded-full px-4 py-1.5 mb-6">
                     <span className="size-1.5 rounded-full bg-navy inline-block" />
                     Coming Soon
                 </span>
 
                 <h2 className="font-black text-[clamp(26px,4vw,42px)] leading-tight tracking-tight
-          text-foreground mb-4">
+  text-foreground mb-4">
                     The Class Pilot blog<br />is on its way
                 </h2>
 
@@ -585,7 +562,7 @@ export default function BlogPage() {
                     ].map(({ label, icon }) => (
                         <span key={label}
                             className="inline-flex items-center gap-2 text-[12px] font-semibold
-                text-navy bg-navy/8 border border-navy/15 rounded-full px-4 py-2">
+        text-navy bg-navy/8 border border-navy/15 rounded-full px-4 py-2">
                             <span>{icon}</span>
                             {label}
                         </span>
@@ -595,10 +572,10 @@ export default function BlogPage() {
                 {/* Divider */}
                 <div className="w-12 h-0.5 bg-border mx-auto mb-10" />
 
-                {/* Back to home */}
+                {/* Back to home nudge */}
                 <a href="/"
                     className="inline-flex items-center gap-2 text-[13px] font-semibold text-navy
-            hover:gap-3 transition-all duration-200">
+    hover:gap-3 transition-all duration-200">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M12 7H2M7 2L2 7l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
