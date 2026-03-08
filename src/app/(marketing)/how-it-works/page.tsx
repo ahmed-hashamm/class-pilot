@@ -6,6 +6,7 @@ import { useState, useEffect, ReactNode } from "react";
    TYPES
 ───────────────────────────────────────────────────────────────────────────── */
 import WavePattern from "@/components/layout/WavePattern";
+import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
 type View = "teacher" | "student";
 
 interface Step {
@@ -383,7 +384,7 @@ const DIFF_CARDS: DiffCard[] = [
                 <path d="M2.5 18c0-3 2.5-4.5 5.5-4.5h7c3 0 5.5 1.5 5.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
         ),
-    },  
+    },
     {
         badge: "AI",
         title: "Class-Specific AI Assistant",
@@ -435,53 +436,15 @@ export default function HowItWorks() {
             <main className="bg-background text-foreground font-sans mt-[1px] ">
 
                 {/* ── HERO  (navy bg) ─────────────────────────────────────────────── */}
-                <section className="relative bg-navy text-white text-center  px-6 py-12 overflow-hidden">
-                    {/* subtle radial glow */}
-                    {/* <div className="pointer-events-none absolute inset-0"
-                        style={{ background: `radial-gradient(ellipse 55% 40% at 50% 0%, rgba(79,156,249,.18) 0%, transparent 70%)` }} /> */}
-                    <WavePattern />
-                    <div className="cp-hero-1">
-                        <span className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[.18em]
-              uppercase bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-6 text-white/80">
-                            <span className="size-2 rounded-full bg-yellow inline-block animate-pulse" />
-                            How It Works
-                        </span>
-                    </div>
-
-                    <h1 className="cp-hero-2 font-black text-[clamp(36px,3vw,70px)] leading-[1.06]
-            tracking-tight mb-5 max-w-3xl mx-auto">
-                        Your classroom,{" "}
-                        <span className="relative inline-block">
-                            <span className="text-yellow">smarter.</span>
-                        </span>
-                    </h1>
-
-                    <p className="cp-hero-3 text-white/65 text-[clamp(15px,1vw,18px)] font-light
-            leading-relaxed max-w-lg mx-auto mb-9">
-                        Create classes, post assignments, collect submissions, and grade — all in one place.
-                        With AI that actually understands your class.
-                    </p>
-
-                    <div className="cp-hero-4 flex gap-3 justify-center flex-wrap">
-                        <a href="/login"
-                            className="inline-flex items-center gap-2 bg-yellow text-navy font-semibold
-                text-sm px-7 py-3 rounded-lg transition hover:bg-yellow-hover hover:-translate-y-0.5">
-                            Get started free
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </a>
-                        {/* <a href="/demo"
-                            className="inline-flex items-center gap-2 text-white font-normal text-sm
-                px-5 py-3 border border-white/25 rounded-lg transition hover:border-yellow/60 hover:text-yellow">
-                            Watch 2-min demo
-                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                                <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.1" />
-                                <path d="M5.5 4.5l4 2-4 2v-4z" fill="currentColor" />
-                            </svg>
-                        </a> */}
-                    </div>
-                </section>
+                <MarketingPagesLayout
+                    pageIntro="How It Works"
+                    href="/login"
+                    buttonText="Get started free"
+                    headingStart="Your classroom,"
+                    headingHighlight="smarter"
+                    text="Teaching tips, AI in education, product news, and study strategies —
+                    written by teachers and the Class Pilot team."
+                />
 
                 {/* ── STEP-BY-STEP (white bg) ──────────────────────────────────────── */}
                 <section className="py-20 bg-background">
@@ -693,7 +656,7 @@ export default function HowItWorks() {
                                 in real time. No switching to external tools, no version confusion.
                             </p>
                             <p className="text-[15px] text-muted-foreground leading-relaxed">
-                            Teachers see a single submission so that there is no repetition — saving them a lot of time.
+                                Teachers see a single submission so that there is no repetition — saving them a lot of time.
                             </p>
                         </div>
                     </div>
