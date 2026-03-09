@@ -317,3 +317,64 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===============================
+   CP ANIMATIONS
+   Used by useReveal() hook across
+   all marketing pages.
+   =============================== */
+
+/* Scroll-triggered fade-up */
+@keyframes cp-fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating bob — for diagram cards */
+@keyframes cp-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+
+/* Pulsing ring — for spine dots */
+@keyframes cp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(4, 56, 115, 0.35); }
+  50%       { box-shadow: 0 0 0 10px rgba(4, 56, 115, 0);   }
+}
+
+/* Hero entrance animations */
+@keyframes cp-heroIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility classes ── */
+
+/* Scroll reveal — initial hidden state */
+.cp-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* Applied by useReveal() when element enters viewport */
+.cp-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Floating diagram cards */
+.cp-float {
+  animation: cp-float 5s ease-in-out infinite;
+}
+
+/* Pulsing spine dots */
+.cp-pulse {
+  animation: cp-pulse 2.8s ease-in-out infinite;
+}
+
+/* Hero staggered entrance — apply cp-hero-1 through cp-hero-4 */
+.cp-hero-1 { animation: cp-heroIn 0.6s ease 0.10s both; }
+.cp-hero-2 { animation: cp-heroIn 0.6s ease 0.22s both; }
+.cp-hero-3 { animation: cp-heroIn 0.6s ease 0.34s both; }
+.cp-hero-4 { animation: cp-heroIn 0.6s ease 0.46s both; }

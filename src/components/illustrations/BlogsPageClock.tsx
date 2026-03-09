@@ -1,5 +1,5 @@
 "use client"
-export default function BlogSPageClock() {
+export default function BlogsPageClock() {
     return (
         <div className="mx-auto mb-10 w-[200px] h-[200px]">
             <svg viewBox="0 0 200 200" fill="none" className="w-full h-full">
