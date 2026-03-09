@@ -30,17 +30,17 @@ export default function AttachmentButton({ path, type, label }: AttachmentButton
     href={url}
     target="_blank"
     rel="noopener noreferrer"
-    className="group flex items-center w-min gap-4 justify-between rounded-xl border border-gray-100 bg-gray-50 p-1 transition-all hover:border-orange-200 hover:bg-orange-50/40"
+    className="group flex items-center w-min gap-4 justify-between rounded-xl border border-gray-100 bg-gray-50 p-1 transition-all "
   >
     <div className="flex items-center gap-3 overflow-hidden">
-      <div className="rounded-lg border border-gray-100 bg-white p-2 text-gray-400 group-hover:text-orange-600">
+      <div className="rounded-lg border border-gray-100 bg-white p-2 text-gray-400 group-hover:text-navy">
         <FileIcon size={18} />
       </div>
       <span className="truncate text-sm font-bold text-gray-700">
         {displayName}
       </span>
     </div>
-    <ExternalLink size={14} className="text-gray-300 group-hover:text-orange-400" />
+    <ExternalLink size={14} className="text-gray-300 group-hover:text-navy" />
   </a>
   )
 }

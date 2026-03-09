@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Plus, Users2, ArrowRight, FolderOpen, Loader2 } from 'lucide-react'
 
 interface ProjectsTabProps {
   classId: string
@@ -13,12 +12,10 @@ interface ProjectsTabProps {
 
 export default function ProjectsTab({ classId, isTeacher, userId }: ProjectsTabProps) {
   const [projects, setProjects] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading,  setLoading]  = useState(true)
   const supabase = createClient()
 
-  useEffect(() => {
-    loadProjects()
-  }, [classId, userId])
+  useEffect(() => { loadProjects() }, [classId, userId])
 
   const loadProjects = async () => {
     const { data, error } = await supabase
@@ -27,51 +24,68 @@ export default function ProjectsTab({ classId, isTeacher, userId }: ProjectsTabP
       .eq('class_id', classId)
       .order('created_at', { ascending: false })
 
-    if (!error && data) {
-      setProjects(data)
-    }
+    if (!error && data) setProjects(data)
     setLoading(false)
   }
 
   if (loading) {
-    return <div className="text-center py-8">Loading projects...</div>
+    return (
+      <div className="flex items-center justify-center gap-2 py-16
+        text-[14px] text-muted-foreground font-medium">
+        <Loader2 size={16} className="animate-spin text-navy" />
+        Loading projects...
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-5 py-6">
+
+      {/* Teacher CTA */}
       {isTeacher && (
         <div className="flex justify-end">
-          <Button variant="primary" onClick={() => {
-            // TODO: Open create project modal
-            alert('Create group project feature coming soon')
-          }}>
-            Create Group Project
-          </Button>
+          <button
+            onClick={() => alert('Create group project feature coming soon')}
+            className="inline-flex items-center gap-2 bg-navy text-white
+              font-semibold text-[13px] px-5 py-2.5 rounded-xl
+              hover:bg-navy/90 hover:-translate-y-0.5 transition-all
+              cursor-pointer border-none shadow-sm">
+            <Plus size={15} />
+            Create group project
+          </button>
         </div>
       )}
 
+      {/* Empty state */}
       {projects.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-gray-600">
-            No group projects yet.
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center gap-3
+          py-16 border-2 border-dashed border-border rounded-2xl bg-white text-center">
+          <div className="size-14 rounded-2xl bg-navy/8 border border-navy/15
+            flex items-center justify-center">
+            <Users2 size={24} className="text-navy/50" />
+          </div>
+          <p className="font-bold text-[16px] tracking-tight">No group projects yet</p>
+          <p className="text-[13px] text-muted-foreground max-w-xs leading-relaxed">
+            {isTeacher
+              ? 'Create a group project and assign students to collaborate in real-time.'
+              : "Your teacher hasn't created any group projects yet."}
+          </p>
+          {isTeacher && (
+            <button
+              onClick={() => alert('Create group project feature coming soon')}
+              className="mt-2 inline-flex items-center gap-2 bg-navy text-white
+                font-semibold text-[13px] px-5 py-2.5 rounded-xl
+                hover:bg-navy/90 transition cursor-pointer border-none">
+              <Plus size={14} />
+              Create first project
+            </button>
+          )}
+        </div>
       ) : (
-        <div className="space-y-4">
+        /* Projects grid */
+        <div className="grid gap-4 sm:grid-cols-2">
           {projects.map((project) => (
-            <Card key={project.id}>
-              <CardHeader>
-                <CardTitle>{project.name}</CardTitle>
-                {project.description && (
-                  <p className="text-sm text-gray-600 mt-1">{project.description}</p>
-                )}
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </CardContent>
-            </Card>
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       )}
@@ -79,3 +93,48 @@ export default function ProjectsTab({ classId, isTeacher, userId }: ProjectsTabP
   )
 }
 
+/* ── Project card ─────────────────────────────────────────────────────────── */
+function ProjectCard({ project }: { project: any }) {
+  return (
+    <div className="bg-white border border-border rounded-2xl p-5 flex flex-col gap-4
+      hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
+
+      {/* Header */}
+      <div className="flex items-start gap-3">
+        <div className="shrink-0 size-10 rounded-xl bg-navy/8 border border-navy/15
+          flex items-center justify-center">
+          <FolderOpen size={17} className="text-navy" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-bold text-[15px] text-foreground tracking-tight
+            truncate group-hover:text-navy transition-colors">
+            {project.name}
+          </h4>
+          {project.description && (
+            <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-2
+              leading-relaxed">
+              {project.description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-3 border-t border-border">
+        <span className="text-[11px] text-muted-foreground font-medium">
+          {new Date(project.created_at).toLocaleDateString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric',
+          })}
+        </span>
+        <button
+          onClick={() => alert('View details coming soon')}
+          className="inline-flex items-center gap-1.5 text-[13px] font-bold
+            text-navy hover:gap-2.5 transition-all duration-200 cursor-pointer
+            bg-transparent border-none">
+          View details
+          <ArrowRight size={13} />
+        </button>
+      </div>
+    </div>
+  )
+}
