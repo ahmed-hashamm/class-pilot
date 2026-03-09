@@ -18,7 +18,7 @@ import {
   saveGroup,
   deleteGroup,
   removeGroupMember,
-} from "@/components/class/actions";
+} from "@/components/class/ClassActions";
 import Loader from "@/components/layout/Loader";
 /* ---------- TYPES ---------- */
 interface Profile {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { submitAssignment } from '@/components/class/actions'
+import { submitAssignment } from '@/components/class/ClassActions'
 import { Loader2, CheckCircle2, AlertCircle, Award, MessageSquare, FileText, Users } from 'lucide-react'
 
 export default function SubmissionForm({ assignment, onClose, onSuccess }: any) {

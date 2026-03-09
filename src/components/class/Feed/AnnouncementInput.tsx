@@ -12,7 +12,7 @@ import {
   SendHorizontal, 
   Loader2 
 } from 'lucide-react'
-import { createAnnouncement } from '../actions' 
+import { createAnnouncement } from '../ClassActions' 
 
 interface AnnouncementInputProps {
   classId: string

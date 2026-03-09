@@ -77,10 +77,10 @@ const Footer = () => {
               Connect
             </p>
             <a
-              href="mailto:hello@classpilot.com"
+              href="mailto:classpilot.edu@gmail.com"
               className="text-sm text-primary-foreground/70 hover:text-accent transition-colors w-fit"
             >
-              hello@classpilot.com
+              classpilot.edu@gmail.com
             </a>
             <a
               href="/contact"

@@ -65,7 +65,7 @@ export default function MaterialUpload({
     })
 
     try {
-      const { createMaterial } = await import('../actions')
+      const { createMaterial } = await import('../ClassActions')
       await createMaterial(formData)
 
       setFiles([])

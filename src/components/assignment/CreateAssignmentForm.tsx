@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 // Added Users icon for the group project label
 import { Paperclip, X, UploadCloud, Loader2, Settings2, Users } from 'lucide-react' 
-import { createAssignment } from '@/components/class/actions'
+import { createAssignment } from '@/components/class/ClassActions'
 import { Checkbox } from '@/components/ui/checkbox' // Assuming you have a UI checkbox, otherwise use a standard input
 
 export default function CreateAssignmentForm({ classId, userId, rubrics }: any) {

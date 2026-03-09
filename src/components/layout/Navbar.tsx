@@ -29,10 +29,10 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 h-16 bg-navy text-primary-foreground">
+    <header className="sticky top-0 z-50 h-16 bg-navy text-primary-foreground mb-[1px]">
       <div className="container mx-auto  h-full flex items-center justify-between px-6 lg:px-20">
 
-        {/* Logo */}
+       
         {/* Logo */}
         <Link href="/" className="flex items-center  group">
           <div className="relative w-14 h-14"> {/* Added a wrapper with specific dimensions */}

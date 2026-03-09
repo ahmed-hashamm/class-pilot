@@ -3,38 +3,28 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, CheckCircle2, AlertCircle, Camera, ArrowLeft } from 'lucide-react'
 
 export default function SettingsPage() {
   const supabase = createClient()
-  const router = useRouter()
+  const router   = useRouter()
 
-  const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [loading,        setLoading]        = useState(false)
+  const [uploading,      setUploading]      = useState(false)
+  const [userId,         setUserId]         = useState<string | null>(null)
+  const [fullName,       setFullName]       = useState('')
+  const [avatarUrl,      setAvatarUrl]      = useState<string | null>(null)
+  const [file,           setFile]           = useState<File | null>(null)
+  const [preview,        setPreview]        = useState<string | null>(null)
+  const [status,         setStatus]         = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [initialLoading, setInitialLoading] = useState(true)
 
-  // Profile data state
-  const [fullName, setFullName] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const [file, setFile] = useState<File | null>(null)
-
-  // Feedback state
-  const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-  const [initialLoading, setInitialLoading] = useState(true) // Add this to prevent empty placeholders
-
+  // Load profile
   useEffect(() => {
     const loadProfile = async () => {
       setInitialLoading(true)
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        setInitialLoading(false)
-        return
-      }
+      if (!user) { setInitialLoading(false); return }
       setUserId(user.id)
 
       const { data } = await supabase
@@ -52,11 +42,19 @@ export default function SettingsPage() {
     loadProfile()
   }, [supabase])
 
+  // Live preview before upload
+  useEffect(() => {
+    if (!file) { setPreview(null); return }
+    const url = URL.createObjectURL(file)
+    setPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
+
+  // Upload avatar
   const handleAvatarUpload = async () => {
     if (!file || !userId) return
     setUploading(true)
     setStatus(null)
-
     try {
       const fileExt = file.name.split('.').pop()
       const filePath = `${userId}-${Math.random()}.${fileExt}`
@@ -64,133 +62,213 @@ export default function SettingsPage() {
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, { upsert: true })
-
       if (uploadError) throw uploadError
 
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
-      const publicUrl = data.publicUrl
-
       const { error: updateError } = await supabase
         .from('users')
-        .update({ avatar_url: publicUrl } as never)
+        .update({ avatar_url: data.publicUrl } as never)
         .eq('id', userId)
-
       if (updateError) throw updateError
 
-      setAvatarUrl(publicUrl)
+      setAvatarUrl(data.publicUrl)
       setFile(null)
-      setStatus({ type: 'success', message: 'Avatar updated!' })
-    } catch (error: any) {
+      setPreview(null)
+      setStatus({ type: 'success', message: 'Profile photo updated.' })
+    } catch {
       setStatus({ type: 'error', message: 'Failed to upload image.' })
     } finally {
       setUploading(false)
     }
   }
 
+  // Save name
   const handleSaveProfile = async () => {
     if (!userId) return
     setLoading(true)
     setStatus(null)
-
     try {
       const { error } = await supabase
         .from('users')
         .update({ full_name: fullName } as never)
         .eq('id', userId)
-
       if (error) throw error
 
       setStatus({ type: 'success', message: 'Changes saved! Redirecting...' })
-      
-      // Delay to let user see the success state
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 1500)
-    } catch (error: any) {
+      setTimeout(() => router.push('/dashboard'), 1500)
+    } catch {
       setStatus({ type: 'error', message: 'Could not save changes.' })
       setLoading(false)
     }
   }
 
-  return (
-    <div className="container mx-auto max-w-2xl py-10 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Settings</CardTitle>
-          <CardDescription>Update your personal information below.</CardDescription>
-        </CardHeader>
+  const displayAvatar = preview || avatarUrl
+  const initials      = fullName?.[0]?.toUpperCase() || 'U'
 
-        <CardContent className="space-y-6">
-          {/* Avatar Section */}
-          <div className="flex items-center gap-6 p-4 border rounded-lg bg-slate-50/50">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={avatarUrl ?? undefined} className="object-cover" />
-              <AvatarFallback className="bg-slate-200">
-                {fullName?.[0]?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="space-y-2 flex-1">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground">Profile Picture</Label>
-              <Input
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="max-w-2xl mx-auto px-6 py-10 flex flex-col gap-5">
+
+        {/* Back + title */}
+        <div>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="inline-flex items-center gap-1.5 text-muted-foreground
+              hover:text-navy text-[13px] font-semibold mb-5 transition-colors
+              cursor-pointer bg-transparent border-none">
+            <ArrowLeft size={14} />
+            Back to dashboard
+          </button>
+          <h1 className="font-black text-[24px] tracking-tight">Profile Settings</h1>
+          <p className="text-[14px] text-muted-foreground mt-1">
+            Update your name and profile photo.
+          </p>
+        </div>
+
+        {/* Avatar card */}
+        <div className="bg-white border border-border rounded-2xl p-6">
+          <p className="text-[11px] font-bold tracking-[.18em] uppercase text-navy mb-5">
+            Profile photo
+          </p>
+
+          <div className="flex items-center gap-6">
+            {/* Avatar preview */}
+            <div className="relative shrink-0">
+              <div className="size-20 rounded-2xl overflow-hidden border-2 border-border
+                bg-secondary flex items-center justify-center">
+                {displayAvatar ? (
+                  <img src={displayAvatar} alt={fullName}
+                    className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-[26px] font-black text-navy">{initials}</span>
+                )}
+              </div>
+              <label htmlFor="avatar-upload"
+                className="absolute -bottom-1.5 -right-1.5 size-7 rounded-full
+                  bg-navy border-2 border-white flex items-center justify-center
+                  cursor-pointer hover:bg-navy/90 transition-colors">
+                <Camera size={12} className="text-white" />
+              </label>
+            </div>
+
+            <div className="flex-1">
+              <input
+                id="avatar-upload"
                 type="file"
                 accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="bg-white"
+                className="hidden"
+                onChange={(e) => { setFile(e.target.files?.[0] || null); setStatus(null) }}
               />
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleAvatarUpload}
-                disabled={!file || uploading}
-              >
-                {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {uploading ? 'Uploading...' : 'Update Photo'}
-              </Button>
+              {file ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[13px] font-semibold text-foreground truncate">
+                    {file.name}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleAvatarUpload}
+                      disabled={uploading}
+                      className="inline-flex items-center gap-2 bg-navy text-white
+                        font-semibold text-[13px] px-4 py-2 rounded-lg
+                        hover:bg-navy/90 transition disabled:opacity-60
+                        cursor-pointer border-none">
+                      {uploading
+                        ? <><Loader2 size={13} className="animate-spin" />Uploading...</>
+                        : 'Save photo'}
+                    </button>
+                    <button
+                      onClick={() => { setFile(null); setPreview(null) }}
+                      className="text-[13px] font-semibold text-muted-foreground
+                        hover:text-foreground transition cursor-pointer
+                        bg-transparent border-none">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label htmlFor="avatar-upload"
+                    className="inline-flex items-center gap-2 bg-secondary border border-border
+                      text-foreground font-semibold text-[13px] px-4 py-2 rounded-lg
+                      hover:border-navy/30 transition cursor-pointer">
+                    <Camera size={13} />
+                    Choose photo
+                  </label>
+                  <p className="text-[12px] text-muted-foreground mt-2">
+                    JPG, PNG or GIF · Max 5MB
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Name Section */}
-          <div className="space-y-2">
-            <Label htmlFor="full-name">Full Name</Label>
-            <Input
+        {/* Name card */}
+        <div className="bg-white border border-border rounded-2xl p-6">
+          <p className="text-[11px] font-bold tracking-[.18em] uppercase text-navy mb-5">
+            Personal info
+          </p>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="full-name"
+              className="text-[13px] font-semibold text-foreground">
+              Full name <span className="text-navy">*</span>
+            </label>
+            <input
               id="full-name"
-              // The value is the current name. If the user clears it, 
-              // the placeholder shows what it originally was.
+              type="text"
               value={fullName}
-              disabled={initialLoading} 
-              onChange={(e) => {
-                setFullName(e.target.value)
-                if (status) setStatus(null)
-              }}
-              placeholder={initialLoading ? "Loading..." : fullName || "Enter your name"}
+              disabled={initialLoading}
+              onChange={(e) => { setFullName(e.target.value); setStatus(null) }}
+              placeholder={initialLoading ? 'Loading...' : 'Enter your full name'}
+              className="w-full bg-white border border-border rounded-lg px-4 py-3
+                text-[14px] text-foreground placeholder:text-muted-foreground
+                focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy
+                transition disabled:opacity-50"
             />
           </div>
+        </div>
 
-          {/* Inline Feedback Message */}
-          {status && (
-            <div className={`flex items-center gap-2 p-3 rounded-md text-sm font-medium animate-in fade-in slide-in-from-top-1 ${
-              status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+        {/* Status message */}
+        {status && (
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl text-[13px]
+            font-semibold animate-in fade-in slide-in-from-top-1
+            ${status.type === 'success'
+              ? 'bg-green-50 text-green-700 border border-green-200'
+              : 'bg-red-50 text-red-600 border border-red-200'
             }`}>
-              {status.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-              {status.message}
-            </div>
-          )}
-
-          <div className="flex items-center gap-3 pt-2">
-            <Button 
-              className="flex-1" 
-              onClick={handleSaveProfile} 
-              disabled={loading}
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Saving...' : 'Save Changes'}
-            </Button>
-            <Button variant="ghost" onClick={() => router.push('/dashboard')} disabled={loading}>
-              Cancel
-            </Button>
+            {status.type === 'success'
+              ? <CheckCircle2 size={15} />
+              : <AlertCircle size={15} />
+            }
+            {status.message}
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSaveProfile}
+            disabled={loading || initialLoading}
+            className="flex-1 inline-flex items-center justify-center gap-2
+              bg-navy text-white font-semibold text-[14px] px-6 py-3 rounded-lg
+              hover:bg-navy/90 hover:-translate-y-0.5 transition-all
+              disabled:opacity-60 disabled:translate-y-0 cursor-pointer border-none">
+            {loading
+              ? <><Loader2 size={14} className="animate-spin" />Saving...</>
+              : 'Save changes'
+            }
+          </button>
+          <button
+            onClick={() => router.push('/dashboard')}
+            disabled={loading}
+            className="inline-flex items-center gap-2 bg-secondary border border-border
+              text-foreground font-semibold text-[14px] px-6 py-3 rounded-lg
+              hover:border-navy/30 transition disabled:opacity-60 cursor-pointer">
+            Cancel
+          </button>
+        </div>
+
+      </div>
     </div>
   )
 }

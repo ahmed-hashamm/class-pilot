@@ -8,7 +8,7 @@ import {
   getStickyNotes,
   addStickyNote,
   clearStickyNotes,
-} from '@/components/class/actions'
+} from '@/components/class/ClassActions'
 
 interface Note {
   id: string

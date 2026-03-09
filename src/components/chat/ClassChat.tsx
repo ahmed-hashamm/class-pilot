@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import ChatMessage from './ChatMessage'
 import { Loader2, Send, Sparkles } from 'lucide-react'
-import { getClassName } from '@/components/class/actions'
+import { getClassName } from '@/components/class/ClassActions'
 
 interface ClassChatProps {
   classId: string

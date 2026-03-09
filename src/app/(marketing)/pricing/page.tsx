@@ -43,7 +43,7 @@ export default function PricingPage() {
   useReveal();
 
   return (
-    <main className="bg-background text-foreground font-sans overflow-x-hidden mt-[1px]">
+    <main className="bg-background text-foreground font-sans overflow-x-hidden">
 
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}

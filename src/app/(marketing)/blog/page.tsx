@@ -11,7 +11,7 @@ export default function BlogPage() {
     useReveal();
 
     return (
-        <main className="bg-background text-foreground font-sans overflow-x-hidden mt-[1px]">
+        <main className="bg-background text-foreground font-sans overflow-x-hidden ">
 
             {/* ── HERO HEADER (navy) ────────────────────────────────────────────── */}
             <MarketingPagesLayout
