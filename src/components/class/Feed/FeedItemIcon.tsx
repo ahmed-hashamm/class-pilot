@@ -35,7 +35,7 @@ export const getFeedIconConfig = (item: any) => {
     case "assignment":
       return {
         icon: <ClipboardList size={20} />,
-        color: "bg-yellow text-blue-800",       // yellow — high priority, action required
+        color: "bg-yellow text-blue-900",       // yellow — high priority, action required
         bg: "bg-yellow/20",
         textColor: "text-navy",
       };

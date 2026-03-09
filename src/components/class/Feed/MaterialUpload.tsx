@@ -79,7 +79,7 @@ export default function MaterialUpload({
   }
 
   return (
-    <Card className="border-2 border-emerald-100 bg-emerald-50/30 rounded-2xl">
+    <Card className="border-2  rounded-2xl">
       <CardContent className="p-4">
         <form onSubmit={handleUpload} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
