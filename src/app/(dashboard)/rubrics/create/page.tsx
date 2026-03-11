@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 import { ArrowLeft } from 'lucide-react'
-import router from 'next/router'
 export default async function CreateRubricPage() {
   const supabase = await createClient()
   const {

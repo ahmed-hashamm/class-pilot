@@ -756,19 +756,26 @@ const supabase = createClient()
 /* ---------------- ANNOUNCEMENTS ---------------- */
 export function useRealtimeAnnouncements(classId: string, userId: string) {
   const [announcements, setAnnouncements] = useState<any[]>([])
+  const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
     if (!classId) return
     let isMounted = true
+    setHasSettled(false)
 
     const loadInitial = async () => {
-      const { data } = await supabase
-        .from('announcements')
-        .select('*, users(full_name,email)')
-        .eq('class_id', classId)
-        .order('pinned', { ascending: false })
-        .order('created_at', { ascending: false })
-      if (data && isMounted) setAnnouncements(data)
+      try {
+        await supabase.auth.getSession()
+        const { data } = await supabase
+          .from('announcements')
+          .select('*, users(full_name,email)')
+          .eq('class_id', classId)
+          .order('pinned', { ascending: false })
+          .order('created_at', { ascending: false })
+        if (data && isMounted) setAnnouncements(data)
+      } finally {
+        if (isMounted) setHasSettled(true)
+      }
     }
     loadInitial()
 
@@ -802,27 +809,32 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
     return () => { isMounted = false; supabase.removeChannel(channel) }
   }, [classId])
 
-  return announcements
+  return { announcements, hasSettled }
 }
 
 /* ---------------- ASSIGNMENTS ---------------- */
 export function useRealtimeAssignments(classId: string, userId: string) {
   const [assignments, setAssignments] = useState<any[]>([]);
+  const [hasSettled, setHasSettled] = useState(false);
 
   useEffect(() => {
     if (!classId) return;
     let isMounted = true;
-
-    // Reset state when classId changes
     setAssignments([]);
+    setHasSettled(false);
 
     const loadInitial = async () => {
-      const { data } = await supabase
-        .from('assignments')
-        .select('*, users(full_name,email)')
-        .eq('class_id', classId)
-        .order('created_at', { ascending: false });
-      if (data && isMounted) setAssignments(data);
+      try {
+        await supabase.auth.getSession()
+        const { data } = await supabase
+          .from('assignments')
+          .select('*, users(full_name,email)')
+          .eq('class_id', classId)
+          .order('created_at', { ascending: false });
+        if (data && isMounted) setAssignments(data);
+      } finally {
+        if (isMounted) setHasSettled(true);
+      }
     };
 
     loadInitial();
@@ -859,23 +871,24 @@ export function useRealtimeAssignments(classId: string, userId: string) {
       isMounted = false;
       supabase.removeChannel(channel);
     };
-  }, [classId, userId]); // Dependencies are correct
+  }, [classId, userId]);
 
-  return assignments;
+  return { assignments, hasSettled };
 }
 /* ---------------- MATERIALS ---------------- */
 export function useRealtimeMaterials(classId: string, userId: string) {
   const [materials, setMaterials] = useState<any[]>([])
+  const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
     if (!classId) return
     let isMounted = true
-
-    // 1. Clear state immediately on class change to prevent "stale" data
     setMaterials([])
+    setHasSettled(false)
 
     const fetchMaterials = async () => {
       try {
+        await supabase.auth.getSession()
         const { data, error } = await supabase
           .from('materials')
           .select(`
@@ -890,6 +903,8 @@ export function useRealtimeMaterials(classId: string, userId: string) {
         }
       } catch (err) {
         console.error('Initial fetch error:', err)
+      } finally {
+        if (isMounted) setHasSettled(true)
       }
     }
 
@@ -943,10 +958,9 @@ export function useRealtimeMaterials(classId: string, userId: string) {
       isMounted = false
       supabase.removeChannel(channel)
     }
-    // Dependencies: classId is the driver. userId included for auth stability.
   }, [classId, userId])
 
-  return materials
+  return { materials, hasSettled }
 }
 /* ---------------- STICKY NOTES ---------------- */
 export function useRealtimeStickyNotes(classId: string, userId?: string) {
@@ -957,6 +971,7 @@ export function useRealtimeStickyNotes(classId: string, userId?: string) {
     let isMounted = true
 
     const loadInitial = async () => {
+      await supabase.auth.getSession()
       const { data } = await supabase
         .from('class_notes')
         .select('*')
@@ -993,37 +1008,3 @@ export function useRealtimeStickyNotes(classId: string, userId?: string) {
   return notes
 }
 
-/**
- * Observes all `.cp-reveal` elements and adds `.cp-visible` when they
- * enter the viewport, triggering the fade-up animation defined in globals.css.
- *
- * @param dep - Optional dependency (e.g. a tab/view state) that causes the
- *              hook to re-observe newly rendered elements when it changes.
- *
- * @example
- * // Basic usage
- * useReveal();
- *
- * // Re-observe when a toggle changes (e.g. teacher/student tab)
- * useReveal(activeView);
- */
-export function useReveal(dep?: unknown) {
-  useEffect(() => {
-    // Small delay lets React flush new DOM nodes before we query them
-    const id = setTimeout(() => {
-      const els = document.querySelectorAll<HTMLElement>(".cp-reveal:not(.cp-visible)");
-      const obs = new IntersectionObserver(
-        (entries) =>
-          entries.forEach((e) => {
-            if (e.isIntersecting) e.target.classList.add("cp-visible");
-          }),
-        { threshold: 0.08 }
-      );
-      els.forEach((el) => obs.observe(el));
-      return () => obs.disconnect();
-    }, 50);
-
-    return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dep]);
-}

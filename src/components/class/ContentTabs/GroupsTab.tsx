@@ -421,7 +421,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Plus, Pencil, Trash2, UserMinus, Search,
+  Plus, Pencil, Trash2, UserMinus, Search, RefreshCw,
   Check, Users2, X, AlertCircle, Loader2,
 } from "lucide-react";
 import {
@@ -528,7 +528,62 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
     setSelectedIds([]); setSearchQuery(""); setError(null)
   }
 
-  if (loading) return <Loader text="Loading groups" border="border-navy" />
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-6 py-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-muted flex items-center justify-center" />
+            <div className="space-y-2">
+              <div className="h-4 bg-muted rounded w-40" />
+              <div className="h-3 bg-muted rounded w-48" />
+            </div>
+          </div>
+          <div className="h-9 w-40 bg-muted rounded-xl" />
+        </div>
+
+        <div className="bg-white border border-border rounded-2xl overflow-hidden animate-pulse">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-4 p-5 ${i === 1 ? "border-b border-border" : ""}`}
+            >
+              <div className="shrink-0 size-11 rounded-xl bg-muted" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-muted rounded w-1/2" />
+                <div className="h-3 bg-muted rounded w-1/3" />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="h-3 bg-muted rounded w-20" />
+                  <div className="h-3 bg-muted rounded w-16" />
+                  <div className="h-3 bg-muted rounded w-24" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error && groups.length === 0) {
+    return (
+      <div className="flex flex-col gap-6 py-6">
+        <div className="flex flex-col items-center justify-center gap-4 py-16
+          border-2 border-dashed border-border rounded-2xl bg-white text-center">
+          <Users2 size={32} className="text-muted-foreground/40" />
+          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
+          <button
+            onClick={() => fetchData()}
+            className="inline-flex items-center gap-2 bg-navy text-white font-semibold
+              text-[13px] px-5 py-2.5 rounded-xl hover:bg-navy/90 transition cursor-pointer
+              border-none">
+            <RefreshCw size={14} />
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   /* ── Render ── */
   return (

@@ -135,7 +135,7 @@ export default function StickyNotes({ classId }: { classId: string }) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleAddNote()
+    if (e.key === 'Enter') handleAddNote() //(e.metaKey || e.ctrlKey)
   }
 
   return (

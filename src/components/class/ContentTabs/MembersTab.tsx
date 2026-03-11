@@ -135,7 +135,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Mail, ShieldCheck, GraduationCap, Users } from 'lucide-react'
+import { Mail, ShieldCheck, GraduationCap, Users, RefreshCw } from 'lucide-react'
 import Loader from '@/components/layout/Loader'
 
 interface MembersTabProps {
@@ -147,11 +147,15 @@ interface MembersTabProps {
 export default function MembersTab({ classId, isTeacher, userId }: MembersTabProps) {
   const [members, setMembers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
-  useEffect(() => { loadMembers() }, [classId])
-
   const loadMembers = async () => {
+    setLoading(true)
+    setError(null)
+    
+    await supabase.auth.getSession()
+
     const { data, error } = await supabase
       .from('class_members')
       .select('*, users(full_name, email, avatar_url)')
@@ -159,11 +163,92 @@ export default function MembersTab({ classId, isTeacher, userId }: MembersTabPro
       .order('role', { ascending: false })
       .order('joined_at', { ascending: true })
 
-    if (!error && data) setMembers(data)
+    if (error) {
+      setError('Failed to load members.')
+      setMembers([])
+    } else if (data) {
+      setMembers(data)
+    }
     setLoading(false)
   }
 
-  if (loading) return <Loader text="Loading members" border="border-navy" />
+  useEffect(() => { loadMembers() }, [classId])
+
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto py-6 flex flex-col gap-8">
+        {/* Teachers skeleton card */}
+        <section className="bg-white border border-border rounded-2xl overflow-hidden animate-pulse">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-secondary/50">
+            <div className="flex items-center gap-2">
+              <div className="size-8 rounded-xl bg-muted" />
+              <div className="h-4 bg-muted rounded w-24" />
+            </div>
+            <div className="h-3 bg-muted rounded w-16" />
+          </div>
+          <div className="divide-y divide-border">
+            {[1, 2].map((i) => (
+              <div key={i} className="flex items-center justify-between gap-4 px-6 py-3.5">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="shrink-0 size-10 rounded-xl bg-muted" />
+                  <div className="space-y-2 w-40">
+                    <div className="h-3 bg-muted rounded w-32" />
+                    <div className="h-3 bg-muted rounded w-24" />
+                  </div>
+                </div>
+                <div className="h-4 w-16 bg-muted rounded-full" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Students skeleton card */}
+        <section className="bg-white border border-border rounded-2xl overflow-hidden animate-pulse">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-secondary/50">
+            <div className="flex items-center gap-2">
+              <div className="size-8 rounded-xl bg-muted" />
+              <div className="h-4 bg-muted rounded w-28" />
+            </div>
+            <div className="h-3 bg-muted rounded w-20" />
+          </div>
+          <div className="divide-y divide-border">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center justify-between gap-4 px-6 py-3.5">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="shrink-0 size-10 rounded-xl bg-muted" />
+                  <div className="space-y-2 w-48">
+                    <div className="h-3 bg-muted rounded w-40" />
+                    <div className="h-3 bg-muted rounded w-32" />
+                  </div>
+                </div>
+                <div className="h-4 w-14 bg-muted rounded-full" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-3xl mx-auto py-6 flex flex-col gap-6">
+        <div className="flex flex-col items-center justify-center gap-4 py-16
+          border-2 border-dashed border-border rounded-2xl bg-white text-center">
+          <Users size={32} className="text-muted-foreground/40" />
+          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
+          <button
+            onClick={() => loadMembers()}
+            className="inline-flex items-center gap-2 bg-navy text-white font-semibold
+              text-[13px] px-5 py-2.5 rounded-xl hover:bg-navy/90 transition cursor-pointer
+              border-none">
+            <RefreshCw size={14} />
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   const teachers = members.filter((m) => m.role === 'teacher')
   const students = members.filter((m) => m.role === 'student')

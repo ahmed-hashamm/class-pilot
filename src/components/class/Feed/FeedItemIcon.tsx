@@ -30,31 +30,29 @@
 // };
 import { ClipboardList, FileText, Megaphone } from 'lucide-react'
 
-export const getFeedIconConfig = (item: any) => {
-  switch (item.type) {
+export default function FeedItemIcon({ type }: { type: string }) {
+  let icon, color;
+  switch (type) {
     case "assignment":
-      return {
-        icon: <ClipboardList size={20} />,
-        color: "bg-yellow text-blue-900",       // yellow — high priority, action required
-        bg: "bg-yellow/20",
-        textColor: "text-navy",
-      };
+      icon = <ClipboardList size={20} />;
+      color = "bg-yellow text-blue-900";       // yellow — high priority, action required
+      break;
 
     case "material":
-      return {
-        icon: <FileText size={20} />,
-        color: "bg-navy-light text-white",  // navy-light — informational, reference
-        bg: "bg-navy-light/12",
-        textColor: "text-navy-light",
-      };
+      icon = <FileText size={20} />;
+      color = "bg-navy-light text-white";  // navy-light — informational, reference
+      break;
 
     case "announcement":
     default:
-      return {
-        icon: <Megaphone size={20} />,
-        color: "bg-navy/90 text-white",        // navy — authoritative, from teacher
-        bg: "bg-navy/8",
-        textColor: "text-navy",
-      };
+      icon = <Megaphone size={20} />;
+      color = "bg-navy/90 text-white";        // navy — authoritative, from teacher
+      break;
   }
-};
+
+  return (
+    <div className={`shrink-0 size-10 rounded-xl flex items-center justify-center shadow-sm ${color}`}>
+      {icon}
+    </div>
+  );
+}

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import ClassTabs from "@/components/class/ClassTabs"
 import ClassDashboardClient from "@/components/class/ClassDashboardClient"
+import { Suspense } from "react"
+
 export default async function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
@@ -112,15 +114,17 @@ preserveAspectRatio="none"
 </div> */}
 {/* </div> */}
 
-<ClassDashboardClient 
-    classId={id}
-    userId={user.id}
-    className={(rawClass as any).name}
-    classDescription={(rawClass as any).description}
-    classSettings={(rawClass as any).settings}
-    classCode={(rawClass as any).code}
-    isTeacher={isTeacher}
-  />
+<Suspense fallback={<div className="min-h-screen bg-navy flex items-center justify-center text-white font-bold tracking-widest uppercase">Loading class...</div>}>
+  <ClassDashboardClient 
+      classId={id}
+      userId={user.id}
+      className={(rawClass as any).name}
+      classDescription={(rawClass as any).description}
+      classSettings={(rawClass as any).settings}
+      classCode={(rawClass as any).code}
+      isTeacher={isTeacher}
+    />
+</Suspense>
 </>
   )
 }

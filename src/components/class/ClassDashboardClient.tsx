@@ -74,7 +74,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ClassTabs from "./ClassTabs";
 import TabContent from "./TabContent";
 import WavePattern from "../layout/WavePattern";
@@ -89,7 +90,19 @@ export default function ClassDashboardClient({
   userId,
   classSettings,
 }: any) {
-  const [activeTab, setActiveTab] = useState("stream");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const initialTab = searchParams.get("tab") || "stream";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", newTab);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <>
@@ -140,7 +153,7 @@ export default function ClassDashboardClient({
             {/* Tabs */}
             <ClassTabs
               activeTab={activeTab}
-              setActiveTab={setActiveTab}
+              setActiveTab={handleTabChange}
               isTeacher={isTeacher}
               classId={classId}
               classData={{

@@ -21,7 +21,7 @@ export default function HowItWorks() {
     return (
         <>
 
-            <main className="bg-background text-foreground font-sans mt-[1px] ">
+            <main className="bg-background text-foreground font-sans  ">
 
                 {/* ── HERO  (navy bg) ─────────────────────────────────────────────── */}
                 <MarketingPagesLayout

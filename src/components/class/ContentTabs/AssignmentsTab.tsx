@@ -150,7 +150,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import Link from 'next/link'
-import { ClipboardList, Calendar, Award, Plus, Paperclip, ArrowRight } from 'lucide-react'
+import { ClipboardList, Calendar, Award, Plus, Paperclip, ArrowRight, RefreshCw } from 'lucide-react'
 import Loader from '@/components/layout/Loader'
 
 interface AssignmentsTabProps {
@@ -162,20 +162,32 @@ interface AssignmentsTabProps {
 export default function AssignmentsTab({ classId, isTeacher, userId }: AssignmentsTabProps) {
   const [assignments, setAssignments] = useState<any[]>([])
   const [loading,     setLoading]     = useState(true)
+  const [error,       setError]       = useState<string | null>(null)
   const supabase = createClient()
 
-  useEffect(() => { loadAssignments() }, [classId, userId])
-
   const loadAssignments = async () => {
+    setLoading(true)
+    setError(null)
+    
+    // Ensure session is loaded before fetch to avoid empty arrays due to RLS blocked reads
+    await supabase.auth.getSession()
+
     const { data, error } = await supabase
       .from('assignments')
       .select('*')
       .eq('class_id', classId)
       .order('created_at', { ascending: false })
 
-    if (!error && data) setAssignments(data)
+    if (error) {
+      setError('Failed to load assignments.')
+      setAssignments([])
+    } else if (data) {
+      setAssignments(data)
+    }
     setLoading(false)
   }
+
+  useEffect(() => { loadAssignments() }, [classId, userId])
 
   const getDisplayName = (path: string) => {
     const fileName = path.split('/').pop() || 'File'
@@ -183,7 +195,62 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
     return parts.length > 1 ? parts.slice(1).join('-') : fileName
   }
 
-  if (loading) return <Loader text="Loading assignments" border="border-navy" />
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-6 py-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-muted flex items-center justify-center" />
+            <div className="space-y-2">
+              <div className="h-4 bg-muted rounded w-32" />
+              <div className="h-3 bg-muted rounded w-40" />
+            </div>
+          </div>
+          <div className="h-9 w-36 bg-muted rounded-xl" />
+        </div>
+
+        <div className="bg-white border border-border rounded-2xl overflow-hidden animate-pulse">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-4 p-5 ${i === 1 ? "border-b border-border" : ""}`}
+            >
+              <div className="shrink-0 size-11 rounded-xl bg-muted" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-muted rounded w-2/3" />
+                <div className="h-3 bg-muted rounded w-1/2" />
+                <div className="flex gap-3 mt-2">
+                  <div className="h-3 bg-muted rounded w-24" />
+                  <div className="h-3 bg-muted rounded w-20" />
+                </div>
+              </div>
+              <div className="shrink-0 h-4 w-4 bg-muted rounded-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6 py-6">
+        <div className="flex flex-col items-center justify-center gap-4 py-16
+          border-2 border-dashed border-border rounded-2xl bg-white text-center">
+          <ClipboardList size={32} className="text-muted-foreground/40" />
+          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
+          <button
+            onClick={() => loadAssignments()}
+            className="inline-flex items-center gap-2 bg-navy text-white font-semibold
+              text-[13px] px-5 py-2.5 rounded-xl hover:bg-navy/90 transition cursor-pointer
+              border-none">
+            <RefreshCw size={14} />
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   // Split into upcoming and past
   const now = new Date()
@@ -297,7 +364,7 @@ function AssignmentGroup({
         {assignments.map((assignment, i) => (
           <Link
             key={assignment.id}
-            href={`/classes/${classId}/assignments/${assignment.id}`}
+            href={`/classes/${classId}/assignments/${assignment.id}?from=work`}
             className={`group flex items-start gap-4 p-5 transition-colors
               hover:bg-secondary/40
               ${i < assignments.length - 1 ? 'border-b border-border' : ''}`}

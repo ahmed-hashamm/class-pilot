@@ -1,30 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
-import { embedText } from '@/lib/ingestion/embed-text'
+export function buildPrompt(
+  contextChunks: string[],
+  question: string
+) {
+  const context = contextChunks.join('\n\n---\n\n')
 
-export async function retrieveContext(
-  question: string,
-  classId: string,
-  topK = 5
-): Promise<string[]> {
-  const supabase = await createClient()
+  return `
+You are a university classroom assistant.
 
-  // 1️⃣ Embed the question
-  const embedding = await embedText(question)
+Answer the student's question using ONLY the provided context.
+If the answer is not in the context, say:
+"I cannot find this information in the provided class materials."
 
-  // 2️⃣ Call vector search function
-  const { data, error } = await supabase.rpc(
-    'match_material_chunks',
-    {
-      query_embedding: embedding,
-      match_count: topK,
-      class_id: classId,
-    } as any
-  )
+CONTEXT:
+${context}
 
-  if (error) {
-    console.error(error)
-    return []
-  }
-
-  return (data as any).map((row: any) => row.content)
+QUESTION:
+${question}
+`
 }

@@ -18,7 +18,7 @@ export async function retrieveContext(
             query_embedding: embedding,
             match_count: topK,
             class_id: classId,
-        }
+        } as any
     )
 
     if (error) {
@@ -26,5 +26,5 @@ export async function retrieveContext(
         return []
     }
 
-    return data.map((row: any) => row.content)
+    return (data as any).map((row: any) => row.content)
 }

@@ -236,10 +236,10 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft, User, ClipboardList, Clock,
-  Award, CheckCircle2, BookOpen,
+  Award, CheckCircle2, BookOpen, Pencil, Trash2
 } from "lucide-react";
 import AttachmentButton from "@/components/class/Buttons/AttachmentButton";
 import SubmissionForm from "./SubmissionForm";
@@ -250,10 +250,12 @@ export default function AssignmentDetail({
 }: any) {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromTab = searchParams.get("from") || "stream";
 
   const attachments = assignment.attachment_paths || [];
-  const isGraded    = submission?.status === "graded";
-  const isTurnedIn  = !!submission;
+  const isGraded = submission?.status === "graded";
+  const isTurnedIn = !!submission;
 
   const getDisplayName = (path: string) => {
     const fileName = path.split("/").pop() || "File";
@@ -267,18 +269,47 @@ export default function AssignmentDetail({
       {/* Top bar */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push(`/classes/${classId}?tab=${fromTab}`)}
           className="inline-flex items-center gap-2 text-[13px] font-semibold
             text-muted-foreground hover:text-navy transition-colors
             cursor-pointer bg-transparent border-none">
-          <ArrowLeft size={15} /> Back
+          <ArrowLeft size={15} /> Back to Work
         </button>
 
-        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold
-          tracking-widest uppercase bg-yellow/20 text-navy border border-yellow/40
-          rounded-full px-3 py-1">
-          <ClipboardList size={11} /> Assignment
-        </span>
+        <div className="flex items-center gap-3">
+          {isTeacher && (
+            <>
+              <button
+                onClick={() => router.push(`/classes/${classId}/assignments/${assignment.id}/edit?from=${fromTab}`)}
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold
+                  tracking-widest uppercase bg-secondary text-foreground hover:bg-navy hover:text-white
+                  border border-border rounded-full px-3 py-1 transition-colors cursor-pointer">
+                <Pencil size={11} /> Edit
+              </button>
+              <button
+                onClick={async () => {
+                  if (!confirm("Are you sure you want to delete this assignment?")) return;
+                  const { deleteAssignment } = await import('@/components/class/ClassActions');
+                  try {
+                    await deleteAssignment(assignment.id, classId);
+                    router.push(`/classes/${classId}?tab=${fromTab}`);
+                  } catch (err) {
+                    alert("Failed to delete assignment");
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold
+                  tracking-widest uppercase bg-red-50 text-red-600 hover:bg-red-500 hover:text-white
+                  border border-red-200 rounded-full px-3 py-1 transition-colors cursor-pointer">
+                <Trash2 size={11} /> Delete
+              </button>
+            </>
+          )}
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold
+            tracking-widest uppercase bg-yellow/20 text-navy border border-yellow/40
+            rounded-full px-3 py-1">
+            <ClipboardList size={11} /> Assignment
+          </span>
+        </div>
       </div>
 
       <div className="grid flex-1 grid-cols-1 gap-8 overflow-hidden lg:grid-cols-12">

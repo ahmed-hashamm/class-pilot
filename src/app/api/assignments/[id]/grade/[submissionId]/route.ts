@@ -205,7 +205,7 @@ export async function POST(
   const supabase = createClient();
 
   try {
-    const { data: submission, error } = await supabase
+    const { data: submission, error } = await (supabase as any)
       .from('submissions')
       .select(`
         *,
@@ -226,7 +226,7 @@ export async function POST(
     );
 
     // Save strictly to AI columns to avoid overwriting manual data
-    const { error: updateError } = await supabase
+    const { error: updateError } = (await supabase as any)
       .from('submissions')
       .update({
         ai_grade: result.total_score,
