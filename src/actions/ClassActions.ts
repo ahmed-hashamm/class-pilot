@@ -103,7 +103,7 @@
 
 //   if (dbError) throw new Error(`Announcement failed: ${dbError.message}`)
 
-//   revalidatePath(`/dashboard/classes/${classId}`)
+//   revalidatePath(`/classes/${classId}`)
 //   return { success: true }
 // }
 
@@ -150,7 +150,7 @@
 
 //   if (error) throw error
 
-//   revalidatePath(`/dashboard/classes/${classId}`)
+//   revalidatePath(`/classes/${classId}`)
 //   return { success: true }
 // }
 
@@ -184,7 +184,7 @@
 
 //   if (dbError) throw dbError
 
-//   revalidatePath(`/dashboard/classes/${classId}`)
+//   revalidatePath(`/classes/${classId}`)
 //   return { success: true, id: (data as any).id }
 // }
 // //* ---------------- Submit Assignment ---------------- */
@@ -302,7 +302,7 @@
 //     if (memError) throw memError;
 //   }
 
-//   revalidatePath(`/dashboard/classes/${classId}`);
+//   revalidatePath(`/classes/${classId}`);
 //   return { success: true };
 // }
 // /* ---------------- REMOVE MEMBER ---------------- */
@@ -320,7 +320,7 @@
 //     .eq('user_id', studentId)
 
 //   if (error) throw error
-//   revalidatePath(`/dashboard/classes/${classId}`)
+//   revalidatePath(`/classes/${classId}`)
 // }
 
 // /* ---------------- DELETE GROUP ---------------- */
@@ -333,7 +333,7 @@
 //     .eq('id', groupId)
 
 //   if (error) throw error
-//   revalidatePath(`/dashboard/classes/${classId}`)
+//   revalidatePath(`/classes/${classId}`)
 // }
 // export async function getClassName(classId: string) {
 //   const supabase = await createClient()
@@ -449,7 +449,7 @@ export async function createAnnouncement(formData: FormData) {
     } as any)
 
   if (dbError) throw new Error(`Announcement failed: ${dbError.message}`)
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
   return { success: true }
 }
 
@@ -493,7 +493,7 @@ export async function updateAnnouncement(formData: FormData) {
     .eq('created_by', user.id)
 
   if (error) throw new Error(error.message)
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
 }
 
 /* ---------------- DELETE ANNOUNCEMENT ---------------- */
@@ -508,7 +508,7 @@ export async function deleteAnnouncement(id: string, classId: string) {
     .eq('created_by', user.id)
 
   if (error) throw new Error(error.message)
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
 }
 
 /* ---------------- CREATE MATERIAL ---------------- */
@@ -544,7 +544,7 @@ export async function createMaterial(formData: FormData) {
   } as any)
 
   if (error) throw error
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
   return { success: true }
 }
 
@@ -590,7 +590,7 @@ export async function updateMaterial(formData: FormData) {
     .eq('class_id', classId)
 
   if (error) throw new Error(error.message)
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
 }
 
 /* ---------------- DELETE MATERIAL ---------------- */
@@ -605,7 +605,7 @@ export async function deleteMaterial(id: string, classId: string) {
     .eq('class_id', classId)
 
   if (error) throw new Error(error.message)
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
 }
 
 /* ---------------- CREATE ASSIGNMENT ---------------- */
@@ -636,7 +636,7 @@ export async function createAssignment(formData: FormData) {
     .single()
 
   if (dbError) throw dbError
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
   return { success: true, id: (data as any).id }
 }
 
@@ -692,7 +692,7 @@ export async function updateAssignment(formData: FormData) {
     throw new Error("Update failed. You might not have permission to edit this assignment.")
   }
 
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
   return { success: true, id: (data[0] as any).id }
 }
 
@@ -708,7 +708,7 @@ export async function deleteAssignment(id: string, classId: string) {
     .eq('class_id', classId)
 
   if (error) throw new Error(error.message)
-  revalidatePath(`/dashboard/classes/${classId}`)
+  revalidatePath(`/classes/${classId}`)
 }
 
 /* ---------------- SUBMIT ASSIGNMENT ---------------- */

@@ -215,12 +215,13 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AttachmentButton from "@/components/class/Buttons/AttachmentButton";
 import {
   Clock, Megaphone, PlusCircle, FileUp, ArrowRight, Pin, Inbox,
-  MoreVertical, Pencil, Trash2, BarChart2, CheckSquare
+  MoreVertical, Pencil, Trash2, BarChart2, CheckSquare,
+  Timer, Lock, XCircle
 } from "lucide-react";
 import {
   useRealtimeAnnouncements,
@@ -234,9 +235,89 @@ import MaterialUpload from "./MaterialUpload";
 import PollInput from "./PollInput";
 import AttendanceInput from "./AttendanceInput";
 import FeedItemIcon from "./FeedItemIcon";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import EditAnnouncementModal from "./EditAnnouncementModal";
 import { deleteAnnouncement } from "../../../actions/ClassActions";
-import { markAttendancePresent, submitPollResponse } from "@/actions/ClassFeaturesActions";
+import {
+  markAttendancePresent, submitPollResponse,
+  closePoll, closeAttendance
+} from "@/actions/ClassFeaturesActions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+/* ── Countdown hook ── */
+function useCountdown(deadline: string | null, closedAt: string | null) {
+  const getRemaining = useCallback(() => {
+    if (closedAt) return -1;
+    if (!deadline) return Infinity;
+    return Math.max(0, Math.floor((new Date(deadline).getTime() - Date.now()) / 1000));
+  }, [deadline, closedAt]);
+
+  const [remaining, setRemaining] = useState(getRemaining);
+
+  useEffect(() => {
+    setRemaining(getRemaining());
+    if (closedAt || !deadline) return;
+    const id = setInterval(() => {
+      const r = getRemaining();
+      setRemaining(r);
+      if (r <= 0) clearInterval(id);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [deadline, closedAt, getRemaining]);
+
+  const isClosed = closedAt !== null && closedAt !== undefined;
+  const isExpired = remaining <= 0 && !isClosed && deadline !== null;
+  const isActive = !isClosed && !isExpired;
+
+  return { remaining, isClosed, isExpired, isActive };
+}
+
+function formatCountdown(seconds: number) {
+  if (seconds === Infinity) return null;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}h ${m}m left`;
+  if (m > 0) return `${m}m ${s}s left`;
+  return `${s}s left`;
+}
+
+function StatusBadge({ deadline, closedAt }: { deadline: string | null; closedAt: string | null }) {
+  const { remaining, isClosed, isExpired, isActive } = useCountdown(deadline, closedAt);
+
+  if (isClosed) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide
+        uppercase bg-red-500/10 text-red-600 border border-red-500/25 rounded-full px-2 py-0.5">
+        <Lock size={9} /> Closed
+      </span>
+    );
+  }
+  if (isExpired) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide
+        uppercase bg-gray-500/10 text-gray-600 border border-gray-500/25 rounded-full px-2 py-0.5">
+        <XCircle size={9} /> Expired
+      </span>
+    );
+  }
+  if (isActive && deadline) {
+    const label = formatCountdown(remaining);
+    const isUrgent = remaining < 300; // under 5 min
+    return (
+      <span className={`inline-flex items-center gap-1 text-[10px] font-bold tracking-wide
+        uppercase border rounded-full px-2 py-0.5
+        ${isUrgent
+          ? "bg-red-500/10 text-red-600 border-red-500/25 animate-pulse"
+          : "bg-blue-500/10 text-blue-600 border-blue-500/25"
+        }`}>
+        <Timer size={9} /> {label}
+      </span>
+    );
+  }
+  return null;
+}
 
 interface FeedProps {
   classId: string;
@@ -285,67 +366,74 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
   return (
     <div className="flex flex-col gap-4">
 
-      {/* Teacher action bar */}
+      {/* Teacher Action Module */}
       {isTeacher && (
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
-          <div className="flex items-center border-b border-border">
-            {ACTIONS.map(({ id, label, icon: Icon }) => {
-              const isActive = activeAction === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => setActiveAction(activeAction === id ? "none" : id)}
-                  className={`relative flex-1 flex items-center justify-center gap-2
-                    px-4 py-3.5 text-[13px] font-semibold transition-colors cursor-pointer
-                    border-none bg-transparent
-                    ${isActive ? "text-navy" : "text-muted-foreground hover:text-foreground"}`}
-                >
-                  <Icon size={15} />
-                  {label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-navy" />
-                  )}
-                </button>
-              );
-            })}
+        <Card className="rounded-2xl shadow-sm bg-white overflow-hidden border-border">
+          <CardHeader className="p-0 border-b border-border">
+            <div className="flex items-center overflow-x-auto no-scrollbar">
+              {ACTIONS.map(({ id, label, icon: Icon }) => {
+                const isActive = activeAction === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setActiveAction(activeAction === id ? "none" : id)}
+                    className={`relative flex-1 min-w-fit flex items-center justify-center gap-2
+                      px-5 py-4 text-[13px] font-bold transition-all cursor-pointer
+                      border-none bg-transparent
+                      ${isActive 
+                        ? "text-navy bg-navy-light/5" 
+                        : "text-muted-foreground hover:text-navy hover:bg-secondary/30"}`}
+                  >
+                    <Icon size={16} className={isActive ? "text-navy" : "text-muted-foreground"} />
+                    {label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 right-0 h-1 bg-yellow" />
+                    )}
+                  </button>
+                );
+              })}
 
-            <Link href={`/classes/${classId}/assignments/create`} className="flex-1">
-              <button className="w-full flex items-center justify-center gap-2
-                px-4 py-3.5 text-[13px] font-semibold text-muted-foreground
-                hover:text-foreground transition-colors cursor-pointer border-none bg-transparent">
-                <PlusCircle size={15} />
-                Assignment
-              </button>
-            </Link>
-          </div>
+              <Link href={`/classes/${classId}/assignments/create`} className="flex-1 min-w-fit">
+                <button className="w-full flex items-center justify-center gap-2
+                  px-5 py-4 text-[13px] font-bold text-muted-foreground
+                  hover:text-navy hover:bg-secondary/30 transition-all cursor-pointer border-none bg-transparent">
+                  <PlusCircle size={16} />
+                  Assignment
+                </button>
+              </Link>
+            </div>
+          </CardHeader>
 
           {activeAction !== "none" && (
-            <div className="p-4 bg-secondary/50 animate-in fade-in slide-in-from-top-1 duration-200">
-              {activeAction === "announcement" && (
-                <AnnouncementInput classId={classId} userId={userId} />
-              )}
-              {activeAction === "material" && (
-                <MaterialUpload
-                  classId={classId}
-                  userId={userId}
-                  onSuccess={() => setActiveAction("none")}
-                />
-              )}
-              {activeAction === "poll" && (
-                <PollInput
-                  classId={classId}
-                  onSuccess={() => setActiveAction("none")}
-                />
-              )}
-              {activeAction === "attendance" && (
-                <AttendanceInput
-                  classId={classId}
-                  onSuccess={() => setActiveAction("none")}
-                />
-              )}
-            </div>
+            <CardContent className="p-0 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="p-6">
+                {activeAction === "announcement" && (
+                  <AnnouncementInput classId={classId} userId={userId} />
+                )}
+                {activeAction === "material" && (
+                  <MaterialUpload
+                    classId={classId}
+                    userId={userId}
+                    onSuccess={() => setActiveAction("none")}
+                  />
+                )}
+                {activeAction === "poll" && (
+                  <PollInput
+                    classId={classId}
+                    onSuccess={() => setActiveAction("none")}
+                  />
+                )}
+                {activeAction === "attendance" && (
+                  <AttendanceInput
+                    classId={classId}
+                    onSuccess={() => setActiveAction("none")}
+                  />
+                )}
+              </div>
+            </CardContent>
           )}
-        </div>
+        </Card>
       )}
 
       {/* Feed list */}
@@ -492,6 +580,9 @@ function FeedCard({
                       <Pin size={9} /> Pinned
                     </span>
                   )}
+                  {(isPoll || isAttendance) && (
+                    <StatusBadge deadline={item.deadline ?? null} closedAt={item.closed_at ?? null} />
+                  )}
                   <span className={`text-[10px] font-bold tracking-wide uppercase
                     border rounded-full px-2.5 py-0.5 ${typePill[item.type]}`}>
                     {typeLabel[item.type]}
@@ -561,70 +652,12 @@ function FeedCard({
 
           {/* Special rendering for Polls */}
           {isPoll && (
-            <div className="pl-[52px] flex flex-col gap-2">
-              {item.options.map((opt: string, idx: number) => {
-                const totalVotes = item.poll_responses?.length || 0;
-                const optionVotes = item.poll_responses?.filter((r: any) => r.selected_option_index === idx).length || 0;
-                const percent = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
-                const hasVoted = item.poll_responses?.some((r: any) => r.user_id === userId);
-                const isMyVote = item.poll_responses?.some((r: any) => r.user_id === userId && r.selected_option_index === idx);
-
-                if (hasVoted || isTeacher) {
-                  return (
-                    <div key={idx} className="relative overflow-hidden rounded-lg border border-border bg-secondary/30">
-                      <div 
-                        className={`absolute left-0 top-0 bottom-0 transition-all duration-500 ${isMyVote ? 'bg-purple-500/20' : 'bg-muted'}`}
-                        style={{ width: `${percent}%` }}
-                      />
-                      <div className="relative z-10 flex justify-between px-4 py-2 text-[14px]">
-                        <span className={isMyVote ? "font-bold text-purple-700" : "font-medium"}>{opt} {isMyVote && '(You)'}</span>
-                        <span className="text-muted-foreground">{percent}%</span>
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => submitPollResponse(item.id, idx)}
-                    className="flex justify-between w-full px-4 py-2 border border-border rounded-lg text-left text-[14px] font-medium hover:bg-secondary hover:border-border/80 transition-all"
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-              <p className="text-xs text-muted-foreground mt-1">{item.poll_responses?.length || 0} vote(s)</p>
-            </div>
+            <PollBody item={item} userId={userId} isTeacher={isTeacher} />
           )}
 
           {/* Special rendering for Attendance */}
           {isAttendance && (
-            <div className="pl-[52px]">
-              <div className="bg-secondary/30 rounded-lg p-4 flex items-center justify-between border border-border/50">
-                <div>
-                  <p className="font-semibold text-sm mb-0.5">Attendance: {new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                  {isTeacher ? (
-                    <p className="text-xs text-muted-foreground">{item.attendance_records?.length || 0} student(s) marked present</p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">Please mark yourself present.</p>
-                  )}
-                </div>
-                {!isTeacher && (
-                  item.attendance_records?.some((r: any) => r.user_id === userId) ? (
-                    <div className="flex items-center gap-1 text-sm font-bold text-green-600 bg-green-500/10 px-3 py-1.5 rounded-full">
-                      <CheckSquare size={16} /> Present
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={() => markAttendancePresent(item.id)}
-                      className="text-sm font-semibold bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-full transition-colors">
-                      Mark Present
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
+            <AttendanceBody item={item} userId={userId} isTeacher={isTeacher} />
           )}
 
           {/* Attachments */}
@@ -681,6 +714,166 @@ function FeedCard({
         />
       )}
     </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   POLL BODY (with countdown + close)
+───────────────────────────────────────────────────────────────────────────── */
+function PollBody({ item, userId, isTeacher }: { item: any; userId: string; isTeacher: boolean }) {
+  const { isActive } = useCountdown(item.deadline ?? null, item.closed_at ?? null);
+  const [closing, setClosing] = useState(false);
+  const router = useRouter();
+
+  const handleClose = async () => {
+    if (!confirm('Close this poll? Students will no longer be able to vote.')) return;
+    setClosing(true);
+    try {
+      const res = await closePoll(item.id);
+      if (!res.success) toast.error(res.error || 'Failed to close poll');
+    } finally {
+      setClosing(false);
+    }
+  };
+
+  const handleVote = async (idx: number) => {
+    const res = await submitPollResponse(item.id, idx);
+    if (!res.success) {
+      toast.error(res.error || 'Could not submit vote');
+    } else {
+      toast.success('Vote submitted successfully');
+      router.refresh();
+    }
+  };
+
+  return (
+    <div className="pl-[52px] flex flex-col gap-2">
+      {item.options.map((opt: string, idx: number) => {
+        const totalVotes = item.poll_responses?.length || 0;
+        const optionVotes = item.poll_responses?.filter((r: any) => r.selected_option_index === idx).length || 0;
+        const percent = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
+        const hasVoted = item.poll_responses?.some((r: any) => r.user_id === userId);
+        const isMyVote = item.poll_responses?.some((r: any) => r.user_id === userId && r.selected_option_index === idx);
+
+        if (hasVoted || isTeacher || !isActive) {
+          return (
+            <div key={idx} className="relative overflow-hidden rounded-lg border border-border bg-secondary/30">
+              <div
+                className={`absolute left-0 top-0 bottom-0 transition-all duration-500 ${isMyVote ? 'bg-purple-500/20' : 'bg-muted'}`}
+                style={{ width: `${percent}%` }}
+              />
+              <div className="relative z-10 flex justify-between px-4 py-2 text-[14px]">
+                <span className={isMyVote ? 'font-bold text-purple-700' : 'font-medium'}>{opt} {isMyVote && '(You)'}</span>
+                <span className="text-muted-foreground">{percent}%</span>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={idx}
+            onClick={() => handleVote(idx)}
+            className="flex justify-between w-full px-4 py-2 border border-border rounded-lg text-left text-[14px] font-medium hover:bg-secondary hover:border-border/80 transition-all cursor-pointer bg-transparent"
+          >
+            {opt}
+          </button>
+        );
+      })}
+      <div className="flex items-center justify-between mt-1">
+        <p className="text-xs text-muted-foreground">{item.poll_responses?.length || 0} vote(s)</p>
+        {isTeacher && isActive && (
+          <button
+            onClick={handleClose}
+            disabled={closing}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-red-600
+              hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50"
+          >
+            <Lock size={12} /> {closing ? 'Closing…' : 'Close Poll'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ATTENDANCE BODY (with countdown + close)
+───────────────────────────────────────────────────────────────────────────── */
+function AttendanceBody({ item, userId, isTeacher }: { item: any; userId: string; isTeacher: boolean }) {
+  const { isActive } = useCountdown(item.deadline ?? null, item.closed_at ?? null);
+  const [closing, setClosing] = useState(false);
+  const router = useRouter();
+  const alreadyPresent = item.attendance_records?.some((r: any) => r.user_id === userId);
+
+  const handleClose = async () => {
+    if (!confirm('Close this attendance session? Students will no longer be able to mark present.')) return;
+    setClosing(true);
+    try {
+      const res = await closeAttendance(item.id);
+      if (!res.success) toast.error(res.error || 'Failed to close attendance');
+    } finally {
+      setClosing(false);
+    }
+  };
+
+  const handleMark = async () => {
+    const res = await markAttendancePresent(item.id);
+    if (!res.success) {
+      toast.error(res.error || 'Could not mark attendance');
+    } else {
+      toast.success('Attendance marked successfully');
+      router.refresh();
+    }
+  };
+
+  return (
+    <div className="pl-[52px]">
+      <div className="bg-secondary/30 rounded-lg p-4 flex items-center justify-between border border-border/50">
+        <div>
+          <p className="font-semibold text-sm mb-0.5">
+            Attendance: {new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </p>
+          {isTeacher ? (
+            <p className="text-xs text-muted-foreground">{item.attendance_records?.length || 0} student(s) marked present</p>
+          ) : !isActive ? (
+            <p className="text-xs text-muted-foreground">This attendance session is no longer accepting responses.</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">Please mark yourself present.</p>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {!isTeacher && (
+            alreadyPresent ? (
+              <div className="flex items-center gap-1 text-sm font-bold text-green-600 bg-green-500/10 px-3 py-1.5 rounded-full">
+                <CheckSquare size={16} /> Present
+              </div>
+            ) : isActive ? (
+              <button
+                onClick={handleMark}
+                className="text-sm font-semibold bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-full transition-colors cursor-pointer border-none"
+              >
+                Mark Present
+              </button>
+            ) : (
+              <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-full">
+                Unavailable
+              </span>
+            )
+          )}
+          {isTeacher && isActive && (
+            <button
+              onClick={handleClose}
+              disabled={closing}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600
+                hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50"
+            >
+              <Lock size={12} /> {closing ? 'Closing…' : 'Close'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 // 'use client'

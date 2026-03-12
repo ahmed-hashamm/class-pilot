@@ -88,36 +88,41 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
 
     loadInitial()
 
+    const handlePayload = async (payload: any) => {
+      if (!isMounted) return
+      const targetId = payload.new?.id || payload.old?.id
+      if (!targetId) return
+
+      if (payload.eventType === 'DELETE') {
+        setAnnouncements((prev) => prev.filter((a) => a.id !== targetId))
+        return
+      }
+
+      const { data: newRow } = await supabase
+        .from('announcements')
+        .select('*, users(full_name,email)')
+        .eq('id', targetId)
+        .single()
+
+      if (newRow && isMounted) {
+        const row = newRow as AnnouncementRow
+        setAnnouncements((prev) => {
+          const exists = prev.find((a) => a.id === row.id)
+          if (exists) return prev.map((a) => (a.id === row.id ? row : a))
+          return [row, ...prev]
+        })
+      }
+    }
+
     const channel = supabase
       .channel(`ann_${classId}_${mountId}`)
       .on('postgres_changes', {
-        event: 'INSERT', schema: 'public', table: 'announcements',
+        event: '*', schema: 'public', table: 'announcements',
         filter: `class_id=eq.${classId}`,
-      }, async (payload) => {
-        const { data: newRow } = await supabase
-          .from('announcements')
-          .select('*, users(full_name,email)')
-          .eq('id', payload.new.id)
-          .single()
-        if (newRow && isMounted) setAnnouncements((prev) => [newRow as AnnouncementRow, ...prev])
+      }, handlePayload)
+      .subscribe((status) => {
+        if (status !== 'SUBSCRIBED') console.warn(`Announcements subscription status: ${status}`)
       })
-      .on('postgres_changes', {
-        event: 'UPDATE', schema: 'public', table: 'announcements',
-        filter: `class_id=eq.${classId}`,
-      }, (payload) => {
-        if (!isMounted) return
-        setAnnouncements((prev) =>
-          prev.map((a) => (a.id === payload.new.id ? { ...a, ...payload.new } as AnnouncementRow : a))
-        )
-      })
-      .on('postgres_changes', {
-        event: 'DELETE', schema: 'public', table: 'announcements',
-        filter: `class_id=eq.${classId}`,
-      }, (payload) => {
-        if (!isMounted) return
-        setAnnouncements((prev) => prev.filter((a) => a.id !== payload.old.id))
-      })
-      .subscribe()
 
     return () => {
       isMounted = false
@@ -160,27 +165,41 @@ export function useRealtimeAssignments(classId: string, userId: string) {
 
     loadInitial()
 
+    const handlePayload = async (payload: any) => {
+      if (!isMounted) return
+      const targetId = payload.new?.id || payload.old?.id
+      if (!targetId) return
+
+      if (payload.eventType === 'DELETE') {
+        setAssignments((prev) => prev.filter((a) => a.id !== targetId))
+        return
+      }
+
+      const { data: newRow } = await supabase
+        .from('assignments')
+        .select('*, users(full_name,email)')
+        .eq('id', targetId)
+        .single()
+
+      if (newRow && isMounted) {
+        const row = newRow as AssignmentRow
+        setAssignments((prev) => {
+          const exists = prev.find((a) => a.id === row.id)
+          if (exists) return prev.map((a) => (a.id === row.id ? row : a))
+          return [row, ...prev]
+        })
+      }
+    }
+
     const channel = supabase
       .channel(`asn_${classId}_${mountId}`)
       .on('postgres_changes', {
-        event: 'INSERT', schema: 'public', table: 'assignments',
+        event: '*', schema: 'public', table: 'assignments',
         filter: `class_id=eq.${classId}`,
-      }, async (payload) => {
-        const { data: newRow } = await supabase
-          .from('assignments')
-          .select('*, users(full_name,email)')
-          .eq('id', payload.new.id)
-          .single()
-        if (newRow && isMounted) setAssignments((prev) => [newRow as AssignmentRow, ...prev])
+      }, handlePayload)
+      .subscribe((status) => {
+        if (status !== 'SUBSCRIBED') console.warn(`Assignments subscription status: ${status}`)
       })
-      .on('postgres_changes', {
-        event: 'DELETE', schema: 'public', table: 'assignments',
-        filter: `class_id=eq.${classId}`,
-      }, (payload) => {
-        if (!isMounted) return
-        setAssignments((prev) => prev.filter((a) => a.id !== payload.old.id))
-      })
-      .subscribe()
 
     return () => {
       isMounted = false
@@ -223,29 +242,41 @@ export function useRealtimeMaterials(classId: string, userId: string) {
 
     loadInitial()
 
+    const handlePayload = async (payload: any) => {
+      if (!isMounted) return
+      const targetId = payload.new?.id || payload.old?.id
+      if (!targetId) return
+
+      if (payload.eventType === 'DELETE') {
+        setMaterials((prev) => prev.filter((m) => m.id !== targetId))
+        return
+      }
+
+      const { data: newRow } = await supabase
+        .from('materials')
+        .select('*, users:created_by(full_name)')
+        .eq('id', targetId)
+        .single()
+
+      if (newRow && isMounted) {
+        const row = newRow as MaterialRow
+        setMaterials((prev) => {
+          const exists = prev.find((m) => m.id === row.id)
+          if (exists) return prev.map((m) => (m.id === row.id ? row : m))
+          return [row, ...prev]
+        })
+      }
+    }
+
     const channel = supabase
       .channel(`mat_${classId}_${mountId}`)
       .on('postgres_changes', {
         event: '*', schema: 'public', table: 'materials',
         filter: `class_id=eq.${classId}`,
-      }, async (payload) => {
-        if (!isMounted) return
-        if (payload.eventType === 'INSERT') {
-          const { data: newMaterial } = await supabase
-            .from('materials')
-            .select('*, users:created_by(full_name)')
-            .eq('id', payload.new.id)
-            .single()
-          if (newMaterial && isMounted) setMaterials((prev) => [newMaterial as MaterialRow, ...prev])
-        } else if (payload.eventType === 'UPDATE') {
-          setMaterials((prev) =>
-            prev.map((m) => (m.id === payload.new.id ? { ...m, ...payload.new } as MaterialRow : m))
-          )
-        } else if (payload.eventType === 'DELETE') {
-          setMaterials((prev) => prev.filter((m) => m.id !== payload.old.id))
-        }
+      }, handlePayload)
+      .subscribe((status) => {
+        if (status !== 'SUBSCRIBED') console.warn(`Materials subscription status: ${status}`)
       })
-      .subscribe()
 
     return () => {
       isMounted = false

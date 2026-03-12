@@ -108,19 +108,20 @@ import SidebarCard from '@/components/class/Sidebar/Sidebar'
 import Feed from '@/components/class/Feed/Feed'
 import { Copy, Lock, Eye, EyeOff, CheckCheck } from 'lucide-react'
 import { useState } from 'react'
+import { useRealtimeAssignments } from '@/hooks/useRealtime'
 
-interface Assignment {
-  id: string
-  title: string
-  dueDate: string
-}
+// interface Assignment {
+//   id: string
+//   title: string
+//   dueDate: string
+// }
 
 interface StreamViewProps {
   classId: string
   classCode: string
   isTeacher: boolean
   userId: string
-  assignments?: Assignment[]
+  assignments?: any[]
   settings?: {
     showClassCode?: boolean
   }
@@ -135,10 +136,12 @@ export default function StreamView({
   settings,
 }: StreamViewProps) {
   const [copied, setCopied] = useState(false)
+  const { assignments: realtimeAssignments } = useRealtimeAssignments(classId, userId)
 
-  const dueSoon = assignments.filter(
-    (a: Assignment) => new Date(a.dueDate) >= new Date()
-  )
+  const dueSoon = realtimeAssignments
+    .filter((a) => a.due_date && new Date(a.due_date) >= new Date())
+    .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime())
+    .slice(0, 5)
 
   const isCodeHidden = settings?.showClassCode === false && !isTeacher
 
@@ -227,15 +230,15 @@ export default function StreamView({
             </div>
           ) : (
             <ul className="flex flex-col gap-1.5">
-              {dueSoon.map((a: Assignment) => (
+              {dueSoon.map((a: any) => (
                 <li key={a.id}
                   className="flex items-center justify-between gap-2
-                    bg-secondary border border-border/60 rounded-lg px-3 py-2">
+                     border border-border/60 rounded-lg px-3 py-2">
                   <span className="text-[12px] font-medium text-foreground truncate">
                     {a.title}
                   </span>
                   <span className="shrink-0 text-[11px] text-muted-foreground font-medium">
-                    {new Date(a.dueDate).toLocaleDateString('en-US', {
+                    {new Date(a.due_date!).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })}
