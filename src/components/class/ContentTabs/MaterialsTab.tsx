@@ -8,6 +8,7 @@ import { Database, Clock, FileText, Plus, X, RefreshCw } from 'lucide-react'
 import MaterialUpload from '../Feed/MaterialUpload'
 import AttachmentButton from '@/components/class/Buttons/AttachmentButton'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import EditMaterialModal from '@/components/class/ContentTabs/EditMaterialModal'
 
 interface MaterialsTabProps {
@@ -66,8 +67,12 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   }
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this material? This cannot be undone.')) return
-    try { await deleteMaterial(id, classId); setMaterials((prev) => prev.filter((m) => m.id !== id)) }
-    catch { alert('Failed to delete material') }
+    try { 
+      await deleteMaterial(id, classId); 
+      setMaterials((prev) => prev.filter((m) => m.id !== id)) 
+      toast.success("Material deleted");
+    }
+    catch { toast.error('Failed to delete material') }
   }
   const handleEdit = (material: any) => {
     setEditing(material)

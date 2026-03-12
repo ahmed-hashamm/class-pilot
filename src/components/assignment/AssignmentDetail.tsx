@@ -241,6 +241,7 @@ import {
   ArrowLeft, User, ClipboardList, Clock,
   Award, CheckCircle2, BookOpen, Pencil, Trash2
 } from "lucide-react";
+import { toast } from "sonner";
 import AttachmentButton from "@/components/class/Buttons/AttachmentButton";
 import SubmissionForm from "./SubmissionForm";
 import SubmissionsList from "./SubmissionsList";
@@ -292,9 +293,10 @@ export default function AssignmentDetail({
                   const { deleteAssignment } = await import('@/actions/ClassActions');
                   try {
                     await deleteAssignment(assignment.id, classId);
+                    toast.success("Assignment deleted");
                     router.push(`/classes/${classId}?tab=${fromTab}`);
                   } catch (err) {
-                    alert("Failed to delete assignment");
+                    toast.error("Failed to delete assignment");
                   }
                 }}
                 className="inline-flex items-center gap-1.5 text-[11px] font-bold

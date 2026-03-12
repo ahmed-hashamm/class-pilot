@@ -259,6 +259,7 @@ import {
   Loader2, CheckCircle2, AlertCircle, Award,
   MessageSquare, FileText, Users, Paperclip, X, UploadCloud,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function SubmissionForm({ assignment, onClose, onSuccess }: any) {
   const [loading, setLoading] = useState(false)
@@ -333,6 +334,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
         isGroupProject: assignment.is_group_project,
       })
 
+      toast.success("Work submitted successfully")
       onSuccess()
       checkExistingSubmission()
     } catch (err: any) {

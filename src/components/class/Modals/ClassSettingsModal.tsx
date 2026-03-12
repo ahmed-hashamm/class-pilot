@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Settings, Save, Loader2, Eye, EyeOff } from "lucide-react";
+import { toast } from 'sonner';
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -63,18 +64,14 @@ useEffect(() => {
         .eq('id', classData.id);
 
       if (error) throw error;
-      
+      toast.success("Settings updated successfully");
+      onClose();
       router.refresh();
-      
-      setTimeout(() => {
-        setIsSaving(false);
-        onClose();
-      }, 300);
-
     } catch (err: any) {
       console.error("Update error:", err);
-      alert(`Failed to save: ${err.message}`);
-      setIsSaving(false); 
+      toast.error(err.message || "Failed to update settings");
+    } finally {
+      setIsSaving(false);
     }
   };
   

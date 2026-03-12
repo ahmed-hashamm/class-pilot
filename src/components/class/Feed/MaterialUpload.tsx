@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { UploadCloud, X, Loader2, Paperclip, SendHorizontal, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { toast } from "sonner"
 
 const ALLOWED_FILE_TYPES = ['pdf', 'docx', 'ppt', 'pptx']
 
@@ -22,6 +23,7 @@ export default function MaterialUpload({
   const [description, setDescription] = useState('')
   const [files, setFiles] = useState<File[]>([])
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -31,9 +33,9 @@ export default function MaterialUpload({
       return ext && ALLOWED_FILE_TYPES.includes(ext)
     })
     if (valid.length < selected.length)
-      alert('Only PDF, DOCX, PPT, and PPTX files are allowed.')
+      toast.error('Only PDF, DOCX, PPT, and PPTX files are allowed.')
     setFiles((prev) => [...prev, ...valid])
-    e.target.value = ''
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   const handleUpload = async () => {
@@ -48,12 +50,15 @@ export default function MaterialUpload({
 
     try {
       const { createMaterial } = await import('../../../actions/ClassActions')
-      await createMaterial(formData)
-      resetForm()
-      onSuccess()
-      router.refresh()
+      const result = await createMaterial(formData)
+      if (result.success) {
+        toast.success("Materials uploaded successfully");
+        resetForm()
+        onSuccess()
+        ;(window as any).refreshFeed?.()
+      }
     } catch (err: any) {
-      alert(err.message || 'Failed to upload materials')
+      toast.error(err.message || "Failed to upload materials")
     } finally {
       setLoading(false)
     }
@@ -102,9 +107,12 @@ export default function MaterialUpload({
         <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Files
         </Label>
-        <label className="relative flex flex-col items-center justify-center gap-3
+        <div 
+          onClick={() => fileInputRef.current?.click()}
+          className="relative flex flex-col items-center justify-center gap-3
           border-2 border-dashed border-border/60 rounded-2xl py-10 cursor-pointer
-          hover:border-navy/30 hover:bg-navy/5 transition-all bg-gray-50/30 group">
+          hover:border-navy/30 hover:bg-navy/5 transition-all bg-gray-50/30 group"
+        >
           <div className="size-12 rounded-full bg-navy/5 flex items-center justify-center text-navy group-hover:scale-110 transition">
             <UploadCloud size={24} />
           </div>
@@ -112,8 +120,14 @@ export default function MaterialUpload({
             <p className="text-sm font-bold text-foreground">Click or drag to upload</p>
             <p className="text-[11px] text-muted-foreground mt-1">PDF, DOCX, PPT, PPTX only</p>
           </div>
-          <input type="file" multiple className="hidden" onChange={handleFileChange} />
-        </label>
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            multiple 
+            className="hidden" 
+            onChange={handleFileChange} 
+          />
+        </div>
 
         {/* File Chips */}
         {files.length > 0 && (

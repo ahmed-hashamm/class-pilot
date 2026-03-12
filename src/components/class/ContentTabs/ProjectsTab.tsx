@@ -3,6 +3,7 @@
 import { Plus, Users2, ArrowRight, FolderOpen } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { classService } from '@/services/classService'
+import { toast } from 'sonner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader'
@@ -34,7 +35,7 @@ export default function ProjectsTab({ classId, isTeacher }: ProjectsTabProps) {
       {isTeacher && projects.length > 0 && (
         <div className="flex justify-end">
           <Button
-            onClick={() => alert('Create group project feature coming soon')}
+            onClick={() => toast.info('Create group project feature coming soon')}
             className="inline-flex items-center gap-2 bg-navy text-white font-semibold text-[13px] px-5 py-2.5 rounded-xl hover:bg-navy/90 hover:-translate-y-0.5 transition-all cursor-pointer border-none shadow-sm"
           >
             <Plus size={15} />
@@ -55,7 +56,7 @@ export default function ProjectsTab({ classId, isTeacher }: ProjectsTabProps) {
           }
           actionLabel={isTeacher ? 'Create first project' : undefined}
           actionIcon={isTeacher ? Plus : undefined}
-          onAction={isTeacher ? () => alert('Create group project feature coming soon') : undefined}
+          onAction={isTeacher ? () => toast.info('Create group project feature coming soon') : undefined}
         />
       ) : (
         /* Projects grid */
@@ -98,7 +99,7 @@ function ProjectCard({ project }: { project: any }) {
           })}
         </span>
         <button
-          onClick={() => alert('View details coming soon')}
+          onClick={() => toast.info('View details coming soon')}
           className="inline-flex items-center gap-1.5 text-[13px] font-bold text-navy hover:gap-2.5 transition-all duration-200 cursor-pointer bg-transparent border-none"
         >
           View details

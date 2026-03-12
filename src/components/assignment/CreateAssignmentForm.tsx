@@ -218,6 +218,7 @@ import {
 } from "lucide-react";
 import { createAssignment, updateAssignment } from "@/actions/ClassActions";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3
   text-[14px] text-foreground placeholder:text-muted-foreground
@@ -255,12 +256,20 @@ export default function CreateAssignmentForm({ classId, userId, rubrics, initial
         formData.append("assignmentId", initialData.id);
         formData.append("existingAttachments", JSON.stringify(existingFiles));
         const result = await updateAssignment(formData);
-        if (result.success) { router.push(`/classes/${classId}/assignments/${result.id}`); router.refresh(); }
+        if (result.success) { 
+          toast.success("Assignment updated successfully");
+          router.push(`/classes/${classId}/assignments/${result.id}`); 
+          router.refresh(); 
+        }
       } else {
         const result = await createAssignment(formData);
-        if (result.success) { router.push(`/classes/${classId}/assignments/${result.id}`); router.refresh(); }
+        if (result.success) { 
+          toast.success("Assignment created successfully");
+          router.push(`/classes/${classId}/assignments/${result.id}`); 
+          router.refresh(); 
+        }
       }
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { toast.error(err.message || "Failed to save assignment"); }
     finally { setLoading(false); }
   };
 

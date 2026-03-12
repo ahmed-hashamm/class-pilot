@@ -429,6 +429,7 @@ import {
   Plus, Pencil, Trash2, UserMinus, Search, RefreshCw,
   Check, Users2, X, AlertCircle, Loader2,
 } from "lucide-react";
+import { toast } from 'sonner';
 import {
   saveGroup,
   deleteGroup,
@@ -508,8 +509,9 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
     try {
       await deleteGroup(id, classId)
       queryClient.invalidateQueries({ queryKey: ['groups', classId] })
+      toast.success("Group dissolved");
     }
-    catch { alert("Error deleting group") }
+    catch { toast.error("Error deleting group") }
   }
 
   const openEdit = (group: Group) => {

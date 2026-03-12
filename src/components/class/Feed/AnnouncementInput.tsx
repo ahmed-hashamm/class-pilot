@@ -5,6 +5,7 @@ import { Paperclip, Calendar, X, FileText, Pin, SendHorizontal, Loader2, Timer }
 import { useRouter } from 'next/navigation'
 import { createAnnouncement } from '../../../actions/ClassActions'
 import { Button } from '@/components/ui/button'
+import { toast } from "sonner";
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -48,13 +49,16 @@ export default function AnnouncementInput({
     files.forEach((f) => formData.append('files', f))
 
     try {
-      await createAnnouncement(formData)
-      resetForm()
-      router.refresh()
+      const result = await createAnnouncement(formData)
+      if (result.success) {
+        toast.success("Announcement posted successfully");
+        resetForm();
+        (window as any).refreshFeed?.();
+      }
     } catch (err: any) {
-      alert(err.message || 'Failed to post')
+      toast.error(err.message || "Failed to post announcement");
     } finally {
-      setIsPending(false)
+      setIsPending(false);
     }
   }
 
