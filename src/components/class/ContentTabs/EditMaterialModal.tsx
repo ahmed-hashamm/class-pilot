@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { X, Paperclip, UploadCloud, Loader2, AlertCircle, FolderOpen } from 'lucide-react'
-import { updateMaterial } from '../ClassActions'
+import { updateMaterial } from '../../../actions/ClassActions'
 
 interface ExistingFile {
     name: string

@@ -52,10 +52,10 @@ export async function sendContactForm(
   try {
     // ── Notification email to YOU ────────────────────────────────────────
     await transporter.sendMail({
-      from:     `"Class Pilot" <${process.env.GMAIL_USER}>`,
-      to:       process.env.GMAIL_USER,   // lands in your own Gmail inbox
-      replyTo:  data.email,               // hit Reply in Gmail → goes straight to sender
-      subject:  `[${data.type}] ${data.subject || "New message"} — from ${data.name}`,
+      from: `"Class Pilot" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER,   // lands in your own Gmail inbox
+      replyTo: data.email,               // hit Reply in Gmail → goes straight to sender
+      subject: `[${data.type}] ${data.subject || "New message"} — from ${data.name}`,
       html: `
         <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#fff;">
           <div style="background:#043873;border-radius:12px;padding:24px 28px;margin-bottom:28px;">
@@ -109,8 +109,8 @@ export async function sendContactForm(
 
     // ── Confirmation email to the SENDER ────────────────────────────────
     await transporter.sendMail({
-      from:    `"Class Pilot" <${process.env.GMAIL_USER}>`,
-      to:      data.email,
+      from: `"Class Pilot" <${process.env.GMAIL_USER}>`,
+      to: data.email,
       subject: "We got your message — Class Pilot",
       html: `
         <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#fff;">

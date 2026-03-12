@@ -220,18 +220,23 @@ import Link from "next/link";
 import AttachmentButton from "@/components/class/Buttons/AttachmentButton";
 import {
   Clock, Megaphone, PlusCircle, FileUp, ArrowRight, Pin, Inbox,
-  MoreVertical, Pencil, Trash2,
+  MoreVertical, Pencil, Trash2, BarChart2, CheckSquare
 } from "lucide-react";
 import {
   useRealtimeAnnouncements,
   useRealtimeAssignments,
   useRealtimeMaterials,
+  useRealtimePolls,
+  useRealtimeAttendances
 } from "@/hooks/useRealtime";
 import AnnouncementInput from "./AnnouncementInput";
 import MaterialUpload from "./MaterialUpload";
+import PollInput from "./PollInput";
+import AttendanceInput from "./AttendanceInput";
 import FeedItemIcon from "./FeedItemIcon";
 import EditAnnouncementModal from "./EditAnnouncementModal";
-import { deleteAnnouncement } from "../ClassActions";
+import { deleteAnnouncement } from "../../../actions/ClassActions";
+import { markAttendancePresent, submitPollResponse } from "@/actions/ClassFeaturesActions";
 
 interface FeedProps {
   classId: string;
@@ -239,11 +244,13 @@ interface FeedProps {
   isTeacher: boolean;
 }
 
-type TeacherAction = "none" | "announcement" | "material";
+type TeacherAction = "none" | "announcement" | "material" | "poll" | "attendance";
 
 const ACTIONS = [
   { id: "announcement" as TeacherAction, label: "Announcement", icon: Megaphone },
   { id: "material" as TeacherAction, label: "Material", icon: FileUp },
+  { id: "poll" as TeacherAction, label: "Poll", icon: BarChart2 },
+  { id: "attendance" as TeacherAction, label: "Attendance", icon: CheckSquare },
 ] as const;
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -253,23 +260,27 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
   const { announcements, hasSettled: annSettled } = useRealtimeAnnouncements(classId, userId);
   const { assignments, hasSettled: asnSettled } = useRealtimeAssignments(classId, userId);
   const { materials, hasSettled: matSettled } = useRealtimeMaterials(classId, userId);
+  const { polls, hasSettled: pollSettled } = useRealtimePolls(classId, userId);
+  const { attendances, hasSettled: attSettled } = useRealtimeAttendances(classId, userId);
 
   const [activeAction, setActiveAction] = useState<TeacherAction>("none");
-  const isInitialLoad = !(annSettled && asnSettled && matSettled);
+  const isInitialLoad = !(annSettled && asnSettled && matSettled && pollSettled && attSettled);
 
   const feedItems = useMemo(() => {
     const combined = [
       ...announcements.map((a) => ({ ...a, type: "announcement" as const })),
       ...assignments.map((a) => ({ ...a, type: "assignment" as const })),
       ...materials.map((m) => ({ ...m, type: "material" as const })),
+      ...polls.map((p) => ({ ...p, type: "poll" as const })),
+      ...attendances.map((a) => ({ ...a, type: "attendance" as const })),
     ];
     return [...combined].sort((a, b) => {
       const aPinned = a.type === "announcement" && (a as any).pinned ? 1 : 0;
       const bPinned = b.type === "announcement" && (b as any).pinned ? 1 : 0;
       if (aPinned !== bPinned) return bPinned - aPinned;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
     });
-  }, [announcements, assignments, materials]);
+  }, [announcements, assignments, materials, polls, attendances]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -320,6 +331,18 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
                   onSuccess={() => setActiveAction("none")}
                 />
               )}
+              {activeAction === "poll" && (
+                <PollInput
+                  classId={classId}
+                  onSuccess={() => setActiveAction("none")}
+                />
+              )}
+              {activeAction === "attendance" && (
+                <AttendanceInput
+                  classId={classId}
+                  onSuccess={() => setActiveAction("none")}
+                />
+              )}
             </div>
           )}
         </div>
@@ -365,6 +388,7 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
               key={`${item.type}-${item.id}`}
               item={item}
               classId={classId}
+              userId={userId}
               isTeacher={isTeacher}
             />
           ))
@@ -378,10 +402,11 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
    FEED CARD
 ───────────────────────────────────────────────────────────────────────────── */
 function FeedCard({
-  item, classId, isTeacher,
+  item, classId, userId, isTeacher,
 }: {
   item: any
   classId: string
+  userId: string
   isTeacher: boolean
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -390,18 +415,24 @@ function FeedCard({
 
   const isAssignment = item.type === "assignment";
   const isAnnouncement = item.type === "announcement";
+  const isPoll = item.type === "poll";
+  const isAttendance = item.type === "attendance";
   const isPinned = isAnnouncement && item.pinned;
 
   const typeLabel: Record<string, string> = {
     announcement: "Announcement",
     assignment: "Assignment",
     material: "Material",
+    poll: "Poll",
+    attendance: "Attendance",
   };
 
   const typePill: Record<string, string> = {
     announcement: "bg-navy/8 text-navy border-navy/15",
     assignment: "bg-yellow/20 text-navy border-yellow/40",
     material: "bg-navy-light/12 text-navy-light border-navy-light/25",
+    poll: "bg-purple-500/10 text-purple-600 border-purple-500/25",
+    attendance: "bg-green-500/10 text-green-600 border-green-500/25",
   };
 
   const getDisplayName = (path: string) => {
@@ -439,14 +470,18 @@ function FeedCard({
               justify-center text-white shadow-sm
               ${item.type === "announcement" ? "bg-navy"
                 : item.type === "assignment" ? "bg-yellow"
-                  : "bg-navy-light"}`}>
-              <FeedItemIcon type={item.type} />
+                  : item.type === "poll" ? "bg-purple-500"
+                    : item.type === "attendance" ? "bg-green-500"
+                      : "bg-navy-light"}`}>
+              {item.type === "poll" ? <BarChart2 size={20} /> :
+               item.type === "attendance" ? <CheckSquare size={20} /> :
+               <FeedItemIcon type={item.type} />}
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <h4 className="font-bold text-[15px] text-foreground leading-snug truncate">
-                  {item.title || (item.type === "material" ? "Class Material" : "Post")}
+                  {item.title || item.question || (item.type === "material" ? "Class Material" : "Post")}
                 </h4>
 
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -517,11 +552,79 @@ function FeedCard({
           </div>
 
           {/* Body */}
-          {(item.content || item.description) && (
+          {(item.content || item.description) && !isPoll && !isAttendance && (
             <p className="text-[14px] text-foreground/80 leading-relaxed
               whitespace-pre-wrap break-words pl-[52px]">
               {item.content || item.description}
             </p>
+          )}
+
+          {/* Special rendering for Polls */}
+          {isPoll && (
+            <div className="pl-[52px] flex flex-col gap-2">
+              {item.options.map((opt: string, idx: number) => {
+                const totalVotes = item.poll_responses?.length || 0;
+                const optionVotes = item.poll_responses?.filter((r: any) => r.selected_option_index === idx).length || 0;
+                const percent = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
+                const hasVoted = item.poll_responses?.some((r: any) => r.user_id === userId);
+                const isMyVote = item.poll_responses?.some((r: any) => r.user_id === userId && r.selected_option_index === idx);
+
+                if (hasVoted || isTeacher) {
+                  return (
+                    <div key={idx} className="relative overflow-hidden rounded-lg border border-border bg-secondary/30">
+                      <div 
+                        className={`absolute left-0 top-0 bottom-0 transition-all duration-500 ${isMyVote ? 'bg-purple-500/20' : 'bg-muted'}`}
+                        style={{ width: `${percent}%` }}
+                      />
+                      <div className="relative z-10 flex justify-between px-4 py-2 text-[14px]">
+                        <span className={isMyVote ? "font-bold text-purple-700" : "font-medium"}>{opt} {isMyVote && '(You)'}</span>
+                        <span className="text-muted-foreground">{percent}%</span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => submitPollResponse(item.id, idx)}
+                    className="flex justify-between w-full px-4 py-2 border border-border rounded-lg text-left text-[14px] font-medium hover:bg-secondary hover:border-border/80 transition-all"
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+              <p className="text-xs text-muted-foreground mt-1">{item.poll_responses?.length || 0} vote(s)</p>
+            </div>
+          )}
+
+          {/* Special rendering for Attendance */}
+          {isAttendance && (
+            <div className="pl-[52px]">
+              <div className="bg-secondary/30 rounded-lg p-4 flex items-center justify-between border border-border/50">
+                <div>
+                  <p className="font-semibold text-sm mb-0.5">Attendance: {new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                  {isTeacher ? (
+                    <p className="text-xs text-muted-foreground">{item.attendance_records?.length || 0} student(s) marked present</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Please mark yourself present.</p>
+                  )}
+                </div>
+                {!isTeacher && (
+                  item.attendance_records?.some((r: any) => r.user_id === userId) ? (
+                    <div className="flex items-center gap-1 text-sm font-bold text-green-600 bg-green-500/10 px-3 py-1.5 rounded-full">
+                      <CheckSquare size={16} /> Present
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => markAttendancePresent(item.id)}
+                      className="text-sm font-semibold bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-full transition-colors">
+                      Mark Present
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
           )}
 
           {/* Attachments */}
@@ -569,9 +672,9 @@ function FeedCard({
             content: item.content || "",
             pinned: item.pinned || false,
             classId,
-            attachment_paths: Array.isArray(item.attachment_paths) 
-                ? item.attachment_paths 
-                : item.file_url ? [item.file_url] : [],
+            attachment_paths: Array.isArray(item.attachment_paths)
+              ? item.attachment_paths
+              : item.file_url ? [item.file_url] : [],
           }}
           onClose={() => setEditOpen(false)}
           onSuccess={() => setEditOpen(false)}

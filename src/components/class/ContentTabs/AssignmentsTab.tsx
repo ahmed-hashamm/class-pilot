@@ -151,6 +151,7 @@ import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { ClipboardList, Calendar, Award, Plus, Paperclip, ArrowRight, RefreshCw } from 'lucide-react'
+import AttachmentButton from '@/components/class/Buttons/AttachmentButton'
 
 interface AssignmentsTabProps {
   classId: string
@@ -416,12 +417,13 @@ function AssignmentGroup({
                   (assignment.attachment_paths || assignment.attachments).map((path: any, idx: number) => {
                     const filePath = typeof path === 'string' ? path : path.path
                     return (
-                      <span key={idx} className="inline-flex items-center gap-1
-                        text-[11px] text-muted-foreground bg-secondary
-                        border border-border rounded-lg px-2 py-1 font-medium">
-                        <Paperclip size={10} />
-                        <span className="max-w-[100px] truncate">{getDisplayName(filePath)}</span>
-                      </span>
+                      <AttachmentButton
+                        key={idx}
+                        asDiv
+                        path={filePath}
+                        type="assignment"
+                        label={getDisplayName(filePath)}
+                      />
                     )
                   })
                 )}

@@ -101,7 +101,7 @@ import {
   getStickyNotes,
   addStickyNote,
   clearStickyNotes,
-} from '@/components/class/ClassActions'
+} from '@/actions/ClassActions'
 
 interface Note {
   id: string
@@ -110,8 +110,8 @@ interface Note {
 }
 
 export default function StickyNotes({ classId }: { classId: string }) {
-  const [notes,     setNotes]     = useState<Note[]>([])
-  const [noteText,  setNoteText]  = useState('')
+  const [notes, setNotes] = useState<Note[]>([])
+  const [noteText, setNoteText] = useState('')
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {

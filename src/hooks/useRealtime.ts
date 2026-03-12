@@ -3,8 +3,24 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database'
 
 let channelCounter = 0
+
+/* ── Types ── */
+interface Profile     { full_name: string | null; email: string }
+interface ProfileName { full_name: string | null }
+
+type Tables = Database['public']['Tables']
+
+type AnnouncementRow = Tables['announcements']['Row'] & { users: Profile }
+type AssignmentRow   = Tables['assignments']['Row']   & { users: Profile }
+type MaterialRow     = Tables['materials']['Row']     & { users: ProfileName }
+type PollResponseRow = Tables['poll_responses']['Row']
+type PollRow         = Tables['polls']['Row']         & { users: Profile; poll_responses: PollResponseRow[] }
+type AttendRecordRow = Tables['attendance_records']['Row']
+type AttendanceRow   = Tables['attendances']['Row']   & { users: Profile; attendance_records: AttendRecordRow[] }
+type ClassNoteRow    = Tables['class_notes']['Row']
 
 /* ─────────────────────────────────────────────────────────────────────────────
    SHARED AUTH GUARD  (singleton — resolves once, shared by every hook)
@@ -42,7 +58,7 @@ export function ensureAuth(supabase: ReturnType<typeof createClient>): Promise<b
    ANNOUNCEMENTS
 ───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeAnnouncements(classId: string, userId: string) {
-  const [announcements, setAnnouncements] = useState<any[]>([])
+  const [announcements, setAnnouncements] = useState<AnnouncementRow[]>([])
   const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
@@ -64,7 +80,7 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
           .eq('class_id', classId)
           .order('pinned', { ascending: false })
           .order('created_at', { ascending: false })
-        if (isMounted) setAnnouncements(data ?? [])
+        if (isMounted) setAnnouncements((data as AnnouncementRow[]) ?? [])
       } finally {
         if (isMounted) setHasSettled(true)
       }
@@ -83,7 +99,7 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
           .select('*, users(full_name,email)')
           .eq('id', payload.new.id)
           .single()
-        if (newRow && isMounted) setAnnouncements((prev) => [newRow, ...prev])
+        if (newRow && isMounted) setAnnouncements((prev) => [newRow as AnnouncementRow, ...prev])
       })
       .on('postgres_changes', {
         event: 'UPDATE', schema: 'public', table: 'announcements',
@@ -91,7 +107,7 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
       }, (payload) => {
         if (!isMounted) return
         setAnnouncements((prev) =>
-          prev.map((a: any) => (a.id === payload.new.id ? { ...a, ...payload.new } : a))
+          prev.map((a) => (a.id === payload.new.id ? { ...a, ...payload.new } as AnnouncementRow : a))
         )
       })
       .on('postgres_changes', {
@@ -99,7 +115,7 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
         filter: `class_id=eq.${classId}`,
       }, (payload) => {
         if (!isMounted) return
-        setAnnouncements((prev) => prev.filter((a: any) => a.id !== payload.old.id))
+        setAnnouncements((prev) => prev.filter((a) => a.id !== payload.old.id))
       })
       .subscribe()
 
@@ -116,7 +132,7 @@ export function useRealtimeAnnouncements(classId: string, userId: string) {
    ASSIGNMENTS
 ───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeAssignments(classId: string, userId: string) {
-  const [assignments, setAssignments] = useState<any[]>([])
+  const [assignments, setAssignments] = useState<AssignmentRow[]>([])
   const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
@@ -136,7 +152,7 @@ export function useRealtimeAssignments(classId: string, userId: string) {
           .select('*, users(full_name,email)')
           .eq('class_id', classId)
           .order('created_at', { ascending: false })
-        if (isMounted) setAssignments(data ?? [])
+        if (isMounted) setAssignments((data as AssignmentRow[]) ?? [])
       } finally {
         if (isMounted) setHasSettled(true)
       }
@@ -155,14 +171,14 @@ export function useRealtimeAssignments(classId: string, userId: string) {
           .select('*, users(full_name,email)')
           .eq('id', payload.new.id)
           .single()
-        if (newRow && isMounted) setAssignments((prev) => [newRow, ...prev])
+        if (newRow && isMounted) setAssignments((prev) => [newRow as AssignmentRow, ...prev])
       })
       .on('postgres_changes', {
         event: 'DELETE', schema: 'public', table: 'assignments',
         filter: `class_id=eq.${classId}`,
       }, (payload) => {
         if (!isMounted) return
-        setAssignments((prev) => prev.filter((a: any) => a.id !== payload.old.id))
+        setAssignments((prev) => prev.filter((a) => a.id !== payload.old.id))
       })
       .subscribe()
 
@@ -179,7 +195,7 @@ export function useRealtimeAssignments(classId: string, userId: string) {
    MATERIALS
 ───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeMaterials(classId: string, userId: string) {
-  const [materials, setMaterials] = useState<any[]>([])
+  const [materials, setMaterials] = useState<MaterialRow[]>([])
   const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
@@ -199,7 +215,7 @@ export function useRealtimeMaterials(classId: string, userId: string) {
           .select('*, users:created_by(full_name)')
           .eq('class_id', classId)
           .order('created_at', { ascending: false })
-        if (isMounted) setMaterials(data ?? [])
+        if (isMounted) setMaterials((data as MaterialRow[]) ?? [])
       } finally {
         if (isMounted) setHasSettled(true)
       }
@@ -220,13 +236,13 @@ export function useRealtimeMaterials(classId: string, userId: string) {
             .select('*, users:created_by(full_name)')
             .eq('id', payload.new.id)
             .single()
-          if (newMaterial && isMounted) setMaterials((prev) => [newMaterial, ...prev])
+          if (newMaterial && isMounted) setMaterials((prev) => [newMaterial as MaterialRow, ...prev])
         } else if (payload.eventType === 'UPDATE') {
           setMaterials((prev) =>
-            prev.map((m: any) => (m.id === payload.new.id ? { ...m, ...payload.new } : m))
+            prev.map((m) => (m.id === payload.new.id ? { ...m, ...payload.new } as MaterialRow : m))
           )
         } else if (payload.eventType === 'DELETE') {
-          setMaterials((prev) => prev.filter((m: any) => m.id !== payload.old.id))
+          setMaterials((prev) => prev.filter((m) => m.id !== payload.old.id))
         }
       })
       .subscribe()
@@ -241,10 +257,172 @@ export function useRealtimeMaterials(classId: string, userId: string) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   POLLS
+───────────────────────────────────────────────────────────────────────────── */
+export function useRealtimePolls(classId: string, userId: string) {
+  const [polls, setPolls] = useState<PollRow[]>([])
+  const [hasSettled, setHasSettled] = useState(false)
+
+  useEffect(() => {
+    if (!classId || !userId) return
+    let isMounted = true
+    const supabase = createClient()
+    const mountId = ++channelCounter
+    setHasSettled(false)
+    setPolls([])
+
+    const loadInitial = async () => {
+      try {
+        const authed = await ensureAuth(supabase)
+        if (!authed || !isMounted) return
+        const { data } = await supabase
+          .from('polls')
+          .select('*, users(full_name,email), poll_responses(*)')
+          .eq('class_id', classId)
+          .order('created_at', { ascending: false })
+        if (isMounted) setPolls((data as PollRow[]) ?? [])
+      } finally {
+        if (isMounted) setHasSettled(true)
+      }
+    }
+
+    loadInitial()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handlePayload = async (payload: any) => {
+      if (!isMounted) return
+      const targetId = payload.table === 'polls' 
+        ? (payload.new?.id || payload.old?.id)
+        : (payload.new?.poll_id || payload.old?.poll_id)
+        
+      if (!targetId) return
+
+      if (payload.table === 'polls' && payload.eventType === 'DELETE') {
+        setPolls((prev) => prev.filter((p) => p.id !== targetId))
+        return
+      }
+
+      const { data: newRow } = await supabase
+        .from('polls')
+        .select('*, users(full_name,email), poll_responses(*)')
+        .eq('id', targetId)
+        .single()
+        
+      if (newRow && isMounted) {
+        const row = newRow as PollRow
+        setPolls((prev) => {
+          const exists = prev.find((p) => p.id === row.id)
+          if (exists) return prev.map((p) => p.id === row.id ? row : p)
+          return [row, ...prev]
+        })
+      }
+    }
+
+    const channel = supabase
+      .channel(`polls_${classId}_${mountId}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'polls', filter: `class_id=eq.${classId}`,
+      }, handlePayload)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'poll_responses',
+      }, handlePayload)
+      .subscribe()
+
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
+  }, [classId, userId])
+
+  return { polls, hasSettled }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ATTENDANCES
+───────────────────────────────────────────────────────────────────────────── */
+export function useRealtimeAttendances(classId: string, userId: string) {
+  const [attendances, setAttendances] = useState<AttendanceRow[]>([])
+  const [hasSettled, setHasSettled] = useState(false)
+
+  useEffect(() => {
+    if (!classId || !userId) return
+    let isMounted = true
+    const supabase = createClient()
+    const mountId = ++channelCounter
+    setHasSettled(false)
+    setAttendances([])
+
+    const loadInitial = async () => {
+      try {
+        const authed = await ensureAuth(supabase)
+        if (!authed || !isMounted) return
+        const { data } = await supabase
+          .from('attendances')
+          .select('*, users(full_name,email), attendance_records(*)')
+          .eq('class_id', classId)
+          .order('created_at', { ascending: false })
+        if (isMounted) setAttendances((data as AttendanceRow[]) ?? [])
+      } finally {
+        if (isMounted) setHasSettled(true)
+      }
+    }
+
+    loadInitial()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handlePayload = async (payload: any) => {
+      if (!isMounted) return
+      const targetId = payload.table === 'attendances' 
+        ? (payload.new?.id || payload.old?.id)
+        : (payload.new?.attendance_id || payload.old?.attendance_id)
+        
+      if (!targetId) return
+
+      if (payload.table === 'attendances' && payload.eventType === 'DELETE') {
+        setAttendances((prev) => prev.filter((a) => a.id !== targetId))
+        return
+      }
+
+      const { data: newRow } = await supabase
+        .from('attendances')
+        .select('*, users(full_name,email), attendance_records(*)')
+        .eq('id', targetId)
+        .single()
+        
+      if (newRow && isMounted) {
+        const row = newRow as AttendanceRow
+        setAttendances((prev) => {
+          const exists = prev.find((a) => a.id === row.id)
+          if (exists) return prev.map((a) => a.id === row.id ? row : a)
+          return [row, ...prev]
+        })
+      }
+    }
+
+    const channel = supabase
+      .channel(`attend_${classId}_${mountId}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'attendances', filter: `class_id=eq.${classId}`,
+      }, handlePayload)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'attendance_records',
+      }, handlePayload)
+      .subscribe()
+
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
+  }, [classId, userId])
+
+  return { attendances, hasSettled }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    STICKY NOTES
 ───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeStickyNotes(classId: string, userId?: string) {
-  const [notes, setNotes] = useState<any[]>([])
+  const [notes, setNotes] = useState<ClassNoteRow[]>([])
 
   useEffect(() => {
     if (!classId || !userId) return
@@ -273,15 +451,14 @@ export function useRealtimeStickyNotes(classId: string, userId?: string) {
         filter: `class_id=eq.${classId}`,
       }, (payload) => {
         if (!isMounted) return
-        const noteUser = payload.new
-          ? (payload.new as any).user_id
-          : (payload.old as any).user_id
+        const noteUser = (payload.new as ClassNoteRow)?.user_id
+          ?? (payload.old as ClassNoteRow)?.user_id
         if (noteUser !== userId) return
 
         if (payload.eventType === 'INSERT') {
-          setNotes((prev) => [payload.new, ...prev])
+          setNotes((prev) => [payload.new as ClassNoteRow, ...prev])
         } else if (payload.eventType === 'UPDATE') {
-          setNotes((prev) => prev.map((n) => (n.id === payload.new.id ? payload.new : n)))
+          setNotes((prev) => prev.map((n) => (n.id === payload.new.id ? payload.new as ClassNoteRow : n)))
         } else if (payload.eventType === 'DELETE') {
           setNotes((prev) => prev.filter((n) => n.id !== payload.old.id))
         }

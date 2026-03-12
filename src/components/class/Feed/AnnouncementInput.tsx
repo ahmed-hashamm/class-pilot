@@ -27,7 +27,7 @@
 //   // 1. Change to an array of Files
 //   const [files, setFiles] = useState<File[]>([])
 //   const [isPending, setIsPending] = useState(false)
-  
+
 //   const fileInputRef = useRef<HTMLInputElement>(null)
 //   const dateInputRef = useRef<HTMLInputElement>(null)
 
@@ -46,7 +46,7 @@
 
 //   const handlePost = async () => {
 //     if (!content.trim() && !title.trim() && files.length === 0) return
-    
+
 //     setIsPending(true)
 //     const formData = new FormData()
 //     formData.append('title', title || 'Class Update')
@@ -55,7 +55,7 @@
 //     formData.append('userId', userId)
 //     formData.append('pinned', String(isPinned))
 //     if (deadline) formData.append('deadline', deadline)
-    
+
 //     // 2. Append all files to the same key 'files'
 //     files.forEach((file) => {
 //       formData.append('files', file)
@@ -104,7 +104,7 @@
 //             value={content}
 //             onChange={(e) => setContent(e.target.value)}
 //           />
-          
+
 //           <div className="flex flex-wrap gap-3 mt-4">
 //             {/* 3. Map through multiple files */}
 //             {files.map((f, index) => (
@@ -141,7 +141,7 @@
 //             <Button variant="ghost" size="md" className="rounded-full" onClick={() => fileInputRef.current?.click()}>
 //               <Paperclip size={18} className="text-gray-500" />
 //             </Button>
-            
+
 //             <input 
 //               type="date" 
 //               ref={dateInputRef} 
@@ -192,7 +192,7 @@
 
 import { useRef, useState } from 'react'
 import { Paperclip, Calendar, X, FileText, Pin, SendHorizontal, Loader2 } from 'lucide-react'
-import { createAnnouncement } from '../ClassActions'
+import { createAnnouncement } from '../../../actions/ClassActions'
 
 export default function AnnouncementInput({
   classId, userId,
@@ -200,11 +200,11 @@ export default function AnnouncementInput({
   classId: string
   userId: string
 }) {
-  const [title,     setTitle]     = useState('')
-  const [content,   setContent]   = useState('')
-  const [deadline,  setDeadline]  = useState('')
-  const [isPinned,  setIsPinned]  = useState(false)
-  const [files,     setFiles]     = useState<File[]>([])
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [deadline, setDeadline] = useState('')
+  const [isPinned, setIsPinned] = useState(false)
+  const [files, setFiles] = useState<File[]>([])
   const [isPending, setIsPending] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -223,11 +223,11 @@ export default function AnnouncementInput({
     setIsPending(true)
 
     const formData = new FormData()
-    formData.append('title',   title || 'Class Update')
+    formData.append('title', title || 'Class Update')
     formData.append('content', content)
     formData.append('classId', classId)
-    formData.append('userId',  userId)
-    formData.append('pinned',  String(isPinned))
+    formData.append('userId', userId)
+    formData.append('pinned', String(isPinned))
     if (deadline) formData.append('deadline', deadline)
     files.forEach((f) => formData.append('files', f))
 

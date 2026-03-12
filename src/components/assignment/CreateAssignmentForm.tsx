@@ -216,7 +216,7 @@ import {
   Paperclip, X, UploadCloud, Loader2,
   Settings2, Users, Calendar, Award, FileText, AlignLeft,
 } from "lucide-react";
-import { createAssignment, updateAssignment } from "@/components/class/ClassActions";
+import { createAssignment, updateAssignment } from "@/actions/ClassActions";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { X, Pin, Loader2, AlertCircle, FileText, Paperclip, UploadCloud } from 'lucide-react'
-import { updateAnnouncement } from '../ClassActions'
+import { updateAnnouncement } from '../../../actions/ClassActions'
 
 interface Props {
     announcement: {

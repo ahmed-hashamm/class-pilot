@@ -289,7 +289,7 @@ export default function AssignmentDetail({
               <button
                 onClick={async () => {
                   if (!confirm("Are you sure you want to delete this assignment?")) return;
-                  const { deleteAssignment } = await import('@/components/class/ClassActions');
+                  const { deleteAssignment } = await import('@/actions/ClassActions');
                   try {
                     await deleteAssignment(assignment.id, classId);
                     router.push(`/classes/${classId}?tab=${fromTab}`);

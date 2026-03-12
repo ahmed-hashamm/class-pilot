@@ -200,11 +200,12 @@ import { gradeSubmission } from '@/lib/ai/grading'; // Adjust path to your OpenA
 
 export async function POST(
   request: Request,
-  { params }: { params: { assignmentId: string; submissionId: string } }
+  { params }: { params: Promise<{ id: string; submissionId: string }> }
 ) {
   const supabase = createClient();
 
   try {
+    const { id: assignmentId, submissionId } = await params;
     const { data: submission, error } = await (supabase as any)
       .from('submissions')
       .select(`
@@ -214,7 +215,7 @@ export async function POST(
           rubrics (id, name, criteria, total_points)
         )
       `)
-      .eq('id', params.submissionId)
+      .eq('id', submissionId)
       .single();
 
     if (error || !submission) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -233,7 +234,7 @@ export async function POST(
         ai_feedback: result.overall_feedback,
         // Optional: store detailed breakdown in a separate JSON column if you have one
       })
-      .eq('id', params.submissionId);
+      .eq('id', submissionId);
 
     if (updateError) throw updateError;
     return NextResponse.json(result);

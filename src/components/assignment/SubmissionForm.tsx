@@ -11,10 +11,10 @@
 //   const [checking, setChecking] = useState(true)
 //   const [submissionData, setSubmissionData] = useState<any>(null)
 //   const [error, setError] = useState<string | null>(null)
-  
+
 //   const [content, setContent] = useState('')
 //   const [files, setFiles] = useState<File[]>([])
-  
+
 //   const supabase = createClient()
 
 //   useEffect(() => {
@@ -50,11 +50,11 @@
 //       }
 
 //       const { data: existing } = await query.maybeSingle()
-      
+
 //       if (existing) {
 //         setSubmissionData(existing)
 //       }
-      
+
 //     } catch (err) {
 //       console.error("Check error:", err)
 //     } finally {
@@ -80,7 +80,7 @@
 //           .select('project_id')
 //           .eq('user_id', user.id)
 //           .maybeSingle()
-        
+
 //         if (!memberData) throw new Error("You are not part of a group for this project.")
 //         groupId = (memberData as any).project_id
 //       }
@@ -199,7 +199,7 @@
 //           {assignment.is_group_project ? "Group Submission" : "Individual Submission"}
 //         </h3>
 //       </div>
-      
+
 //       {assignment.is_group_project && (
 //         <div className="flex gap-3 p-4 bg-amber-50/50 rounded-xl border border-amber-100">
 //           <AlertCircle className="text-amber-600 shrink-0" size={18} />
@@ -218,7 +218,7 @@
 //           placeholder="Enter submission details..."
 //         />
 //       </div>
-      
+
 //       <div className="space-y-2">
 //         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Attachments</label>
 //         <input 
@@ -254,19 +254,19 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { submitAssignment } from '@/components/class/ClassActions'
+import { submitAssignment } from '@/actions/ClassActions'
 import {
   Loader2, CheckCircle2, AlertCircle, Award,
   MessageSquare, FileText, Users, Paperclip, X, UploadCloud,
 } from 'lucide-react'
 
 export default function SubmissionForm({ assignment, onClose, onSuccess }: any) {
-  const [loading,        setLoading]        = useState(false)
-  const [checking,       setChecking]       = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [checking, setChecking] = useState(true)
   const [submissionData, setSubmissionData] = useState<any>(null)
-  const [error,          setError]          = useState<string | null>(null)
-  const [content,        setContent]        = useState('')
-  const [files,          setFiles]          = useState<File[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [content, setContent] = useState('')
+  const [files, setFiles] = useState<File[]>([])
   const supabase = createClient()
 
   useEffect(() => { checkExistingSubmission() }, [assignment.id])
@@ -356,7 +356,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
 
   /* ── Already submitted ── */
   if (submissionData) {
-    const grade    = submissionData.final_grade
+    const grade = submissionData.final_grade
     const isGraded = submissionData.status === 'graded' || grade !== null
 
     return (

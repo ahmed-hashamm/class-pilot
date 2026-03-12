@@ -158,12 +158,12 @@ export default function MaterialUpload({
   onSuccess: () => void
 }) {
   const [loading, setLoading] = useState(false)
-  const [files,   setFiles]   = useState<File[]>([])
+  const [files, setFiles] = useState<File[]>([])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
     const selected = Array.from(e.target.files)
-    const valid   = selected.filter((f) => {
+    const valid = selected.filter((f) => {
       const ext = f.name.split('.').pop()?.toLowerCase()
       return ext && ALLOWED_FILE_TYPES.includes(ext)
     })
@@ -182,7 +182,7 @@ export default function MaterialUpload({
     formData.append('userId', userId)
     files.forEach((f) => formData.append('files', f))
     try {
-      const { createMaterial } = await import('../ClassActions')
+      const { createMaterial } = await import('../../../actions/ClassActions')
       await createMaterial(formData)
       setFiles([])
       onSuccess()

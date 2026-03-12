@@ -433,14 +433,14 @@ import {
   saveGroup,
   deleteGroup,
   removeGroupMember,
-} from "@/components/class/ClassActions";
+} from "@/actions/ClassActions";
 
 /* ── Types ── */
-interface Profile     { full_name: string | null }
+interface Profile { full_name: string | null }
 interface ProjectMember { user_id: string; profiles: Profile | Profile[] }
-interface Group       { id: string; title: string; project_members: ProjectMember[] }
+interface Group { id: string; title: string; project_members: ProjectMember[] }
 interface ClassMember { user_id: string; profiles: Profile | Profile[] }
-interface Props       { classId: string; isTeacher: boolean }
+interface Props { classId: string; isTeacher: boolean }
 
 /* ── Helpers ── */
 const getName = (profiles: Profile | Profile[]) =>
@@ -464,13 +464,13 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
   const loading = loadingGroups || loadingMembers
 
   // UI State
-  const [showModal,       setShowModal]       = useState(false)
-  const [groupTitle,      setGroupTitle]      = useState("")
-  const [editingGroupId,  setEditingGroupId]  = useState<string | null>(null)
-  const [selectedIds,     setSelectedIds]     = useState<string[]>([])
-  const [searchQuery,     setSearchQuery]     = useState("")
-  const [localError,      setLocalError]      = useState<string | null>(null)
-  const [submitting,      setSubmitting]      = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [groupTitle, setGroupTitle] = useState("")
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [localError, setLocalError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   /* ── Filtered students ── */
   const availableStudents = useMemo(() => {
@@ -505,7 +505,7 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Dissolve this group? Members will become unassigned.")) return
-    try { 
+    try {
       await deleteGroup(id, classId)
       queryClient.invalidateQueries({ queryKey: ['groups', classId] })
     }
@@ -657,7 +657,7 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
                           {isTeacher && (
                             <button
                               onClick={() =>
-                                removeGroupMember(group.id, m.user_id, classId).then(() => 
+                                removeGroupMember(group.id, m.user_id, classId).then(() =>
                                   queryClient.invalidateQueries({ queryKey: ['groups', classId] })
                                 )
                               }
