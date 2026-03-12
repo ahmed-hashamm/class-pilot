@@ -1,957 +1,461 @@
-// // 'use client'
-
-// // import { useEffect, useState } from 'react'
-// // import { createClient } from '@/lib/supabase/client'
-// // import type { RealtimeChannel } from '@supabase/supabase-js'
-
-// // const supabase = createClient()
-
-// // /* ---------------- NOTIFICATIONS ---------------- */
-// // export interface Notification {
-// //   id: string
-// //   user_id: string
-// //   type: string
-// //   message: string
-// //   created_at: string
-// // }
-
-// // export function useRealtimeNotifications(userId?: string) {
-// //   const [notifications, setNotifications] = useState<Notification[]>([])
-
-// //   useEffect(() => {
-// //     if (!userId) return
-
-// //     let isMounted = true
-
-// //     // Load initial notifications
-// //     supabase
-// //       .from('notifications')
-// //       .select('*')
-// //       .eq('user_id', userId)
-// //       .order('created_at', { ascending: false })
-// //       .limit(20)
-// //       .then(({ data }) => {
-// //         if (data && isMounted) setNotifications(data as Notification[])
-// //       })
-
-// //     // Subscribe to INSERT
-// //     const channel: RealtimeChannel = supabase
-// //       .channel(`notifications:${userId}`)
-// //       .on(
-// //         'postgres_changes',
-// //         {
-// //           event: 'INSERT',
-// //           schema: 'public',
-// //           table: 'notifications',
-// //           filter: `user_id=eq.${userId}`,
-// //         },
-// //         (payload) => {
-// //           setNotifications((prev) => [payload.new as Notification, ...prev])
-// //         }
-// //       )
-// //       .subscribe()
-
-// //     return () => {
-// //       isMounted = false
-// //       supabase.removeChannel(channel)
-// //     }
-// //   }, [userId])
-
-// //   return notifications
-// // }
-
-// // /* ---------------- ANNOUNCEMENTS ---------------- */
-// // export interface Announcement {
-// //   id: string
-// //   class_id: string
-// //   title: string
-// //   content: string
-// //   pinned?: boolean
-// //   created_at: string
-// //   users?: { full_name?: string; email?: string }
-// // }
-
-// // export function useRealtimeAnnouncements(classId: string) {
-// //   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-
-// //   useEffect(() => {
-// //     if (!classId) return
-
-// //     let isMounted = true
-
-// //     // Load initial announcements
-// //     supabase
-// //       .from('announcements')
-// //       .select('*, users(full_name,email)')
-// //       .eq('class_id', classId)
-// //       .order('pinned', { ascending: false })
-// //       .order('created_at', { ascending: false })
-// //       .then(({ data }) => {
-// //         if (data && isMounted) setAnnouncements(data as Announcement[])
-// //       })
-
-// //     const channel: RealtimeChannel = supabase.channel(`announcements:${classId}`)
-
-// //     channel
-// //       // INSERT
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'INSERT', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` },
-// //         (payload) => {
-// //           setAnnouncements((prev) => [payload.new as Announcement, ...prev])
-// //         }
-// //       )
-// //       // UPDATE
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'UPDATE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` },
-// //         (payload) => {
-// //           setAnnouncements((prev) =>
-// //             prev.map((a) => (a.id === (payload.new as Announcement).id ? (payload.new as Announcement) : a))
-// //           )
-// //         }
-// //       )
-// //       // DELETE
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'DELETE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` },
-// //         (payload) => {
-// //           setAnnouncements((prev) => prev.filter((a) => a.id !== (payload.old as Announcement).id))
-// //         }
-// //       )
-// //       .subscribe()
-
-// //     return () => {
-// //       isMounted = false
-// //       supabase.removeChannel(channel)
-// //     }
-// //   }, [classId])
-
-// //   return announcements
-// // }
-
-// // /* ---------------- ASSIGNMENTS ---------------- */
-// // export interface Assignment {
-// //   id: string
-// //   class_id: string
-// //   title: string
-// //   content?: string
-// //   dueDate?: string
-// //   created_at: string
-// //   users?: { full_name?: string; email?: string }
-// // }
-
-// // export function useRealtimeAssignments(classId: string) {
-// //   const [assignments, setAssignments] = useState<Assignment[]>([])
-
-// //   useEffect(() => {
-// //     if (!classId) return
-// //     let isMounted = true
-  
-// //     const loadAssignments = async () => {
-// //       try {
-// //         const { data } = await supabase
-// //           .from('assignments')
-// //           .select('*, users(full_name,email)')
-// //           .eq('class_id', classId)
-// //           .order('created_at', { ascending: false })
-  
-// //         if (data && isMounted) setAssignments(data as Assignment[])
-// //       } catch (err) {
-// //         console.error(err)
-// //       }
-// //     }
-  
-// //     loadAssignments()
-  
-// //     const channel: RealtimeChannel = supabase.channel(`assignments:${classId}`)
-// //     channel
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'INSERT', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-// //         (payload) => setAssignments((prev) => [payload.new as Assignment, ...prev])
-// //       )
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'UPDATE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-// //         (payload) =>
-// //           setAssignments((prev) =>
-// //             prev.map((a) => (a.id === (payload.new as Assignment).id ? (payload.new as Assignment) : a))
-// //           )
-// //       )
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'DELETE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-// //         (payload) => setAssignments((prev) => prev.filter((a) => a.id !== (payload.old as Assignment).id))
-// //       )
-// //       .subscribe()
-  
-// //     return () => supabase.removeChannel(channel)
-// //   }, [classId])
-  
-    
-// //   return assignments
-// // }
-
-// // /* ---------------- STICKY NOTES ---------------- */
-// // export interface Note {
-// //   id: string
-// //   class_id: string
-// //   user_id: string
-// //   content: string
-// //   created_at: string
-// // }
-
-// // export function useRealtimeStickyNotes(classId: string, userId?: string) {
-// //   const [notes, setNotes] = useState<Note[]>([])
-
-// //   useEffect(() => {
-// //     if (!classId || !userId) return
-
-// //     let isMounted = true
-
-// //     // Load initial notes
-// //     supabase
-// //       .from('class_notes')
-// //       .select('*')
-// //       .eq('class_id', classId)
-// //       .eq('user_id', userId)
-// //       .order('created_at', { ascending: false })
-// //       .then(({ data }) => {
-// //         if (data && isMounted) setNotes(data as Note[])
-// //       })
-
-// //     const channel: RealtimeChannel = supabase.channel(`class_notes:${classId}:${userId}`)
-
-// //     channel
-// //       .on(
-// //         'postgres_changes',
-// //         {
-// //           event: '*',
-// //           schema: 'public',
-// //           table: 'class_notes',
-// //           filter: `class_id=eq.${classId}&user_id=eq.${userId}`,
-// //         },
-// //         (payload) => {
-// //           if (!isMounted) return
-// //           if (payload.eventType === 'INSERT') {
-// //             setNotes((prev) => [payload.new as Note, ...prev])
-// //           } else if (payload.eventType === 'UPDATE') {
-// //             setNotes((prev) =>
-// //               prev.map((n) => (n.id === (payload.new as Note).id ? (payload.new as Note) : n))
-// //             )
-// //           } else if (payload.eventType === 'DELETE') {
-// //             setNotes((prev) => prev.filter((n) => n.id !== (payload.old as Note).id))
-// //           }
-// //         }
-// //       )
-// //       .subscribe()
-
-// //     return () => {
-// //       isMounted = false
-// //       supabase.removeChannel(channel)
-// //     }
-// //   }, [classId, userId])
-
-// //   return notes
-// // }
-
 // 'use client'
 
-// import { useEffect, useState } from 'react'
+// import { useEffect, useState, useRef } from 'react'
 // import { createClient } from '@/lib/supabase/client'
-// import type { RealtimeChannel } from '@supabase/supabase-js'
+// import { ensureFreshSession } from '@/lib/supabase/waitForAuth'
 
-// // We keep this here, but inside hooks we ensure we check for session
-// const supabase = createClient()
-
-// /* ---------------- NOTIFICATIONS ---------------- */
-// export interface Notification {
-//   id: string
-//   user_id: string
-//   type: string
-//   message: string
-//   created_at: string
-// }
-
-// export function useRealtimeNotifications(userId: string, classId: string) {
-//   const [notifications, setNotifications] = useState<Notification[]>([])
-
-//   useEffect(() => {
-//     if (!userId) return
-
-//     let isMounted = true
-
-//     // Load initial notifications
-//     supabase
-//       .from('notifications')
-//       .select('*')
-//       .eq('user_id', userId)
-//       .order('created_at', { ascending: false })
-//       .limit(20)
-//       .then(({ data }) => {
-//         if (data && isMounted) setNotifications(data as Notification[])
-//       })
-
-//     // Subscribe to INSERT
-//     const channel: RealtimeChannel = supabase
-//       .channel(`notifications:${userId}`)
-//       .on(
-//         'postgres_changes',
-//         {
-//           event: 'INSERT',
-//           schema: 'public',
-//           table: 'notifications',
-//           filter: `user_id=eq.${userId}`,
-//         },
-//         (payload) => {
-//           setNotifications((prev) => [payload.new as Notification, ...prev])
-//         }
-//       )
-//       .subscribe()
-
-//     return () => {
-//       isMounted = false
-//       supabase.removeChannel(channel)
-//     }
-//   }, [userId,classId])
-
-//   return notifications
-// }
-
+// /* 
+//  * Counter to ensure unique Supabase channel names across mounts.
+//  * When a component unmounts and remounts with the same classId,
+//  * the old channel name would conflict with the new one.
+//  */
+// let channelCounter = 0
 
 // /* ---------------- ANNOUNCEMENTS ---------------- */
-// export interface Announcement {
-//   id: string
-//   class_id: string
-//   title: string
-//   content: string
-//   pinned?: boolean
-//   created_at: string
-//   users?: { full_name?: string; email?: string }
-// }
-// // export function useRealtimeAnnouncements(classId: string, userId: string) {
-// //   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-
-// //   useEffect(() => {
-// //     // 1. Guard: Ensure classId exists before running
-// //     if (!classId) return
-
-// //     let isMounted = true
-
-// //     async function loadInitialData() {
-// //       const { data, error } = await supabase
-// //         .from('announcements')
-// //         .select('*, users(full_name,email)')
-// //         .eq('class_id', classId)
-// //         .order('pinned', { ascending: false })
-// //         .order('created_at', { ascending: false })
-
-// //       if (!error && data && isMounted) {
-// //         setAnnouncements(data as Announcement[])
-// //       }
-// //     }
-
-// //     loadInitialData()
-
-// //     const channel: RealtimeChannel = supabase.channel(`announcements:${classId}`)
-
-// //     channel
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'INSERT', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` },
-// //         (payload) => {
-// //           setAnnouncements((prev) => [payload.new as Announcement, ...prev])
-// //         }
-// //       )
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'UPDATE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` },
-// //         (payload) => {
-// //           setAnnouncements((prev) =>
-// //             prev.map((a) => (a.id === (payload.new as Announcement).id ? (payload.new as Announcement) : a))
-// //           )
-// //         }
-// //       )
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'DELETE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` },
-// //         (payload) => {
-// //           setAnnouncements((prev) => prev.filter((a) => a.id !== (payload.old as Announcement).id))
-// //         }
-// //       )
-// //       .subscribe()
-
-// //     return () => {
-// //       isMounted = false
-// //       supabase.removeChannel(channel)
-// //     }
-// //     // Added classId to dependency to ensure it re-triggers on navigation
-// //   }, [classId, userId])
-
-// //   return announcements
-// // }
 // export function useRealtimeAnnouncements(classId: string, userId: string) {
-//   const [announcements, setAnnouncements] = useState<Announcement[]>([])
+//   const [announcements, setAnnouncements] = useState<any[]>([])
+//   const [hasSettled, setHasSettled] = useState(false)
 
 //   useEffect(() => {
 //     if (!classId) return
 //     let isMounted = true
+//     const supabase = createClient()
+//     const mountId = ++channelCounter
+//     setHasSettled(false)
 
-//     // RESET: Clear old class data immediately
-//     setAnnouncements([])
-
-//     async function loadInitialData() {
-//       const { data, error } = await supabase
-//         .from('announcements')
-//         .select('*, users(full_name,email)')
-//         .eq('class_id', classId)
-//         .order('pinned', { ascending: false })
-//         .order('created_at', { ascending: false })
-
-//       if (!error && data && isMounted) setAnnouncements(data as Announcement[])
+//     const loadInitial = async () => {
+//       try {
+//         // Force token refresh if JWT might be expired after idle
+//         await ensureFreshSession()
+//         const { data } = await supabase
+//           .from('announcements')
+//           .select('*, users(full_name,email)')
+//           .eq('class_id', classId)
+//           .order('pinned', { ascending: false })
+//           .order('created_at', { ascending: false })
+//         if (data && isMounted) setAnnouncements(data)
+//       } finally {
+//         if (isMounted) setHasSettled(true)
+//       }
 //     }
+//     loadInitial()
 
-//     loadInitialData()
-
-//     const channel = supabase.channel(`announcements:${classId}`)
+//     const channel = supabase.channel(`ann_${classId}_${mountId}`)
 //       .on('postgres_changes', { 
 //         event: 'INSERT', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` 
 //       }, async (payload) => {
-//         // SIDE-FETCH: Get full record including user info
 //         const { data: newRow } = await supabase
 //           .from('announcements')
 //           .select('*, users(full_name,email)')
 //           .eq('id', payload.new.id)
 //           .single()
-        
-//         if (newRow && isMounted) setAnnouncements((prev) => [newRow as Announcement, ...prev])
+//         if (newRow && isMounted) setAnnouncements((prev) => [newRow, ...prev])
 //       })
 //       .on('postgres_changes', { 
 //         event: 'UPDATE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` 
 //       }, (payload) => {
-//         setAnnouncements((prev) => prev.map((a) => (a.id === payload.new.id ? { ...a, ...payload.new } : a)))
+//         setAnnouncements((prev) => prev.map((a: any) => (a.id === payload.new.id ? { ...a, ...payload.new } : a)))
 //       })
 //       .on('postgres_changes', { 
 //         event: 'DELETE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` 
 //       }, (payload) => {
-//         setAnnouncements((prev) => prev.filter((a) => a.id !== payload.old.id))
+//         setAnnouncements((prev) => prev.filter((a: any) => a.id !== payload.old.id))
 //       })
 //       .subscribe()
 
-//     return () => {
-//       isMounted = false
-//       supabase.removeChannel(channel)
-//     }
+//     return () => { isMounted = false; supabase.removeChannel(channel) }
 //   }, [classId, userId])
 
-//   return announcements
+//   return { announcements, hasSettled }
 // }
 
 // /* ---------------- ASSIGNMENTS ---------------- */
-// export interface Assignment {
-//   id: string
-//   class_id: string
-//   title: string
-//   content?: string
-//   dueDate?: string
-//   created_at: string
-//   users?: { full_name?: string; email?: string }
-// }
 // export function useRealtimeAssignments(classId: string, userId: string) {
-//   const [assignments, setAssignments] = useState<Assignment[]>([])
+//   const [assignments, setAssignments] = useState<any[]>([])
+//   const [hasSettled, setHasSettled] = useState(false)
 
 //   useEffect(() => {
 //     if (!classId) return
 //     let isMounted = true
-//     setAssignments([]) // Reset state
-  
-//     const loadAssignments = async () => {
-//       const { data } = await supabase
-//         .from('assignments')
-//         .select('*, users(full_name,email)')
-//         .eq('class_id', classId)
-//         .order('created_at', { ascending: false })
-  
-//       if (data && isMounted) setAssignments(data as Assignment[])
-//     }
-  
-//     loadAssignments()
-  
-//     const channel = supabase.channel(`assignments:${classId}`)
-//       .on('postgres_changes', { 
-//         event: 'INSERT', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` 
-//       }, async (payload) => {
-//         const { data: newRow } = await supabase
+//     const supabase = createClient()
+//     const mountId = ++channelCounter
+//     setHasSettled(false)
+
+//     const loadInitial = async () => {
+//       try {
+//         await ensureFreshSession()
+//         const { data } = await supabase
 //           .from('assignments')
 //           .select('*, users(full_name,email)')
-//           .eq('id', payload.new.id)
-//           .single()
-//         if (newRow && isMounted) setAssignments((prev) => [newRow as Assignment, ...prev])
-//       })
-//       .on('postgres_changes', { 
-//         event: 'UPDATE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` 
-//       }, (payload) => {
-//         setAssignments((prev) => prev.map((a) => (a.id === payload.new.id ? { ...a, ...payload.new } : a)))
-//       })
-//       .on('postgres_changes', { 
-//         event: 'DELETE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` 
-//       }, (payload) => setAssignments((prev) => prev.filter((a) => a.id !== payload.old.id)))
-//       .subscribe()
-  
-//     return () => {
-//       isMounted = false
-//       supabase.removeChannel(channel)
+//           .eq('class_id', classId)
+//           .order('created_at', { ascending: false })
+//         if (data && isMounted) setAssignments(data)
+//       } finally {
+//         if (isMounted) setHasSettled(true)
+//       }
 //     }
+//     loadInitial()
+
+//     const channel = supabase.channel(`asn_${classId}_${mountId}`)
+//       .on('postgres_changes',
+//         { event: 'INSERT', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
+//         async (payload) => {
+//           const { data: newRow } = await supabase
+//             .from('assignments')
+//             .select('*, users(full_name,email)')
+//             .eq('id', payload.new.id)
+//             .single()
+//           if (newRow && isMounted) setAssignments((current) => [newRow, ...current])
+//         }
+//       )
+//       .on('postgres_changes',
+//         { event: 'DELETE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
+//         (payload) => {
+//           setAssignments((current) => current.filter((a: any) => a.id !== payload.old.id))
+//         }
+//       )
+//       .subscribe()
+
+//     return () => { isMounted = false; supabase.removeChannel(channel) }
 //   }, [classId, userId])
-  
-//   return assignments
-// }
-// // export function useRealtimeAssignments(classId: string, userId: string) {
-  
-// //   const [assignments, setAssignments] = useState<Assignment[]>([])
 
-// //   useEffect(() => {
-// //     if (!classId) return
-// //     let isMounted = true
-  
-// //     const loadAssignments = async () => {
-// //       try {
-// //         const { data, error } = await supabase
-// //           .from('assignments')
-// //           .select('*, users(full_name,email)')
-// //           .eq('class_id', classId)
-// //           .order('created_at', { ascending: false })
-  
-// //         if (!error && data && isMounted) {
-// //           setAssignments(data as Assignment[])
-// //         }
-// //       } catch (err) {
-// //         console.error(err)
-// //       }
-// //     }
-  
-// //     loadAssignments()
-  
-// //     const channel: RealtimeChannel = supabase.channel(`assignments:${classId}`)
-// //     channel
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'INSERT', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-// //         (payload) => setAssignments((prev) => [payload.new as Assignment, ...prev])
-// //       )
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'UPDATE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-// //         (payload) =>
-// //           setAssignments((prev) =>
-// //             prev.map((a) => (a.id === (payload.new as Assignment).id ? (payload.new as Assignment) : a))
-// //           )
-// //       )
-// //       .on(
-// //         'postgres_changes',
-// //         { event: 'DELETE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-// //         (payload) => setAssignments((prev) => prev.filter((a) => a.id !== (payload.old as Announcement).id))
-// //       )
-// //       .subscribe()
-  
-// //     return () => {
-// //       isMounted = false
-// //       supabase.removeChannel(channel)
-// //     }
-// //     // Re-trigger on classId change
-// //   }, [classId, userId])
-  
-// //   return assignments
-// // }
-// /* ---------------- STICKY NOTES ---------------- */
-// export interface Note {
-//   id: string
-//   class_id: string
-//   user_id: string
-//   content: string
-//   created_at: string
+//   return { assignments, hasSettled }
 // }
 
-// export function useRealtimeStickyNotes(classId: string, userId?: string) {
-//   const [notes, setNotes] = useState<Note[]>([])
+// /* ---------------- MATERIALS ---------------- */
+// export function useRealtimeMaterials(classId: string, userId: string) {
+//   const [materials, setMaterials] = useState<any[]>([])
+//   const [hasSettled, setHasSettled] = useState(false)
 
 //   useEffect(() => {
-//     if (!classId || !userId) return
-
+//     if (!classId) return
 //     let isMounted = true
+//     const supabase = createClient()
+//     const mountId = ++channelCounter
+//     setHasSettled(false)
 
-//     // Load initial notes
-//     supabase
-//       .from('class_notes')
-//       .select('*')
-//       .eq('class_id', classId)
-//       .eq('user_id', userId)
-//       .order('created_at', { ascending: false })
-//       .then(({ data }) => {
-//         if (data && isMounted) setNotes(data as Note[])
-//       })
+//     const fetchMaterials = async () => {
+//       try {
+//         await ensureFreshSession()
+//         const { data, error } = await supabase
+//           .from('materials')
+//           .select('*, users:created_by (full_name)')
+//           .eq('class_id', classId)
+//           .order('created_at', { ascending: false })
+//         if (!error && data && isMounted) setMaterials(data)
+//       } finally {
+//         if (isMounted) setHasSettled(true)
+//       }
+//     }
+//     fetchMaterials()
 
-//     const channel: RealtimeChannel = supabase.channel(`class_notes:${classId}:${userId}`)
-
-//     channel
-//       .on(
-//         'postgres_changes',
-//         {
-//           event: '*',
-//           schema: 'public',
-//           table: 'class_notes',
-//           filter: `class_id=eq.${classId}&user_id=eq.${userId}`,
-//         },
-//         (payload) => {
+//     const channel = supabase
+//       .channel(`mat_${classId}_${mountId}`)
+//       .on('postgres_changes',
+//         { event: '*', schema: 'public', table: 'materials', filter: `class_id=eq.${classId}` },
+//         async (payload) => {
 //           if (!isMounted) return
 //           if (payload.eventType === 'INSERT') {
-//             setNotes((prev) => [payload.new as Note, ...prev])
+//             const { data: newMaterial } = await supabase
+//               .from('materials')
+//               .select('*, users:created_by (full_name)')
+//               .eq('id', payload.new.id)
+//               .single()
+//             if (newMaterial && isMounted) setMaterials((prev) => [newMaterial, ...prev])
 //           } else if (payload.eventType === 'UPDATE') {
-//             setNotes((prev) =>
-//               prev.map((n) => (n.id === (payload.new as Note).id ? (payload.new as Note) : n))
+//             setMaterials((prev) =>
+//               prev.map((m: any) => (m.id === payload.new.id ? { ...m, ...payload.new } : m))
 //             )
 //           } else if (payload.eventType === 'DELETE') {
-//             setNotes((prev) => prev.filter((n) => n.id !== (payload.old as Note).id))
+//             setMaterials((prev) => prev.filter((m: any) => m.id !== payload.old.id))
 //           }
 //         }
 //       )
 //       .subscribe()
 
-//     return () => {
-//       isMounted = false
-//       supabase.removeChannel(channel)
+//     return () => { isMounted = false; supabase.removeChannel(channel) }
+//   }, [classId, userId])
+
+//   return { materials, hasSettled }
+// }
+
+// /* ---------------- STICKY NOTES ---------------- */
+// export function useRealtimeStickyNotes(classId: string, userId?: string) {
+//   const [notes, setNotes] = useState<any[]>([])
+
+//   useEffect(() => {
+//     if (!classId || !userId) return
+//     let isMounted = true
+//     const supabase = createClient()
+//     const mountId = ++channelCounter
+
+//     const loadInitial = async () => {
+//       await ensureFreshSession()
+//       const { data } = await supabase
+//         .from('class_notes')
+//         .select('*')
+//         .eq('class_id', classId)
+//         .eq('user_id', userId)
+//         .order('created_at', { ascending: false })
+//       if (data && isMounted) setNotes(data)
 //     }
+//     loadInitial()
+
+//     const channel = supabase.channel(`notes_${classId}_${userId}_${mountId}`)
+//       .on('postgres_changes', { 
+//         event: '*', schema: 'public', table: 'class_notes', filter: `class_id=eq.${classId}` 
+//       }, (payload) => {
+//         if (!isMounted) return
+//         const noteUser = payload.new ? (payload.new as any).user_id : (payload.old as any).user_id
+//         if (noteUser !== userId) return
+
+//         if (payload.eventType === 'INSERT') {
+//           setNotes((prev) => [payload.new, ...prev])
+//         } else if (payload.eventType === 'UPDATE') {
+//           setNotes((prev) => prev.map((n) => (n.id === payload.new.id ? payload.new : n)))
+//         } else if (payload.eventType === 'DELETE') {
+//           setNotes((prev) => prev.filter((n) => n.id !== payload.old.id))
+//         }
+//       })
+//       .subscribe()
+
+//     return () => { isMounted = false; supabase.removeChannel(channel) }
 //   }, [classId, userId])
 
 //   return notes
 // }
 
 
-// // export function useRealtimeMaterials(classId: string, userId: string) {
-// //   const [materials, setMaterials] = useState<any[]>([])
-// //   const supabase = createClient()
-
-// //   useEffect(() => {
-// //     // 1. Initial Fetch of Materials
-// //     const fetchMaterials = async () => {
-// //       const { data, error } = await supabase
-// //         .from('materials')
-// //         .select(`
-// //           *,
-// //           users:created_by (full_name)
-// //         `)
-// //         .eq('class_id', classId)
-// //         .order('created_at', { ascending: false })
-
-// //       if (error) {
-// //         console.error('Error fetching materials:', error)
-// //       } else {
-// //         setMaterials(data || [])
-// //       }
-// //     }
-
-// //     fetchMaterials()
-
-// //     // 2. Realtime Subscription
-// //     const channel = supabase
-// //       .channel(`realtime:materials:${classId}`)
-// //       .on(
-// //         'postgres_changes',
-// //         {
-// //           event: '*',
-// //           schema: 'public',
-// //           table: 'materials',
-// //           filter: `class_id=eq.${classId}`,
-// //         },
-// //         async (payload) => {
-// //           if (payload.eventType === 'INSERT') {
-// //             // For inserts, we fetch the full row to get the joined 'users' data
-// //             const { data: newMaterial } = await supabase
-// //               .from('materials')
-// //               .select('*, users:created_by (full_name)')
-// //               .eq('id', payload.new.id)
-// //               .single()
-            
-// //             if (newMaterial) {
-// //               setMaterials((prev) => [newMaterial, ...prev])
-// //             }
-// //           } else if (payload.eventType === 'UPDATE') {
-// //             setMaterials((prev) =>
-// //               prev.map((m) => (m.id === payload.new.id ? { ...m, ...payload.new } : m))
-// //             )
-// //           } else if (payload.eventType === 'DELETE') {
-// //             setMaterials((prev) => prev.filter((m) => m.id === payload.old.id))
-// //           }
-// //         }
-// //       )
-// //       .subscribe()
-
-// //     return () => {
-// //       supabase.removeChannel(channel)
-// //     }
-// //   }, [classId, supabase])
-
-// //   return materials
-// // }
-// export function useRealtimeMaterials(classId: string, userId: string) {
-//   const [materials, setMaterials] = useState<any[]>([])
-
-//   useEffect(() => {
-//     if (!classId) return
-//     let isMounted = true
-//     setMaterials([]) // Reset state
-
-//     const fetchMaterials = async () => {
-//       const { data } = await supabase
-//         .from('materials')
-//         .select('*, users:created_by (full_name)')
-//         .eq('class_id', classId)
-//         .order('created_at', { ascending: false })
-
-//       if (data && isMounted) setMaterials(data || [])
-//     }
-
-//     fetchMaterials()
-
-//     const channel = supabase.channel(`materials:${classId}`)
-//       .on('postgres_changes', { 
-//         event: 'INSERT', schema: 'public', table: 'materials', filter: `class_id=eq.${classId}` 
-//       }, async (payload) => {
-//         const { data: newMaterial } = await supabase
-//           .from('materials')
-//           .select('*, users:created_by (full_name)')
-//           .eq('id', payload.new.id)
-//           .single()
-//         if (newMaterial && isMounted) setMaterials((prev) => [newMaterial, ...prev])
-//       })
-//       .on('postgres_changes', { 
-//         event: 'UPDATE', schema: 'public', table: 'materials', filter: `class_id=eq.${classId}` 
-//       }, (payload) => {
-//         setMaterials((prev) => prev.map((m) => (m.id === payload.new.id ? { ...m, ...payload.new } : m)))
-//       })
-//       .on('postgres_changes', { 
-//         event: 'DELETE', schema: 'public', table: 'materials', filter: `class_id=eq.${classId}` 
-//       }, (payload) => {
-//         setMaterials((prev) => prev.filter((m) => m.id !== payload.old.id))
-//       })
-//       .subscribe()
-
-//     return () => {
-//       isMounted = false
-//       supabase.removeChannel(channel)
-//     }
-//   }, [classId, userId])
-
-//   return materials
-// }
 'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { RealtimeChannel } from '@supabase/supabase-js'
 
-const supabase = createClient()
+let channelCounter = 0
 
-/* ---------------- ANNOUNCEMENTS ---------------- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   SHARED AUTH GUARD  (singleton — resolves once, shared by every hook)
+───────────────────────────────────────────────────────────────────────────── */
+
+let authPromise: Promise<boolean> | null = null
+
+/**
+ * Ensures the Supabase browser client has a valid session before any
+ * data‑fetching begins.  Only the **first** caller actually triggers
+ * `getUser()` (with retries); every subsequent caller awaits the same
+ * promise so there is no auth-lock contention.
+ */
+export function ensureAuth(supabase: ReturnType<typeof createClient>): Promise<boolean> {
+  if (authPromise) return authPromise
+
+  authPromise = (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) return true
+      await new Promise((r) => setTimeout(r, 300))
+    }
+    return false
+  })()
+
+  // Reset after 30 s so a future mount can re-verify if the JWT expired
+  authPromise.finally(() => {
+    setTimeout(() => { authPromise = null }, 30_000)
+  })
+
+  return authPromise
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANNOUNCEMENTS
+───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeAnnouncements(classId: string, userId: string) {
   const [announcements, setAnnouncements] = useState<any[]>([])
   const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
-    if (!classId) return
+    if (!classId || !userId) return
     let isMounted = true
+    // Create client once per effect, not per render
+    const supabase = createClient()
+    const mountId = ++channelCounter
     setHasSettled(false)
+    setAnnouncements([])
 
     const loadInitial = async () => {
       try {
-        await supabase.auth.getSession()
+        const authed = await ensureAuth(supabase)
+        if (!authed || !isMounted) return
         const { data } = await supabase
           .from('announcements')
           .select('*, users(full_name,email)')
           .eq('class_id', classId)
           .order('pinned', { ascending: false })
           .order('created_at', { ascending: false })
-        if (data && isMounted) setAnnouncements(data)
+        if (isMounted) setAnnouncements(data ?? [])
       } finally {
         if (isMounted) setHasSettled(true)
       }
     }
+
     loadInitial()
 
-    const channel = supabase.channel(`announcements_feed_${classId}`)
-      .on('postgres_changes', { 
-        event: 'INSERT', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` 
+    const channel = supabase
+      .channel(`ann_${classId}_${mountId}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'announcements',
+        filter: `class_id=eq.${classId}`,
       }, async (payload) => {
-        // SIDE-FETCH: Get full record with user join
         const { data: newRow } = await supabase
           .from('announcements')
           .select('*, users(full_name,email)')
           .eq('id', payload.new.id)
           .single()
-        
-        if (newRow && isMounted) {
-          setAnnouncements((prev) => [newRow, ...prev])
-        }
+        if (newRow && isMounted) setAnnouncements((prev) => [newRow, ...prev])
       })
-      .on('postgres_changes', { 
-        event: 'UPDATE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` 
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'announcements',
+        filter: `class_id=eq.${classId}`,
       }, (payload) => {
-        setAnnouncements((prev) => prev.map((a) => (a.id === payload.new.id ? { ...a, ...payload.new } : a)))
+        if (!isMounted) return
+        setAnnouncements((prev) =>
+          prev.map((a: any) => (a.id === payload.new.id ? { ...a, ...payload.new } : a))
+        )
       })
-      .on('postgres_changes', { 
-        event: 'DELETE', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` 
+      .on('postgres_changes', {
+        event: 'DELETE', schema: 'public', table: 'announcements',
+        filter: `class_id=eq.${classId}`,
       }, (payload) => {
-        setAnnouncements((prev) => prev.filter((a) => a.id !== payload.old.id))
+        if (!isMounted) return
+        setAnnouncements((prev) => prev.filter((a: any) => a.id !== payload.old.id))
       })
       .subscribe()
 
-    return () => { isMounted = false; supabase.removeChannel(channel) }
-  }, [classId])
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
+  }, [classId, userId])
 
   return { announcements, hasSettled }
 }
 
-/* ---------------- ASSIGNMENTS ---------------- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   ASSIGNMENTS
+───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeAssignments(classId: string, userId: string) {
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [hasSettled, setHasSettled] = useState(false);
+  const [assignments, setAssignments] = useState<any[]>([])
+  const [hasSettled, setHasSettled] = useState(false)
 
   useEffect(() => {
-    if (!classId) return;
-    let isMounted = true;
-    setAssignments([]);
-    setHasSettled(false);
+    if (!classId || !userId) return
+    let isMounted = true
+    const supabase = createClient()
+    const mountId = ++channelCounter
+    setHasSettled(false)
+    setAssignments([])
 
     const loadInitial = async () => {
       try {
-        await supabase.auth.getSession()
+        const authed = await ensureAuth(supabase)
+        if (!authed || !isMounted) return
         const { data } = await supabase
           .from('assignments')
           .select('*, users(full_name,email)')
           .eq('class_id', classId)
-          .order('created_at', { ascending: false });
-        if (data && isMounted) setAssignments(data);
-      } finally {
-        if (isMounted) setHasSettled(true);
-      }
-    };
-
-    loadInitial();
-
-    const channel = supabase.channel(`assignments_realtime_${classId}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` },
-        async (payload) => {
-          // IMPORTANT: We fetch the full row to get the 'users' join 
-          // that standard Realtime doesn't provide.
-          const { data: newRow } = await supabase
-            .from('assignments')
-            .select('*, users(full_name,email)')
-            .eq('id', payload.new.id)
-            .single();
-
-          if (newRow && isMounted) {
-            // Use a functional update and a new array reference [...]
-            setAssignments((current) => [newRow, ...current]);
-          }
-        }
-      )
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` }, 
-        (payload) => {
-          setAssignments((current) => current.filter(a => a.id !== payload.old.id));
-        }
-      )
-      .subscribe((status) => {
-        console.log("Assignment Sync Status:", status);
-      });
-
-    return () => {
-      isMounted = false;
-      supabase.removeChannel(channel);
-    };
-  }, [classId, userId]);
-
-  return { assignments, hasSettled };
-}
-/* ---------------- MATERIALS ---------------- */
-export function useRealtimeMaterials(classId: string, userId: string) {
-  const [materials, setMaterials] = useState<any[]>([])
-  const [hasSettled, setHasSettled] = useState(false)
-
-  useEffect(() => {
-    if (!classId) return
-    let isMounted = true
-    setMaterials([])
-    setHasSettled(false)
-
-    const fetchMaterials = async () => {
-      try {
-        await supabase.auth.getSession()
-        const { data, error } = await supabase
-          .from('materials')
-          .select(`
-            *,
-            users:created_by (full_name)
-          `)
-          .eq('class_id', classId)
           .order('created_at', { ascending: false })
-
-        if (!error && data && isMounted) {
-          setMaterials(data)
-        }
-      } catch (err) {
-        console.error('Initial fetch error:', err)
+        if (isMounted) setAssignments(data ?? [])
       } finally {
         if (isMounted) setHasSettled(true)
       }
     }
 
-    fetchMaterials()
+    loadInitial()
 
-    // 2. Realtime Subscription
-    // Use a unique channel name per class to avoid cross-talk
     const channel = supabase
-      .channel(`materials_feed_${classId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'materials',
-          filter: `class_id=eq.${classId}`,
-        },
-        async (payload) => {
-          if (!isMounted) return
+      .channel(`asn_${classId}_${mountId}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'assignments',
+        filter: `class_id=eq.${classId}`,
+      }, async (payload) => {
+        const { data: newRow } = await supabase
+          .from('assignments')
+          .select('*, users(full_name,email)')
+          .eq('id', payload.new.id)
+          .single()
+        if (newRow && isMounted) setAssignments((prev) => [newRow, ...prev])
+      })
+      .on('postgres_changes', {
+        event: 'DELETE', schema: 'public', table: 'assignments',
+        filter: `class_id=eq.${classId}`,
+      }, (payload) => {
+        if (!isMounted) return
+        setAssignments((prev) => prev.filter((a: any) => a.id !== payload.old.id))
+      })
+      .subscribe()
 
-          if (payload.eventType === 'INSERT') {
-            // SIDE-FETCH: Standard Realtime doesn't send the 'users' join.
-            // We fetch the full row manually so the Feed doesn't need a refresh.
-            const { data: newMaterial } = await supabase
-              .from('materials')
-              .select('*, users:created_by (full_name)')
-              .eq('id', payload.new.id)
-              .single()
-            
-            if (newMaterial && isMounted) {
-              setMaterials((prev) => [newMaterial, ...prev])
-            }
-          } 
-          
-          else if (payload.eventType === 'UPDATE') {
-            // Merge the update into existing state to preserve the 'users' join 
-            // that might already be there from the initial load.
-            setMaterials((prev) =>
-              prev.map((m) => (m.id === payload.new.id ? { ...m, ...payload.new } : m))
-            )
-          } 
-          
-          else if (payload.eventType === 'DELETE') {
-            setMaterials((prev) => prev.filter((m) => m.id !== payload.old.id))
-          }
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
+  }, [classId, userId])
+
+  return { assignments, hasSettled }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MATERIALS
+───────────────────────────────────────────────────────────────────────────── */
+export function useRealtimeMaterials(classId: string, userId: string) {
+  const [materials, setMaterials] = useState<any[]>([])
+  const [hasSettled, setHasSettled] = useState(false)
+
+  useEffect(() => {
+    if (!classId || !userId) return
+    let isMounted = true
+    const supabase = createClient()
+    const mountId = ++channelCounter
+    setHasSettled(false)
+    setMaterials([])
+
+    const loadInitial = async () => {
+      try {
+        const authed = await ensureAuth(supabase)
+        if (!authed || !isMounted) return
+        const { data } = await supabase
+          .from('materials')
+          .select('*, users:created_by(full_name)')
+          .eq('class_id', classId)
+          .order('created_at', { ascending: false })
+        if (isMounted) setMaterials(data ?? [])
+      } finally {
+        if (isMounted) setHasSettled(true)
+      }
+    }
+
+    loadInitial()
+
+    const channel = supabase
+      .channel(`mat_${classId}_${mountId}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'materials',
+        filter: `class_id=eq.${classId}`,
+      }, async (payload) => {
+        if (!isMounted) return
+        if (payload.eventType === 'INSERT') {
+          const { data: newMaterial } = await supabase
+            .from('materials')
+            .select('*, users:created_by(full_name)')
+            .eq('id', payload.new.id)
+            .single()
+          if (newMaterial && isMounted) setMaterials((prev) => [newMaterial, ...prev])
+        } else if (payload.eventType === 'UPDATE') {
+          setMaterials((prev) =>
+            prev.map((m: any) => (m.id === payload.new.id ? { ...m, ...payload.new } : m))
+          )
+        } else if (payload.eventType === 'DELETE') {
+          setMaterials((prev) => prev.filter((m: any) => m.id !== payload.old.id))
         }
-      )
+      })
       .subscribe()
 
     return () => {
@@ -962,16 +466,22 @@ export function useRealtimeMaterials(classId: string, userId: string) {
 
   return { materials, hasSettled }
 }
-/* ---------------- STICKY NOTES ---------------- */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STICKY NOTES
+───────────────────────────────────────────────────────────────────────────── */
 export function useRealtimeStickyNotes(classId: string, userId?: string) {
   const [notes, setNotes] = useState<any[]>([])
 
   useEffect(() => {
     if (!classId || !userId) return
     let isMounted = true
+    const supabase = createClient()
+    const mountId = ++channelCounter
 
     const loadInitial = async () => {
-      await supabase.auth.getSession()
+      const authed = await ensureAuth(supabase)
+      if (!authed || !isMounted) return
       const { data } = await supabase
         .from('class_notes')
         .select('*')
@@ -980,16 +490,19 @@ export function useRealtimeStickyNotes(classId: string, userId?: string) {
         .order('created_at', { ascending: false })
       if (data && isMounted) setNotes(data)
     }
+
     loadInitial()
 
-    const channel = supabase.channel(`notes_${classId}_${userId}`)
-      .on('postgres_changes', { 
-        event: '*', schema: 'public', table: 'class_notes', filter: `class_id=eq.${classId}` 
+    const channel = supabase
+      .channel(`notes_${classId}_${userId}_${mountId}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'class_notes',
+        filter: `class_id=eq.${classId}`,
       }, (payload) => {
         if (!isMounted) return
-
-        // Manual filter: Only process if the note belongs to this user
-        const noteUser = payload.new ? (payload.new as any).user_id : (payload.old as any).user_id
+        const noteUser = payload.new
+          ? (payload.new as any).user_id
+          : (payload.old as any).user_id
         if (noteUser !== userId) return
 
         if (payload.eventType === 'INSERT') {
@@ -1002,9 +515,11 @@ export function useRealtimeStickyNotes(classId: string, userId?: string) {
       })
       .subscribe()
 
-    return () => { isMounted = false; supabase.removeChannel(channel) }
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
   }, [classId, userId])
 
   return notes
 }
-

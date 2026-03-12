@@ -20,7 +20,6 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   const [materials, setMaterials] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // const [editing, setEditing] = useState<material | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [editing, setEditing] = useState<any>(null)
@@ -31,8 +30,9 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
     setLoading(true)
     setError(null)
 
-    await supabase.auth.getSession()
-    
+    // getUser() makes a real server call that triggers JWT refresh
+    await supabase.auth.getUser()
+
     const { data, error } = await supabase
       .from('materials')
       .select('*, users(full_name, email)')

@@ -38,7 +38,7 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
 
       // 2. Enroll the user (assuming a table named 'class_enrollments')
       const { error: joinError } = await supabase
-        .from('class_members') 
+        .from('class_members')
         .insert({
           class_id: (classroom as any).id,
           user_id: userId,
@@ -58,9 +58,14 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
       setLoading(false)
     }
   }
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div onClick={handleBackdropClick} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-bold text-navy flex items-center gap-2">

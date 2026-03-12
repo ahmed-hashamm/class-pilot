@@ -153,8 +153,6 @@ export default function MembersTab({ classId, isTeacher, userId }: MembersTabPro
   const loadMembers = async () => {
     setLoading(true)
     setError(null)
-    
-    await supabase.auth.getSession()
 
     const { data, error } = await supabase
       .from('class_members')

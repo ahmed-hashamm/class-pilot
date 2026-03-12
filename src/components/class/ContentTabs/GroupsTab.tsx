@@ -420,6 +420,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { ensureAuth } from "@/hooks/useRealtime";
 import {
   Plus, Pencil, Trash2, UserMinus, Search, RefreshCw,
   Check, Users2, X, AlertCircle, Loader2,
@@ -462,6 +463,8 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
   async function fetchData() {
     setLoading(true); setError(null)
     try {
+      const authed = await ensureAuth(supabase)
+      if (!authed) { setError('Not authenticated.'); return }
       const [groupsRes, membersRes] = await Promise.all([
         supabase
           .from("group_projects")

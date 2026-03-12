@@ -151,7 +151,6 @@ import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { ClipboardList, Calendar, Award, Plus, Paperclip, ArrowRight, RefreshCw } from 'lucide-react'
-import Loader from '@/components/layout/Loader'
 
 interface AssignmentsTabProps {
   classId: string
@@ -161,16 +160,13 @@ interface AssignmentsTabProps {
 
 export default function AssignmentsTab({ classId, isTeacher, userId }: AssignmentsTabProps) {
   const [assignments, setAssignments] = useState<any[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [error,       setError]       = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
   const loadAssignments = async () => {
     setLoading(true)
     setError(null)
-    
-    // Ensure session is loaded before fetch to avoid empty arrays due to RLS blocked reads
-    await supabase.auth.getSession()
 
     const { data, error } = await supabase
       .from('assignments')
@@ -255,7 +251,7 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
   // Split into upcoming and past
   const now = new Date()
   const upcoming = assignments.filter((a) => !a.due_date || new Date(a.due_date) >= now)
-  const past     = assignments.filter((a) =>  a.due_date && new Date(a.due_date) <  now)
+  const past = assignments.filter((a) => a.due_date && new Date(a.due_date) < now)
 
   return (
     <div className="flex flex-col gap-6 py-6">
