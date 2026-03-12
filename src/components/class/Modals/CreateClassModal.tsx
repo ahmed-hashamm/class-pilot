@@ -1,8 +1,23 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Plus, Loader2, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+
+const createClassSchema = z.object({
+  className: z.string().min(1, 'Class name is required').trim(),
+  description: z.string().trim().optional(),
+})
+
+type CreateClassFormData = z.infer<typeof createClassSchema>
 
 interface CreateClassModalProps {
   userId: string
@@ -13,146 +28,115 @@ interface CreateClassModalProps {
 export default function CreateClassModal({ userId, onClose, onSuccess }: CreateClassModalProps) {
   const router = useRouter()
   const supabase = createClient()
-  const [className, setClassName] = useState('')
-  const [description, setDescription] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateClassFormData>({
+    resolver: zodResolver(createClassSchema),
+    defaultValues: { className: '', description: '' },
+  })
 
   const generateClassCode = () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase()
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!className.trim()) {
-      setError('Class name is required')
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-
+  const onSubmit = async (data: CreateClassFormData) => {
     const code = generateClassCode()
 
     try {
-      // Create class (user profile should already exist from authentication)
+      // 1. Create class
       const { data: classData, error: classError } = await supabase
         .from('classes')
         .insert({
-          name: className.trim(),
-          description: description.trim() || null,
+          name: data.className,
+          description: data.description || null,
           code,
           created_by: userId,
         } as any)
         .select()
         .single()
 
-      if (classError) {
-        console.error('Class creation error:', classError)
-        throw classError
-      }
+      if (classError) throw classError
+      if (!classData) throw new Error('Class creation failed: No data returned')
 
-      if (!classData) {
-        throw new Error('Class creation failed: No data returned')
-      }
+      const classId = (classData as any).id
 
-      // Add creator as teacher
+      // 2. Add creator as teacher
       const { error: memberError } = await supabase.from('class_members').insert({
-        class_id: (classData as any).id,
+        class_id: classId,
         user_id: userId,
         role: 'teacher',
       } as any)
 
-      if (memberError) {
-        console.error('Member creation error:', memberError)
-        throw memberError
-      }
+      if (memberError) throw memberError
 
-      // Call success callback if provided
-      if (onSuccess) {
-        onSuccess()
-      }
-
-      // Close modal and refresh
+      toast.success('Class created successfully!')
+      if (onSuccess) onSuccess()
+      
       onClose()
-      router.push(`/dashboard/classes/${(classData as any).id}`)
-      router.refresh()
+      router.push(`/classes/${classId}`)
+      // Removed router.refresh() as React Query invalidate will handle data refetching in Phase 4
     } catch (err: any) {
       console.error('Error creating class:', err)
-      setError(err.message || 'Failed to create class')
-    } finally {
-      setLoading(false)
+      toast.error(err.message || 'Failed to create class')
     }
   }
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && !isSubmitting) {
       onClose()
     }
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={handleBackdropClick}
-    >
-      <div className="bg-white rounded-lg w-full max-w-md mx-4 shadow-xl">
-        {/* Title */}
-        <div className="px-6 pt-6 pb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Create Class</h2>
+    <div onClick={handleBackdropClick} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-xl font-bold text-navy flex items-center gap-2">
+            <Plus className="text-accent" size={24} />
+            Create Class
+          </h2>
+          <button onClick={onClose} disabled={isSubmitting} className="text-gray-400 hover:text-gray-600 disabled:opacity-50">
+            <X size={24} />
+          </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 pb-6">
-          {/* Input Fields */}
-          <div className="space-y-4 mb-6">
-            <div>
-              <input
-                type="text"
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                placeholder="Class name"
-                className="w-full bg-gray-50 px-4 py-3 rounded-lg border-0 border-b-2 border-blue-500 focus:outline-none focus:bg-white focus:border-blue-600 text-gray-900 placeholder:text-gray-400"
-                disabled={loading}
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="className">Class Name <span className="text-red-500">*</span></Label>
+              <Input
+                id="className"
+                placeholder="e.g. Introduction to Computer Science"
+                {...register('className')}
+                className="text-navy"
                 autoFocus
               />
+              {errors.className && (
+                <p className="text-sm font-medium text-red-600">{errors.className.message}</p>
+              )}
             </div>
-            <div>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Description (optional)"
-                rows={3}
-                className="w-full bg-gray-50 px-4 py-3 rounded-lg border-0 border-b-2 border-blue-500 focus:outline-none focus:bg-white focus:border-blue-600 text-gray-900 placeholder:text-gray-400 resize-none"
-                disabled={loading}
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description (Optional)</Label>
+              <Textarea
+                id="description"
+                placeholder="What is this class about?"
+                {...register('description')}
+                className="resize-none min-h-[100px] text-navy"
               />
             </div>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-4 text-sm text-red-600 bg-red-50 px-3 py-2 rounded">
-              {error}
-            </div>
-          )}
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="text-gray-600 hover:text-gray-800 font-medium disabled:opacity-50"
-            >
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="flex-1">
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || !className.trim()}
-              className="text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating...' : 'Create'}
-            </button>
+            </Button>
+            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-navy hover:bg-navy-light text-white">
+              {isSubmitting ? <Loader2 className="animate-spin" /> : 'Create Class'}
+            </Button>
           </div>
         </form>
       </div>

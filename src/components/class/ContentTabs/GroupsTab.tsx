@@ -420,7 +420,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { ensureAuth } from "@/hooks/useRealtime";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { classService } from "@/services/classService";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import {
   Plus, Pencil, Trash2, UserMinus, Search, RefreshCw,
   Check, Users2, X, AlertCircle, Loader2,
@@ -430,7 +434,6 @@ import {
   deleteGroup,
   removeGroupMember,
 } from "@/components/class/ClassActions";
-import Loader from "@/components/layout/Loader";
 
 /* ── Types ── */
 interface Profile     { full_name: string | null }
@@ -445,43 +448,29 @@ const getName = (profiles: Profile | Profile[]) =>
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 export default function GroupsTab({ classId, isTeacher }: Props) {
-  const supabase = createClient()
+  const queryClient = useQueryClient()
 
-  const [groups,          setGroups]          = useState<Group[]>([])
-  const [allClassMembers, setAllClassMembers] = useState<ClassMember[]>([])
-  const [loading,         setLoading]         = useState(true)
+  // Data fetching with React Query
+  const { data: groups = [] as Group[], isLoading: loadingGroups, error: errorGroups, refetch: refetchGroups } = useQuery({
+    queryKey: ['groups', classId],
+    queryFn: () => classService.getGroupsWithMembers(classId),
+  })
+
+  const { data: allClassMembers = [] as ClassMember[], isLoading: loadingMembers } = useQuery({
+    queryKey: ['classMembers', classId],
+    queryFn: () => classService.getAllClassMembers(classId),
+  })
+
+  const loading = loadingGroups || loadingMembers
+
+  // UI State
   const [showModal,       setShowModal]       = useState(false)
   const [groupTitle,      setGroupTitle]      = useState("")
   const [editingGroupId,  setEditingGroupId]  = useState<string | null>(null)
   const [selectedIds,     setSelectedIds]     = useState<string[]>([])
   const [searchQuery,     setSearchQuery]     = useState("")
-  const [error,           setError]           = useState<string | null>(null)
+  const [localError,      setLocalError]      = useState<string | null>(null)
   const [submitting,      setSubmitting]      = useState(false)
-
-  useEffect(() => { fetchData() }, [classId])
-
-  async function fetchData() {
-    setLoading(true); setError(null)
-    try {
-      const authed = await ensureAuth(supabase)
-      if (!authed) { setError('Not authenticated.'); return }
-      const [groupsRes, membersRes] = await Promise.all([
-        supabase
-          .from("group_projects")
-          .select("id, title, project_members(user_id, profiles:user_id(full_name))")
-          .eq("class_id", classId),
-        supabase
-          .from("class_members")
-          .select("user_id, profiles:user_id(full_name)")
-          .eq("class_id", classId),
-      ])
-      if (groupsRes.error) throw groupsRes.error
-      if (membersRes.error) throw membersRes.error
-      setGroups(groupsRes.data ?? [])
-      setAllClassMembers(membersRes.data ?? [])
-    } catch { setError("Failed to load group data.") }
-    finally  { setLoading(false) }
-  }
 
   /* ── Filtered students ── */
   const availableStudents = useMemo(() => {
@@ -503,19 +492,23 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
     setSelectedIds((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id])
 
   const handleSave = async () => {
-    if (!groupTitle.trim()) { setError("Group name is required"); return }
-    setSubmitting(true); setError(null)
+    if (!groupTitle.trim()) { setLocalError("Group name is required"); return }
+    setSubmitting(true); setLocalError(null)
     try {
       await saveGroup(classId, groupTitle, editingGroupId, selectedIds)
-      closeModal(); fetchData()
+      queryClient.invalidateQueries({ queryKey: ['groups', classId] })
+      closeModal()
     } catch (err: any) {
-      setError(err.message || "Failed to save group")
+      setLocalError(err.message || "Failed to save group")
     } finally { setSubmitting(false) }
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm("Dissolve this group? Members will become unassigned.")) return
-    try { await deleteGroup(id, classId); fetchData() }
+    try { 
+      await deleteGroup(id, classId)
+      queryClient.invalidateQueries({ queryKey: ['groups', classId] })
+    }
     catch { alert("Error deleting group") }
   }
 
@@ -528,64 +521,19 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
 
   const closeModal = () => {
     setShowModal(false); setGroupTitle(""); setEditingGroupId(null)
-    setSelectedIds([]); setSearchQuery(""); setError(null)
+    setSelectedIds([]); setSearchQuery(""); setLocalError(null)
   }
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-6 py-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-muted flex items-center justify-center" />
-            <div className="space-y-2">
-              <div className="h-4 bg-muted rounded w-40" />
-              <div className="h-3 bg-muted rounded w-48" />
-            </div>
-          </div>
-          <div className="h-9 w-40 bg-muted rounded-xl" />
-        </div>
-
-        <div className="bg-white border border-border rounded-2xl overflow-hidden animate-pulse">
-          {[1, 2].map((i) => (
-            <div
-              key={i}
-              className={`flex items-start gap-4 p-5 ${i === 1 ? "border-b border-border" : ""}`}
-            >
-              <div className="shrink-0 size-11 rounded-xl bg-muted" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-muted rounded w-1/2" />
-                <div className="h-3 bg-muted rounded w-1/3" />
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <div className="h-3 bg-muted rounded w-20" />
-                  <div className="h-3 bg-muted rounded w-16" />
-                  <div className="h-3 bg-muted rounded w-24" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="py-6">
+        <SkeletonLoader variant="list" count={3} />
       </div>
     )
   }
 
-  if (error && groups.length === 0) {
-    return (
-      <div className="flex flex-col gap-6 py-6">
-        <div className="flex flex-col items-center justify-center gap-4 py-16
-          border-2 border-dashed border-border rounded-2xl bg-white text-center">
-          <Users2 size={32} className="text-muted-foreground/40" />
-          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
-          <button
-            onClick={() => fetchData()}
-            className="inline-flex items-center gap-2 bg-navy text-white font-semibold
-              text-[13px] px-5 py-2.5 rounded-xl hover:bg-navy/90 transition cursor-pointer
-              border-none">
-            <RefreshCw size={14} />
-            Retry
-          </button>
-        </div>
-      </div>
-    )
+  if (errorGroups) {
+    return <ErrorState message="Failed to load group data." onRetry={() => refetchGroups()} />
   }
 
   /* ── Render ── */
@@ -709,7 +657,9 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
                           {isTeacher && (
                             <button
                               onClick={() =>
-                                removeGroupMember(group.id, m.user_id, classId).then(fetchData)
+                                removeGroupMember(group.id, m.user_id, classId).then(() => 
+                                  queryClient.invalidateQueries({ queryKey: ['groups', classId] })
+                                )
                               }
                               className="opacity-0 group-hover/member:opacity-100
                                 text-muted-foreground/40 hover:text-red-500 transition-all
@@ -749,10 +699,10 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
 
             <div className="p-6 flex flex-col gap-5">
               {/* Error */}
-              {error && (
+              {localError && (
                 <div className="flex items-center gap-2.5 bg-red-50 border border-red-200
                   text-red-600 text-[13px] font-semibold px-4 py-3 rounded-xl">
-                  <AlertCircle size={14} /> {error}
+                  <AlertCircle size={14} /> {localError}
                 </div>
               )}
 
