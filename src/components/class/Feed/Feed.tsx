@@ -381,14 +381,14 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
                     className={`relative flex-1 min-w-fit flex items-center justify-center gap-2
                       px-5 py-4 text-[13px] font-bold transition-all cursor-pointer
                       border-none bg-transparent
-                      ${isActive 
-                        ? "text-navy bg-navy-light/5" 
+                      ${isActive
+                        ? "text-navy bg-navy-light/5"
                         : "text-muted-foreground hover:text-navy hover:bg-secondary/30"}`}
                   >
                     <Icon size={16} className={isActive ? "text-navy" : "text-muted-foreground"} />
                     {label}
                     {isActive && (
-                      <span className="absolute bottom-0 left-0 right-0 h-1 bg-yellow" />
+                      <span className="absolute bottom-0 left-0 right-0 h-1 bg-navy animate-in fade-in slide-in-from-left-20 duration-300 ease-in-out" />
                     )}
                   </button>
                 );
@@ -562,8 +562,8 @@ function FeedCard({
                     : item.type === "attendance" ? "bg-green-500"
                       : "bg-navy-light"}`}>
               {item.type === "poll" ? <BarChart2 size={20} /> :
-               item.type === "attendance" ? <CheckSquare size={20} /> :
-               <FeedItemIcon type={item.type} />}
+                item.type === "attendance" ? <CheckSquare size={20} /> :
+                  <FeedItemIcon type={item.type} />}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -730,7 +730,12 @@ function PollBody({ item, userId, isTeacher }: { item: any; userId: string; isTe
     setClosing(true);
     try {
       const res = await closePoll(item.id);
-      if (!res.success) toast.error(res.error || 'Failed to close poll');
+      if (!res.success) {
+        toast.error(res.error || 'Failed to close poll');
+      } else {
+        toast.success('Poll closed successfully');
+        router.refresh();
+      }
     } finally {
       setClosing(false);
     }
@@ -811,7 +816,12 @@ function AttendanceBody({ item, userId, isTeacher }: { item: any; userId: string
     setClosing(true);
     try {
       const res = await closeAttendance(item.id);
-      if (!res.success) toast.error(res.error || 'Failed to close attendance');
+      if (!res.success) {
+        toast.error(res.error || 'Failed to close attendance');
+      } else {
+        toast.success('Attendance closed successfully');
+        router.refresh();
+      }
     } finally {
       setClosing(false);
     }
@@ -861,18 +871,18 @@ function AttendanceBody({ item, userId, isTeacher }: { item: any; userId: string
               </span>
             )
           )}
-          {isTeacher && isActive && (
-            <button
-              onClick={handleClose}
-              disabled={closing}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600
-                hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50"
-            >
-              <Lock size={12} /> {closing ? 'Closing…' : 'Close'}
-            </button>
-          )}
         </div>
       </div>
+      {isTeacher && isActive && (
+        <button
+          onClick={handleClose}
+          disabled={closing}
+          className="inline-flex items-center justify-end w-full  gap-1 text-xs mt-3 font-semibold text-red-600
+                hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50"
+        >
+          <Lock size={12} /> {closing ? 'Closing…' : 'Close'}
+        </button>
+      )}
     </div>
   );
 }
