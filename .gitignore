@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# build error log
+build_error.log
+
+#setup notes
+
+SETUP_NOTES.md
+TAILWIND_NOTES.md
+GOOGLE_AUTH_SETUP.md

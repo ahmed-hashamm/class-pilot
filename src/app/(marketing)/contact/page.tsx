@@ -3,7 +3,7 @@
 import { useState } from "react";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
 import { useReveal } from "@/hooks/useReveal";
-import { sendContactForm, ContactFormState } from "@/actions/contact.action";
+import { sendContactForm, ContactFormState } from "@/actions/ContactActions";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    CONSTANTS

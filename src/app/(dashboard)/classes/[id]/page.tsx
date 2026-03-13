@@ -32,100 +32,26 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
     .maybeSingle()
 
   const isTeacher =
-  (rawMember as { role: string } | null)?.role === 'teacher' ||
-  (rawClass as { created_by: string }).created_by === user.id 
+    (rawMember as { role: string } | null)?.role === 'teacher' ||
+    (rawClass as { created_by: string }).created_by === user.id
 
   return (
-    // <div className="min-h-screen bg-[#f8fafc]">
-    //   {/* HEADER */}
-    //   <div className="bg-[#003366] w-full pt-12 pb-8 px-8 rounded-b-[40px] shadow-2xl">
-    //     <div className="max-w-7xl mx-auto">
-    //       <h1 className="text-4xl font-bold text-white mb-2">
-    //         {(rawClass as { name: string }).name}
-    //       </h1>
-    //       <p className="text-white/70 mb-6 font-medium">
-    //         [{isTeacher ? 'Teacher' : 'Student'}]
-    //       </p>
-    //       <ClassTabs
-    //         classId={id}
-    //         isTeacher={isTeacher}
-    //         classCode={(rawClass as { code: string }).code}
-    //       />
-    //     </div>
-    //   </div>
-    // </div>
+
     <>
-{/* <div className="relative bg-navy text-primary-foreground w-full py-16 pb-0"> */}
-{/* Wave decoration */}
-{/* <div className="absolute inset-0 overflow-hidden opacity-80 text-accent">
-<svg
-className="w-full h-full"
-viewBox="0 0 1200 300"
-preserveAspectRatio="none"
->
-<defs>
-  <pattern
-    id="heroWave"
-    width="600"
-    height="300"
-    patternUnits="userSpaceOnUse"
-  >
-    <path
-      d="M0,150 Q150,60 300,150 T600,150"
-      stroke="currentColor"
-      strokeWidth="0.6"
-      fill="none"
-    />
-    <path
-      d="M0,180 Q150,100 300,180 T600,180"
-      stroke="currentColor"
-      strokeWidth="0.4"
-      fill="none"
-      opacity="0.6"
-    />
-    <path
-      d="M0,120 Q150,200 300,120 T600,120"
-      stroke="currentColor"
-      strokeWidth="0.4"
-      fill="none"
-      opacity="0.5"
-    />
-  </pattern>
-</defs>
 
-<rect width="100%" height="100%" fill="url(#heroWave)" />
-</svg>
-</div> */}
 
-{/* <div className=" container mx-auto flex flex-col justify-between  px-6 lg:px-20">
-<div className="max-w-7xl ">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            {(rawClass as { name: string }).name}
-          </h1>
-          <p className="text-primary-foreground mb-6 font-medium">
-            [{isTeacher ? 'Teacher' : 'Student'}]
-          </p>
-          <ClassTabs
-            classId={id}
-            isTeacher={isTeacher}
-            classCode={(rawClass as { code: string }).code}
-          />
-        </div>
-</div> */}
-{/* </div> */}
-
-<Suspense fallback={<div className="min-h-screen bg-navy flex items-center justify-center text-white font-bold tracking-widest uppercase">Loading class...</div>}>
-  <ClassDashboardClient 
-      classId={id}
-      userId={user.id}
-      className={(rawClass as any).name}
-      classDescription={(rawClass as any).description}
-      classSettings={(rawClass as any).settings}
-      classCode={(rawClass as any).code}
-      isTeacher={isTeacher}
-    />
-</Suspense>
-</>
+      <Suspense fallback={<div className="min-h-screen bg-navy flex items-center justify-center text-white font-bold tracking-widest uppercase">Loading class...</div>}>
+        <ClassDashboardClient
+          classId={id}
+          userId={user.id}
+          className={(rawClass as any).name}
+          classDescription={(rawClass as any).description}
+          classSettings={(rawClass as any).settings}
+          classCode={(rawClass as any).code}
+          isTeacher={isTeacher}
+        />
+      </Suspense>
+    </>
   )
 }
 
@@ -164,8 +90,8 @@ preserveAspectRatio="none"
 //     .eq('user_id', user.id)
 //     .maybeSingle()
 
-//   const isTeacher = (rawMember as { role: string } | null)?.role === 'teacher' || 
-//                     (rawClass as { created_by: string }).created_by === user.id 
+//   const isTeacher = (rawMember as { role: string } | null)?.role === 'teacher' ||
+//                     (rawClass as { created_by: string }).created_by === user.id
 
 //   return (
 //     <div className="min-h-screen bg-[#f8fafc]">

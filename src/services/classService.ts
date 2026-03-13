@@ -22,7 +22,7 @@ export const classService = {
 
   /**
    * Fetches all project members across group projects in a class
-   * This is used in the GroupsTab to see who is assigned to what project
+   * used in the GroupsTab to see who is assigned to what project
    */
   getProjectMembers: async (projectIds: string[]) => {
     if (!projectIds.length) return []
