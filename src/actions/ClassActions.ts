@@ -253,18 +253,18 @@ export async function createMaterial(formData: FormData) {
 
   const attachmentPaths = await uploadFiles(files, parsed.data.classId, 'materials')
 
-  const { error } = await supabase.from('materials').insert({
+  const { data: inserted, error } = await supabase.from('materials').insert({
     title: parsed.data.title || 'Class Material',
     description: parsed.data.description,
     class_id: parsed.data.classId,
     created_by: user.id,
     attachment_paths: attachmentPaths,
     file_types: fileTypes,
-  } as any)
+  } as any).select('id').single()
 
   if (error) throw error
   revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true }
+  return { success: true, materialId: (inserted as any)?.id }
 }
 
 /* ---------------- UPDATE MATERIAL ---------------- */

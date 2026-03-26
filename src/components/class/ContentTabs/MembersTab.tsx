@@ -24,6 +24,9 @@ export default function MembersTab({ classId, isTeacher, userId }: MembersTabPro
     setLoading(true)
     setError(null)
 
+    // Refresh auth session to prevent stale JWT
+    await supabase.auth.getUser()
+
     const { data, error } = await supabase
       .from('class_members')
       .select('*, users(full_name, email, avatar_url)')

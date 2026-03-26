@@ -17,7 +17,7 @@ export async function retrieveContext(
         {
             query_embedding: embedding,
             match_count: topK,
-            class_id: classId,
+            p_class_id: classId,
         } as any
     )
 

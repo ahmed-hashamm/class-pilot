@@ -56,6 +56,20 @@ export default function MaterialUpload({
         resetForm()
         onSuccess()
         ;(window as any).refreshFeed?.()
+
+        // Auto-sync for AI in the background
+        if (result.materialId) {
+          fetch('/api/materials/ingest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ materialId: result.materialId }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.success) toast.success(`AI synced (${data.chunks} chunks)`)
+            })
+            .catch(() => { /* silent fail — manual sync available */ })
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to upload materials")

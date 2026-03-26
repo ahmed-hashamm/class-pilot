@@ -169,6 +169,9 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
     setLoading(true)
     setError(null)
 
+    // Refresh auth session to prevent stale JWT
+    await supabase.auth.getUser()
+
     const { data, error } = await supabase
       .from('assignments')
       .select('id, class_id, title, description, points, due_date, attachment_paths, attachments, created_at')

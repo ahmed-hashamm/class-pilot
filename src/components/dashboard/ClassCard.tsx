@@ -58,10 +58,15 @@ export default function ClassCard({
     e.stopPropagation()
     setIsPinning(true)
     try {
+      // Refresh auth session so RLS works on client-side navigation
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
       const { error } = await supabase
         .from('class_members')
         .update({ is_pinned: !isPinned } as never)
         .eq('class_id', classId)
+        .eq('user_id', user.id)
       if (error) throw error
       setIsPinned(!isPinned)
       setMenuOpen(false)
@@ -88,10 +93,15 @@ export default function ClassCard({
     if (!confirm('Are you sure you want to leave this class?')) return
     setIsLeaving(true)
     try {
+      // Refresh auth session so RLS works on client-side navigation
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
       const { error } = await supabase
         .from('class_members')
         .delete()
         .eq('class_id', classId)
+        .eq('user_id', user.id)
       if (error) throw error
       router.refresh()
     } catch (error) {

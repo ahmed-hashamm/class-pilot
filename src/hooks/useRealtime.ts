@@ -46,9 +46,9 @@ export function ensureAuth(supabase: ReturnType<typeof createClient>): Promise<b
     return false
   })()
 
-  // Reset after 30 s so a future mount can re-verify if the JWT expired
+  // Reset after 10 s so a future mount can re-verify if the JWT expired
   authPromise.finally(() => {
-    setTimeout(() => { authPromise = null }, 30_000)
+    setTimeout(() => { authPromise = null }, 10_000)
   })
 
   return authPromise

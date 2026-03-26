@@ -24,7 +24,7 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
           <div className="relative z-10 max-w-2xl">
-            <h1 className="text-5xl lg:text-6xl font-extrabold leading-[1.1] mb-8 tracking-tight">
+            <h1 className="text-4xl lg:text-5xl font-extrabold leading-[1.1] mb-8 tracking-tight">
               Create, Learn &<br />
               Collaborate — All in<br />
               One Classroom

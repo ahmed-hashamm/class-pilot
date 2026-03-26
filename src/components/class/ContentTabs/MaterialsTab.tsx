@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
-import { Database, Clock, FileText, Plus, X, RefreshCw } from 'lucide-react'
+import { Database, Clock, FileText, Plus, X, RefreshCw, Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
 import MaterialUpload from '../Feed/MaterialUpload'
 import AttachmentButton from '@/components/class/Buttons/AttachmentButton'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
@@ -24,6 +24,7 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   const [isUploading, setIsUploading] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [editing, setEditing] = useState<any>(null)
+  const [syncingId, setSyncingId] = useState<string | null>(null)
 
   const supabase = createClient()
 
@@ -80,6 +81,30 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   const handleUpdate = () => {
     setEditing(null)
     loadMaterials()
+  }
+
+  /** Trigger AI ingestion for a specific material */
+  const handleSyncForAI = async (materialId: string) => {
+    setSyncingId(materialId)
+    setMenuOpen(null)
+    try {
+      const res = await fetch('/api/materials/ingest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ materialId }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(`Synced for AI (${data.chunks} chunks)`)
+        loadMaterials()
+      } else {
+        toast.error(data.message || 'Failed to sync')
+      }
+    } catch {
+      toast.error('Failed to sync material for AI')
+    } finally {
+      setSyncingId(null)
+    }
   }
   if (loading) {
     return (
@@ -238,6 +263,15 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
                   <span className="font-medium">
                     {material.users?.full_name || 'Teacher'}
                   </span>
+                  {material.ai_synced && (
+                    <>
+                      <span className="text-border">·</span>
+                      <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                        <CheckCircle2 size={10} />
+                        AI synced
+                      </span>
+                    </>
+                  )}
                 </p>
 
                 {material.description && (
@@ -279,6 +313,13 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(null)} />
                       <div className="absolute right-0 top-8 z-50 bg-white border border-border rounded-xl shadow-lg overflow-hidden min-w-[140px]">
+                        <button onClick={() => handleSyncForAI(material.id)}
+                          disabled={syncingId === material.id}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
+                          {syncingId === material.id
+                            ? <><Loader2 size={13} className="animate-spin text-navy" /> Syncing…</>
+                            : <><Sparkles size={13} className="text-navy" /> Sync for AI</>}
+                        </button>
                         <button onClick={() => { setMenuOpen(null); handleEdit(material) }}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
                           <Pencil size={13} className="text-navy" /> Edit
