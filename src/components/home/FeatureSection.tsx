@@ -24,7 +24,7 @@ const FeatureSection = ({
 
   return (
     <section className={`${bgClass} py-20 lg:py-32 overflow-hidden`}>
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
           <div

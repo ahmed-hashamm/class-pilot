@@ -29,13 +29,13 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 h-16 bg-navy text-primary-foreground mb-[1px]">
-      <div className="w-full max-w-[1600px] mx-auto h-full flex items-center justify-between px-8 md:px-12 lg:px-20">
+    <header className="sticky top-0 z-50 h-14 bg-navy text-primary-foreground mb-[1px]">
+      <div className="w-full max-w-[1600px] mx-auto h-full flex items-center justify-between px-8 md:px-12 lg:px-16">
 
 
         {/* Logo */}
         <Link href="/" className="flex items-center  group">
-          <div className="relative w-14 h-14"> {/* Added a wrapper with specific dimensions */}
+          <div className="relative w-12 h-12"> {/* Added a wrapper with specific dimensions */}
             <Image
               src="/logo.png"
               alt="Class Pilot"
@@ -65,7 +65,7 @@ const Navbar = () => {
           {!isAuthenticated ? (
             <Link
               href="/login"
-              className="bg-yellow text-navy font-semibold px-5 py-2 rounded-lg hover:bg-accent transition-colors"
+              className="bg-yellow text-navy font-semibold px-5 py-2 rounded-md hover:bg-accent transition-colors"
             >
               Sign in to Class Pilot
             </Link>

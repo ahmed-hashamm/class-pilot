@@ -33,8 +33,8 @@ export default function DashboardBanner({ userName, userId, role }: any) {
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" :
-    hour < 17 ? "Good afternoon" :
-                "Good evening";
+      hour < 17 ? "Good afternoon" :
+        "Good evening";
 
   return (
     <div className="relative bg-navy text-white w-full py-14 pb-8 overflow-hidden">
@@ -49,7 +49,7 @@ export default function DashboardBanner({ userName, userId, role }: any) {
 
       <WavePattern />
 
-      <div className="relative w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20">
+      <div className="relative w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16">
         {/* Eyebrow */}
         <span className="inline-flex items-center gap-2 text-[11px] font-semibold
           tracking-[.18em] uppercase bg-white/10 border border-white/20

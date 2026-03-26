@@ -29,7 +29,7 @@ const LearningSection = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 relative z-10">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 relative z-10">
         <div className=" gap-12 items-center">
           {/* Content */}
           <div className="text-center">

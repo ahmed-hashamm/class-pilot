@@ -277,7 +277,7 @@ const DashboardNavbar = () => {
 
   return (
     <nav className="border-b border-gray-200 bg-navy text-primary-foreground sticky top-0 z-50">
-      <div className="w-full max-w-[1600px] mx-auto flex h-16 items-center justify-between px-8 md:px-12 lg:px-20">
+      <div className="w-full max-w-[1600px] mx-auto flex h-16 items-center justify-between px-8 md:px-12 lg:px-16">
         
         {/* Left Section: Logo */}
            {/* Logo */}

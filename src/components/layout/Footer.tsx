@@ -41,7 +41,7 @@ const Footer = () => {
   return (
     <footer className="bg-navy text-primary-foreground">
       {/* ── Top section ── */}
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 py-20 lg:py-32">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-20 lg:py-32">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
 
           {/* Brand */}

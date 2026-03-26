@@ -152,7 +152,7 @@ export default function StreamView({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 max-w-7xl mx-auto py-4">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full mx-auto py-4">
 
       {/* Sidebar */}
       <div className="lg:col-span-3 flex flex-col gap-4">

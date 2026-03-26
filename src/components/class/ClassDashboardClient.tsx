@@ -121,8 +121,8 @@ export default function ClassDashboardClient({
 
         <WavePattern />
 
-        <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 relative pb-8">
-          <div className="max-w-7xl">
+        <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 relative pb-8">
+          <div className="w-full">
 
             {/* Role badge */}
             <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold
@@ -168,8 +168,8 @@ export default function ClassDashboardClient({
 
       {/* CONTENT */}
       <div className="bg-background min-h-screen w-full pt-8">
-        <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20">
-          <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16">
+          <div className="w-full">
             <TabContent
               key={classId}
               activeTab={activeTab}

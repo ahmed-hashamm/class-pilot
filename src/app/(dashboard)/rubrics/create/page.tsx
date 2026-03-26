@@ -18,7 +18,6 @@ export default async function CreateRubricPage() {
   return (
     <div className="mx-auto max-w-3xl p-6 ">
       {/* TOP BAR */}
-      <h1>helo</h1>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Create Rubric</h1>
       <CreateRubricForm userId={user.id} />
     </div>

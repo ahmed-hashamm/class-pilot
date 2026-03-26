@@ -38,15 +38,14 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className={`p-6 rounded-2xl transition-all duration-300 ${
-                index === activeIndex
+              className={`p-6 rounded-2xl transition-all duration-300 ${index === activeIndex
                   ? "bg-navy-light text-primary-foreground shadow-xl scale-110"
                   : "bg-muted text-foreground"
-              }`}
+                }`}
             >
-              <Quote 
-                size={50} 
-                className={index === activeIndex ? "text-primary-foreground mb-4" : "text-navy mb-4"} 
+              <Quote
+                size={50}
+                className={index === activeIndex ? "text-primary-foreground mb-4" : "text-navy mb-4"}
               />
               <p className={`mb-6 leading-relaxed ${index === activeIndex ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
                 {testimonial.quote}
@@ -74,9 +73,8 @@ const TestimonialsSection = () => {
             <button
               key={index}
               onClick={() => setActiveIndex(index)}
-              className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                index === activeIndex ? "bg-navy" : "bg-border"
-              }`}
+              className={`w-2.5 h-2.5 rounded-full transition-colors ${index === activeIndex ? "bg-navy" : "bg-border"
+                }`}
             />
           ))}
         </div>

@@ -39,17 +39,17 @@ export default function ClassCard({
   assignments,
   isPinned: initialIsPinned,
 }: ClassCardProps) {
-  const [menuOpen,  setMenuOpen]  = useState(false)
-  const [imgError,  setImgError]  = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
-  const [isPinned,  setIsPinned]  = useState(initialIsPinned)
+  const [isPinned, setIsPinned] = useState(initialIsPinned)
   const [isPinning, setIsPinning] = useState(false)
-  const menuRef  = useRef<HTMLDivElement>(null)
-  const router   = useRouter()
+  const menuRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
   const supabase = createClient()
 
-  const isTeacher   = role.toLowerCase() === 'teacher'
-  const teacher     = classData?.owner_profile
+  const isTeacher = role.toLowerCase() === 'teacher'
+  const teacher = classData?.owner_profile
   const teacherName = teacher?.full_name || 'Teacher'
 
   /* ── Pin toggle ── */
@@ -113,12 +113,11 @@ export default function ClassCard({
 
       {/* ── Pinned badge ── */}
       {isPinned && (
-        <span className="absolute top-4 right-4 inline-flex items-center gap-1
-          text-[10px] font-bold tracking-widest uppercase
-          bg-yellow text-navy border border-yellow/60 rounded-full px-2 py-0.5">
-          <Pin size={8} />
-          Pinned
-        </span>
+        <div className="absolute top-2.5 right-0 z-20">
+          <div className=" text-navy size-6 flex items-center justify-center">
+            <Pin size={11} fill="currentColor" />
+          </div>
+        </div>
       )}
 
       <div className="flex flex-col flex-1 p-5">

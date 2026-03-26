@@ -20,7 +20,7 @@ const HeroSection = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 py-20 lg:py-32">
+      <div className="w-full max-w-[1600px] mx-auto p-8 md:p-12 lg:p-16">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
           <div className="relative z-10 max-w-2xl">

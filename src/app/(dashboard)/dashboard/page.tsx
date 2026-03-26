@@ -18,13 +18,13 @@ export default async function DashboardPage() {
   }
 
   const userName = user.user_metadata?.full_name || "User";
-  const isEmpty  = !dashboardData || (dashboardData as any[]).length === 0;
+  const isEmpty = !dashboardData || (dashboardData as any[]).length === 0;
 
   return (
     <div className="min-h-screen bg-background">
       <DashboardBanner userName={userName} userId={user.id} />
 
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 py-8">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-8">
         {isEmpty ? (
           /* ── Empty state ────────────────────────────────────────────── */
           <div className="flex flex-col items-center justify-center text-center
@@ -33,10 +33,10 @@ export default async function DashboardPage() {
             <div className="size-16 rounded-2xl bg-navy/8 border border-navy/15
               flex items-center justify-center mb-5">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <rect x="3" y="5" width="22" height="18" rx="4" stroke="#043873" strokeWidth="1.8"/>
-                <path d="M9 11h10M9 15h7" stroke="#043873" strokeWidth="1.8" strokeLinecap="round"/>
-                <circle cx="21" cy="21" r="6" fill="white" stroke="#043873" strokeWidth="1.5"/>
-                <path d="M21 18v3l2 1" stroke="#043873" strokeWidth="1.3" strokeLinecap="round"/>
+                <rect x="3" y="5" width="22" height="18" rx="4" stroke="#043873" strokeWidth="1.8" />
+                <path d="M9 11h10M9 15h7" stroke="#043873" strokeWidth="1.8" strokeLinecap="round" />
+                <circle cx="21" cy="21" r="6" fill="white" stroke="#043873" strokeWidth="1.5" />
+                <path d="M21 18v3l2 1" stroke="#043873" strokeWidth="1.3" strokeLinecap="round" />
               </svg>
             </div>
 
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
                 hover:bg-navy/90 hover:-translate-y-0.5 transition-all
                 cursor-pointer border-none">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                  <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
                 Create a class
               </button>
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
                 hover:border-navy/30 hover:-translate-y-0.5 transition-all cursor-pointer">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6"
-                    strokeLinecap="round" strokeLinejoin="round"/>
+                    strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Join a class
               </button>

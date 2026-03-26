@@ -3,7 +3,7 @@ import ActionButton from "./ActionButton";
 const CTASection = () => {
   return (
     <section className="bg-secondary text-accent-foreground py-20 lg:py-32">
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 text-center">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 text-center">
         <h2 className="text-4xl lg:text-5xl font-extrabold mb-8 text-navy leading-tight">
           Join Class Pilot<br />today
         </h2>
