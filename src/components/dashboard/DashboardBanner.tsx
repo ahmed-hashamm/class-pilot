@@ -9,7 +9,7 @@
 //       <div className="relative bg-navy text-primary-foreground w-full py-16 pb-6">
 //         {/* Wave decoration */}
 //         <WavePattern />
-//         <div className="relative container flex flex-col justify-between mx-auto px-6 lg:px-20">
+//         <div className="relative container flex flex-col justify-between mx-auto px-6 lg:px-8">
 //           {/* Greeting */}
 //           <h1 className="text-4xl  font-bold">
 //             Hello {userName}...
@@ -49,7 +49,7 @@ export default function DashboardBanner({ userName, userId, role }: any) {
 
       <WavePattern />
 
-      <div className="relative container mx-auto px-6 lg:px-20">
+      <div className="relative w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20">
         {/* Eyebrow */}
         <span className="inline-flex items-center gap-2 text-[11px] font-semibold
           tracking-[.18em] uppercase bg-white/10 border border-white/20

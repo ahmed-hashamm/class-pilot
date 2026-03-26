@@ -1,24 +1,17 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import ActionButton from "./ActionButton";
 
 const CTASection = () => {
   return (
-    <section className="bg-secondary text-accent-foreground py-16 lg:py-24">
-      <div className="container mx-auto px-6 text-center">
-        <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+    <section className="bg-secondary text-accent-foreground py-20 lg:py-32">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 text-center">
+        <h2 className="text-4xl lg:text-5xl font-extrabold mb-8 text-navy leading-tight">
           Join Class Pilot<br />today
         </h2>
-        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+        <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
           Built as a Final Year Project — aiming to make digital learning actually usable.
         </p>
-        <Link
-          href="/login"
-          className="bg-navy-light text-primary-foreground font-semibold px-8 py-3 rounded-lg hover:bg-navy-light transition-colors inline-flex items-center gap-2"
-        >
-          Try Class Pilot
-          <ArrowRight size={18} />
-        </Link>
-        <p className="mt-6 text-sm text-muted-foreground">
+        <ActionButton buttonText="Try Class Pilot" />
+        <p className="mt-8 text-sm text-muted-foreground">
           Have some thoughts?{" "}
           <a href="#" className=" hover:underline font-medium">
             Contact us

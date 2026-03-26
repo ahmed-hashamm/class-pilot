@@ -12,7 +12,7 @@ export const classService = {
 
     const { data, error } = await supabase
       .from('group_projects')
-      .select('*')
+      .select('id, title, class_id, created_at, created_by')
       .eq('class_id', classId)
       .order('created_at', { ascending: false })
 
@@ -33,7 +33,7 @@ export const classService = {
 
     const { data, error } = await supabase
       .from('project_members')
-      .select('*, users(full_name, email, avatar_url)')
+      .select('project_id, user_id, role, users(full_name, email, avatar_url)')
       .in('project_id', projectIds)
 
     if (error) throw error

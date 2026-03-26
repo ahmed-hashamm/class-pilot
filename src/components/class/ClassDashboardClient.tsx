@@ -26,7 +26,7 @@
 //       <div className="relative bg-navy text-primary-foreground w-full py-16 pb-0">
 //         {/* Wave decoration */}
 //         <WavePattern />
-//         <div className="container  px-6 lg:px-20 relative mx-auto  pb-6">
+//         <div className="container  px-6 lg:px-8 relative mx-auto  pb-6">
 //           <div className="max-w-7xl">
 //             <h1 className="text-4xl font-bold text-white mb-2">{className}</h1>
 //             <p className="text-primary-foreground mb-6 font-medium">
@@ -54,7 +54,7 @@
 
 //       {/* CONTENT SECTION */}
 //       <div className="bg-[#f8fafc] min-h-screen w-full pt-10">
-//         <div className="container mx-auto px-6 lg:px-20">
+//         <div className="container mx-auto px-6 lg:px-8">
 //           <div className="max-w-7xl mx-auto">
 //             <TabContent
 //               key={classId}
@@ -121,7 +121,7 @@ export default function ClassDashboardClient({
 
         <WavePattern />
 
-        <div className="container px-6 lg:px-20 relative mx-auto pb-8">
+        <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 relative pb-8">
           <div className="max-w-7xl">
 
             {/* Role badge */}
@@ -168,7 +168,7 @@ export default function ClassDashboardClient({
 
       {/* CONTENT */}
       <div className="bg-background min-h-screen w-full pt-8">
-        <div className="container mx-auto px-6 lg:px-20">
+        <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20">
           <div className="max-w-7xl mx-auto">
             <TabContent
               key={classId}

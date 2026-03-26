@@ -160,7 +160,7 @@ export default async function CalendarPage() {
   const totalPending = assignmentList.filter((a) => !a.isDone).length;
 
   return (
-    <div className="max-w-7xl mx-auto p-6 flex flex-col gap-8">
+    <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 py-8 flex flex-col gap-8">
 
       {/* Top bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

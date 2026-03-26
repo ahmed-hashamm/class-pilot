@@ -277,7 +277,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      let query = supabase.from('submissions').select('*').eq('assignment_id', assignment.id)
+      let query = supabase.from('submissions').select('id, assignment_id, user_id, final_grade, status, feedback, group_id').eq('assignment_id', assignment.id)
 
       if (assignment.is_group_project) {
         const { data: memberData } = await supabase

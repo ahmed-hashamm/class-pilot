@@ -1,6 +1,7 @@
 "use server";
 
 import nodemailer from "nodemailer";
+import { z } from "zod";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
@@ -34,17 +35,20 @@ function createTransporter() {
 /* ─────────────────────────────────────────────────────────────────────────────
    ACTION
 ───────────────────────────────────────────────────────────────────────────── */
+const ContactFormSchema = z.object({
+  name: z.string().min(1, "Please fill in all required fields."),
+  email: z.string().email("Please enter a valid email address."),
+  type: z.string(),
+  subject: z.string().optional(),
+  body: z.string().min(1, "Please fill in all required fields."),
+})
+
 export async function sendContactForm(
   data: ContactFormData
 ): Promise<ContactFormState> {
-  // Server-side validation
-  if (!data.name.trim() || !data.email.trim() || !data.body.trim()) {
-    return { status: "error", message: "Please fill in all required fields." };
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(data.email)) {
-    return { status: "error", message: "Please enter a valid email address." };
+  const parsed = ContactFormSchema.safeParse(data)
+  if (!parsed.success) {
+    return { status: "error", message: parsed.error.errors[0]?.message || "Invalid input." }
   }
 
   const transporter = createTransporter();

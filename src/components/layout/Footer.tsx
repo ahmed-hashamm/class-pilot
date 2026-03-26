@@ -6,15 +6,15 @@ import { Twitter, Facebook, Linkedin, GraduationCap } from "lucide-react";
 // ── Footer Component ──────────────────────────────────────────────────────────
 const NAV_LINKS = [
   { label: "How It Works", href: "/how-it-works" },
-  { label: "Pricing",       href: "/pricing" },
-  { label: "Blog",          href: "/blog" },
-  { label: "Help Center",   href: "/help" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
+  { label: "Help Center", href: "/help" },
 ];
 
 const LEGAL_LINKS = [
   { label: "Terms & Privacy", href: "/terms" },
-  { label: "Cookie Policy",   href: "/cookies" },
-  { label: "Accessibility",   href: "/accessibility" },
+  { label: "Cookie Policy", href: "/cookies" },
+  { label: "Accessibility", href: "/accessibility" },
 ];
 
 const SOCIAL_LINKS = [
@@ -41,7 +41,7 @@ const Footer = () => {
   return (
     <footer className="bg-navy text-primary-foreground">
       {/* ── Top section ── */}
-      <div className="container mx-auto px-6 pt-10 pb-6">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 py-20 lg:py-32">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
 
           {/* Brand */}

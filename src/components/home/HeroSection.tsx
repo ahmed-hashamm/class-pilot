@@ -1,73 +1,51 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
+import ActionButton from "./ActionButton";
 
 const HeroSection = () => {
   return (
     <section className="bg-navy text-primary-foreground relative overflow-hidden">
-      {/* Wave decoration lines */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Background decoration: clean wavy line */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <svg
-          className="absolute top-0 left-0 w-full h-full opacity-20"
-          viewBox="0 0 1200 600"
-          preserveAspectRatio="none"
+          className="absolute top-0 right-0 w-1/2 h-full opacity-10"
+          viewBox="0 0 600 600"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M0,100 Q300,150 600,100 T1200,100"
-            stroke="currentColor"
+            d="M600 0C600 331.371 331.371 600 0 600"
+            stroke="white"
             strokeWidth="2"
-            fill="none"
-            className="text-primary-foreground/30"
-          />
-          <path
-            d="M0,150 Q300,200 600,150 T1200,150"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-            className="text-primary-foreground/20"
-          />
-          <path
-            d="M0,200 Q300,250 600,200 T1200,200"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-            className="text-primary-foreground/10"
           />
         </svg>
       </div>
 
-      <div className="container mx-auto px-6 lg:px-20 py-16 lg:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 py-20 lg:py-32">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
-          <div className="relative z-10">
-            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6">
+          <div className="relative z-10 max-w-2xl">
+            <h1 className="text-5xl lg:text-6xl font-extrabold leading-[1.1] mb-8 tracking-tight">
               Create, Learn &<br />
-              Collaborate — All in One<br />
-              Classroom
+              Collaborate — All in<br />
+              One Classroom
             </h1>
 
-            <p className="text-lg text-primary-foreground/80 mb-8 max-w-lg">
+            <p className="text-xl text-primary-foreground/80 mb-10 max-w-lg leading-relaxed">
               An awesome virtual classroom for teachers and students.
             </p>
 
-            <Link
-              href="/login"
-              className="bg-navy-light text-primary-foreground font-semibold px-5 py-2 rounded-lg hover:bg-accent transition-colors inline-flex items-center gap-2"
-            >
-              Get Started
-              <ArrowRight size={18} />
-            </Link>
+            <ActionButton buttonText="Get Started" />
           </div>
 
-          {/* Hero Image */}
+          {/* Hero Image / Illustration */}
           <div className="relative z-10 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-lg aspect-[4/3] rounded-2xl overflow-hidden ">
+            <div className="relative w-full max-w-2xl aspect-[4/3]">
               <Image
                 src="/hero-img.png"
                 alt="Class Pilot virtual classroom"
                 fill
                 priority
-                className="object-contain sm:object-cover"
+                className="object-contain"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>

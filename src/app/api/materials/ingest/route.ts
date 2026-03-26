@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   // 1️⃣ Fetch material
   const { data: material, error } = await supabase
     .from('materials')
-    .select('*')
+    .select('id, class_id')
     .eq('id', materialId)
     .single()
 
@@ -30,16 +30,23 @@ export async function POST(req: Request) {
   const chunks = chunkText(text)
 
   // 4️⃣ Generate embeddings & store
+  const insertPayload = []
   for (let i = 0; i < chunks.length; i++) {
     const embedding = await embedText(chunks[i])
-
-    await supabase.from('material_chunks').insert({
+    insertPayload.push({
       material_id: (material as any).id,
       class_id: (material as any).class_id,
       content: chunks[i],
       embedding,
       chunk_index: i,
-    } as any)
+    })
+  }
+
+  if (insertPayload.length > 0) {
+    const { error: insertError } = await supabase.from('material_chunks').insert(insertPayload as any)
+    if (insertError) {
+      return NextResponse.json({ error: 'Failed to insert chunks' }, { status: 500 })
+    }
   }
 
   return NextResponse.json({ success: true, chunks: chunks.length })

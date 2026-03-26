@@ -119,6 +119,7 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Calendar, ArrowRight, CheckCircle2, Clock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -229,10 +230,10 @@ function StudentAvatar({ name, src, initial }: { name: string; src?: string; ini
   const [imgError, setImgError] = useState(false)
   return (
     <div className="shrink-0 size-9 rounded-xl overflow-hidden border border-border
-      bg-secondary flex items-center justify-center font-black text-[14px] text-navy">
+      bg-secondary flex items-center justify-center font-black text-[14px] text-navy relative">
       {src && !imgError ? (
-        <img src={src} alt={name} className="h-full w-full object-cover"
-          referrerPolicy="no-referrer" onError={() => setImgError(true)} />
+        <Image src={src} alt={name} className="object-cover" fill
+          onError={() => setImgError(true)} />
       ) : initial}
     </div>
   )

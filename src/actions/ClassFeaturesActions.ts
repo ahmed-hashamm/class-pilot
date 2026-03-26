@@ -2,8 +2,19 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+const createAttendanceSchema = z.object({
+  classId: z.string().min(1),
+  date: z.string().min(1),
+  title: z.string().optional(),
+  deadline: z.string().optional()
+})
 
 export async function createAttendance(classId: string, date: string, title?: string, deadline?: string) {
+  const parsed = createAttendanceSchema.safeParse({ classId, date, title, deadline })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -34,7 +45,14 @@ export async function createAttendance(classId: string, date: string, title?: st
   return { success: true, data }
 }
 
+const markAttendancePresentSchema = z.object({
+  attendanceId: z.string().min(1)
+})
+
 export async function markAttendancePresent(attendanceId: string) {
+  const parsed = markAttendancePresentSchema.safeParse({ attendanceId })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -80,7 +98,14 @@ export async function markAttendancePresent(attendanceId: string) {
   return { success: true, data }
 }
 
+const closeAttendanceSchema = z.object({
+  attendanceId: z.string().min(1)
+})
+
 export async function closeAttendance(attendanceId: string) {
+  const parsed = closeAttendanceSchema.safeParse({ attendanceId })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -105,7 +130,17 @@ export async function closeAttendance(attendanceId: string) {
   return { success: true }
 }
 
+const createPollSchema = z.object({
+  classId: z.string().min(1),
+  question: z.string().min(1),
+  options: z.array(z.string()).min(1),
+  deadline: z.string().optional()
+})
+
 export async function createPoll(classId: string, question: string, options: string[], deadline?: string) {
+  const parsed = createPollSchema.safeParse({ classId, question, options, deadline })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -136,7 +171,15 @@ export async function createPoll(classId: string, question: string, options: str
   return { success: true, data }
 }
 
+const submitPollResponseSchema = z.object({
+  pollId: z.string().min(1),
+  selectedOptionIndex: z.number().min(0)
+})
+
 export async function submitPollResponse(pollId: string, selectedOptionIndex: number) {
+  const parsed = submitPollResponseSchema.safeParse({ pollId, selectedOptionIndex })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -182,7 +225,14 @@ export async function submitPollResponse(pollId: string, selectedOptionIndex: nu
   return { success: true, data }
 }
 
+const closePollSchema = z.object({
+  pollId: z.string().min(1)
+})
+
 export async function closePoll(pollId: string) {
+  const parsed = closePollSchema.safeParse({ pollId })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()

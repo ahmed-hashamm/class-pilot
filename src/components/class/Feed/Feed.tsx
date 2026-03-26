@@ -379,7 +379,7 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
                     type="button"
                     onClick={() => setActiveAction(activeAction === id ? "none" : id)}
                     className={`relative flex-1 min-w-fit flex items-center justify-center gap-2
-                      px-5 py-4 text-[13px] font-bold transition-all cursor-pointer
+                      px-4 py-3 text-xs font-bold transition-all cursor-pointer
                       border-none bg-transparent
                       ${isActive
                         ? "text-navy bg-navy-light/5"
@@ -396,7 +396,7 @@ export default function Feed({ classId, userId, isTeacher }: FeedProps) {
 
               <Link href={`/classes/${classId}/assignments/create`} className="flex-1 min-w-fit">
                 <button className="w-full flex items-center justify-center gap-2
-                  px-5 py-4 text-[13px] font-bold text-muted-foreground
+                  px-4 py-3 text-xs font-bold text-muted-foreground
                   hover:text-navy hover:bg-secondary/30 transition-all cursor-pointer border-none bg-transparent">
                   <PlusCircle size={16} />
                   Assignment
@@ -543,18 +543,18 @@ function FeedCard({
 
   return (
     <>
-      <div className={`bg-white rounded-2xl border transition-all duration-200
+      <div className={`bg-white rounded-xl border transition-all duration-200
         ${isPinned
           ? "border-navy/30 ring-1 ring-navy/10"
           : "border-border hover:border-border/80 hover:shadow-sm"
         }
         ${isAssignment ? "hover:shadow-md" : ""}`}>
 
-        <div className="p-5 flex flex-col gap-4">
+        <div className="p-4 flex flex-col gap-3.5">
 
           {/* Header */}
           <div className="flex items-start gap-3">
-            <div className={`shrink-0 size-10 rounded-xl flex items-center
+            <div className={`shrink-0 size-9 rounded-lg flex items-center
               justify-center text-white shadow-sm
               ${item.type === "announcement" ? "bg-navy"
                 : item.type === "assignment" ? "bg-yellow"
@@ -568,7 +568,7 @@ function FeedCard({
 
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h4 className="font-bold text-[15px] text-foreground leading-snug truncate">
+                <h4 className="font-bold text-[14px] text-foreground leading-snug truncate">
                   {item.title || item.question || (item.type === "material" ? "Class Material" : "Post")}
                 </h4>
 
@@ -631,7 +631,7 @@ function FeedCard({
                 </div>
               </div>
 
-              <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+              <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <span className="font-medium">{item.users?.full_name || "Teacher"}</span>
                 <span className="text-border">·</span>
                 <Clock size={11} />
@@ -644,8 +644,8 @@ function FeedCard({
 
           {/* Body */}
           {(item.content || item.description) && !isPoll && !isAttendance && (
-            <p className="text-[14px] text-foreground/80 leading-relaxed
-              whitespace-pre-wrap break-words pl-[52px]">
+            <p className="text-[13px] text-foreground/80 leading-relaxed
+              whitespace-pre-wrap break-words pl-[48px]">
               {item.content || item.description}
             </p>
           )}
@@ -662,7 +662,7 @@ function FeedCard({
 
           {/* Attachments */}
           {(item.attachment_paths || item.file_url) && (
-            <div className="flex flex-wrap gap-2 pl-[52px]"
+            <div className="flex flex-wrap gap-2 pl-[48px]"
               onClick={(e) => e.stopPropagation()}>
               {Array.isArray(item.attachment_paths) ? (
                 item.attachment_paths.map((path: string) => (
@@ -684,7 +684,7 @@ function FeedCard({
 
           {/* Assignment CTA */}
           {isAssignment && (
-            <div className="pl-[52px] pt-3 border-t border-border">
+            <div className="pl-[48px] pt-2.5 border-t border-border">
               <Link
                 href={`/classes/${classId}/assignments/${item.id}?from=stream`}
                 className="inline-flex items-center gap-2 text-[13px] font-bold
@@ -752,7 +752,7 @@ function PollBody({ item, userId, isTeacher }: { item: any; userId: string; isTe
   };
 
   return (
-    <div className="pl-[52px] flex flex-col gap-2">
+    <div className="pl-[48px] flex flex-col gap-2">
       {item.options.map((opt: string, idx: number) => {
         const totalVotes = item.poll_responses?.length || 0;
         const optionVotes = item.poll_responses?.filter((r: any) => r.selected_option_index === idx).length || 0;

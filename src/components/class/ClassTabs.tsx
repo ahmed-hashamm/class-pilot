@@ -162,8 +162,8 @@ export default function ClassTabs({
             <button
               key={tab.id}
               onClick={() => tab.onClick ? tab.onClick() : setActiveTab(tab.id)}
-              className={`relative inline-flex items-center gap-2 px-4 py-2.5
-                rounded-xl text-[13px] font-bold transition-all duration-200
+              className={`relative inline-flex items-center gap-2 px-3.5 py-2
+                rounded-md text-[13px] font-bold transition-all duration-200
                 ${isActive
                   ? "bg-yellow text-navy shadow-sm"
                   : "bg-white/10 border border-white/15 text-white/75 hover:bg-white/18 hover:text-white"

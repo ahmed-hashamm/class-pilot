@@ -152,7 +152,7 @@ export default function StreamView({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto py-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 max-w-7xl mx-auto py-4">
 
       {/* Sidebar */}
       <div className="lg:col-span-3 flex flex-col gap-4">
@@ -174,7 +174,7 @@ export default function StreamView({
               {/* Code display */}
               <div className="flex items-center justify-between gap-2
                 bg-secondary border border-border rounded-xl px-4 py-3">
-                <span className="font-black text-[22px] tracking-widest text-navy
+                <span className="font-black text-[20px] tracking-widest text-navy
                   font-mono leading-none">
                   {classCode}
                 </span>
@@ -223,7 +223,7 @@ export default function StreamView({
         <SidebarCard title="Due Soon">
           {dueSoon.length === 0 ? (
             <div className="flex items-center gap-2 py-1">
-              <span className="text-[18px]">🎉</span>
+              <span className="text-[16px]">🎉</span>
               <p className="text-[12px] text-muted-foreground font-medium">
                 Nothing due — all clear!
               </p>
@@ -234,10 +234,10 @@ export default function StreamView({
                 <li key={a.id}
                   className="flex items-center justify-between gap-2
                      border border-border/60 rounded-lg px-3 py-2">
-                  <span className="text-[12px] font-medium text-foreground truncate">
+                  <span className="text-[11px] font-medium text-foreground truncate">
                     {a.title}
                   </span>
-                  <span className="shrink-0 text-[11px] text-muted-foreground font-medium">
+                  <span className="shrink-0 text-[10px] text-muted-foreground font-medium">
                     {new Date(a.due_date!).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',

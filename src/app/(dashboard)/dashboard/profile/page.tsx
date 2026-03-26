@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Loader2, CheckCircle2, AlertCircle, Camera, ArrowLeft } from 'lucide-react'
 
@@ -135,10 +136,10 @@ export default function SettingsPage() {
             {/* Avatar preview */}
             <div className="relative shrink-0">
               <div className="size-20 rounded-2xl overflow-hidden border-2 border-border
-                bg-secondary flex items-center justify-center">
+                bg-secondary flex items-center justify-center relative">
                 {displayAvatar ? (
-                  <img src={displayAvatar} alt={fullName}
-                    className="h-full w-full object-cover" />
+                  <Image src={displayAvatar} alt={fullName} fill
+                    className="object-cover" />
                 ) : (
                   <span className="text-[26px] font-black text-navy">{initials}</span>
                 )}

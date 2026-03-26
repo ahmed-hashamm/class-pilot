@@ -104,12 +104,12 @@ export default function DashboardButtons({
   // Yellow = primary CTAs, white ghost = nav links
   const primaryBtn =
     "inline-flex items-center gap-2 bg-yellow text-navy text-[13px] font-bold " +
-    "px-4 py-2.5 rounded-lg hover:bg-yellow/90 hover:-translate-y-0.5 " +
+    "px-3.5 py-2 rounded-md hover:bg-yellow/90 hover:-translate-y-0.5 " +
     "transition-all shadow-sm whitespace-nowrap cursor-pointer border-none";
 
   const ghostBtn =
     "inline-flex items-center gap-2 bg-white/10 border border-white/20 " +
-    "text-white/80 text-[13px] font-semibold px-4 py-2.5 rounded-lg " +
+    "text-white/80 text-[13px] font-semibold px-3.5 py-2 rounded-md " +
     "hover:bg-white/15 hover:text-white transition-all whitespace-nowrap";
 
   return (

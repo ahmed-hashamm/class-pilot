@@ -171,7 +171,7 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
 
     const { data, error } = await supabase
       .from('assignments')
-      .select('*')
+      .select('id, class_id, title, description, points, due_date, attachment_paths, attachments, created_at')
       .eq('class_id', classId)
       .order('created_at', { ascending: false })
 

@@ -12,8 +12,8 @@ export default function SidebarCard({
   extra?: React.ReactNode
 }) {
   return (
-    <Card className="rounded-2xl shadow-sm bg-white">
-      <CardContent className="p-5">
+    <Card className="rounded-xl shadow-sm bg-white">
+      <CardContent className="p-4">
         <div className="flex justify-between mb-3">
           <span className="text-sm font-bold text-gray-700">{title}</span>
           {extra}

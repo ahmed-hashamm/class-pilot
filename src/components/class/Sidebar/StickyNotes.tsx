@@ -162,8 +162,8 @@ export default function StickyNotes({ classId }: { classId: string }) {
           onKeyDown={handleKeyDown}
           placeholder="Write a note…"
           rows={3}
-          className="w-full resize-none text-[13px] bg-secondary border border-border
-            rounded-xl p-3 text-foreground placeholder:text-muted-foreground
+          className="w-full resize-none text-[12px] bg-secondary border border-border
+            rounded-xl p-2.5 text-foreground placeholder:text-muted-foreground
             focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy
             transition leading-relaxed"
         />
@@ -172,7 +172,7 @@ export default function StickyNotes({ classId }: { classId: string }) {
           onClick={handleAddNote}
           disabled={!noteText.trim() || isPending}
           className="inline-flex items-center justify-center gap-2 w-full
-            bg-navy text-white text-[13px] font-semibold py-2.5 rounded-xl
+            bg-navy text-white text-[12px] font-semibold py-2 rounded-xl
             hover:bg-navy/90 transition disabled:opacity-40
             disabled:cursor-not-allowed cursor-pointer border-none">
           {isPending

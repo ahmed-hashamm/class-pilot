@@ -1,8 +1,7 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import ActionButton from "./ActionButton";
 const LearningSection = () => {
   return (
-    <section className="bg-navy text-primary-foreground relative overflow-hidden py-16 lg:py-24">
+    <section className="bg-navy text-primary-foreground relative overflow-hidden py-20 lg:py-32">
       {/* Wave decoration lines */}
       <div className="absolute inset-0 overflow-hidden">
         <svg className="absolute top-0 left-0 w-full h-full opacity-20" viewBox="0 0 1200 400" preserveAspectRatio="none">
@@ -30,7 +29,7 @@ const LearningSection = () => {
         </svg>
       </div>
 
-      <div className="container mx-auto px-6 lg:px-20 relative z-10">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-20 relative z-10">
         <div className=" gap-12 items-center">
           {/* Content */}
           <div className="text-center">
@@ -46,10 +45,7 @@ const LearningSection = () => {
               intuitive, distraction-free platform. WhatsApp, Google Drive, LMSs, and scattered links. It because every big plan — class online, assignment, or AI — to that teaching
               becomes easy.
             </p>
-            <Link href={"/login"} className="bg-navy-light text-primary-foreground font-semibold px-6 py-3 rounded-lg hover:brightness-110 transition-all inline-flex items-center gap-2">
-              All in one
-              <ArrowRight size={18} />
-            </Link>
+            <ActionButton buttonText="All in one" />
           </div>
         </div>
       </div>
