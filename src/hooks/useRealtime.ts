@@ -39,8 +39,8 @@ export function ensureAuth(supabase: ReturnType<typeof createClient>): Promise<b
 
   authPromise = (async () => {
     for (let i = 0; i < 5; i++) {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) return true
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) return true
       await new Promise((r) => setTimeout(r, 300))
     }
     return false

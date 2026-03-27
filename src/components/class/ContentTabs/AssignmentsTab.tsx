@@ -152,6 +152,8 @@ import { format } from 'date-fns'
 import Link from 'next/link'
 import { ClipboardList, Calendar, Award, Plus, Paperclip, ArrowRight, RefreshCw } from 'lucide-react'
 import AttachmentButton from '@/components/class/Buttons/AttachmentButton'
+import { getAssignmentsByClass } from '@/lib/data/assignments'
+import { useQuery } from '@tanstack/react-query'
 
 interface AssignmentsTabProps {
   classId: string
@@ -160,34 +162,14 @@ interface AssignmentsTabProps {
 }
 
 export default function AssignmentsTab({ classId, isTeacher, userId }: AssignmentsTabProps) {
-  const [assignments, setAssignments] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
-
-  const loadAssignments = async () => {
-    setLoading(true)
-    setError(null)
-
-    // Refresh auth session to prevent stale JWT
-    await supabase.auth.getUser()
-
-    const { data, error } = await supabase
-      .from('assignments')
-      .select('id, class_id, title, description, points, due_date, attachment_paths, attachments, created_at')
-      .eq('class_id', classId)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      setError('Failed to load assignments.')
-      setAssignments([])
-    } else if (data) {
-      setAssignments(data)
+  const { data: assignments = [], isLoading: loading, error, refetch: loadAssignments } = useQuery({
+    queryKey: ['classAssignments', classId],
+    queryFn: async () => {
+      const { assignments: data, error } = await getAssignmentsByClass(classId)
+      if (error) throw new Error('Failed to load assignments.')
+      return (data || []) as any[]
     }
-    setLoading(false)
-  }
-
-  useEffect(() => { loadAssignments() }, [classId, userId])
+  })
 
   const getDisplayName = (path: string) => {
     const fileName = path.split('/').pop() || 'File'
@@ -238,7 +220,7 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
         <div className="flex flex-col items-center justify-center gap-4 py-16
           border-2 border-dashed border-border rounded-2xl bg-white text-center">
           <ClipboardList size={32} className="text-muted-foreground/40" />
-          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
+          <p className="text-[14px] font-medium text-muted-foreground">{error.message}</p>
           <button
             onClick={() => loadAssignments()}
             className="inline-flex items-center gap-2 bg-navy text-white font-semibold

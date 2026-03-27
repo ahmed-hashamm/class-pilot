@@ -2,7 +2,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import { Database, Clock, FileText, Plus, X, RefreshCw, Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
 import MaterialUpload from '../Feed/MaterialUpload'
@@ -10,6 +9,9 @@ import AttachmentButton from '@/components/class/Buttons/AttachmentButton'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import EditMaterialModal from '@/components/class/ContentTabs/EditMaterialModal'
+import { getMaterialsByClass } from '@/lib/data/materials'
+import { deleteMaterial } from '@/actions/ClassActions'
+import { useQuery } from '@tanstack/react-query'
 
 interface MaterialsTabProps {
   classId: string
@@ -18,48 +20,19 @@ interface MaterialsTabProps {
 }
 
 export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTabProps) {
-  const [materials, setMaterials] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [editing, setEditing] = useState<any>(null)
   const [syncingId, setSyncingId] = useState<string | null>(null)
 
-  const supabase = createClient()
-
-  const loadMaterials = async () => {
-    setLoading(true)
-    setError(null)
-
-    // getUser() makes a real server call that triggers JWT refresh
-    await supabase.auth.getUser()
-
-    const { data, error } = await supabase
-      .from('materials')
-      .select('*, users(full_name, email)')
-      .eq('class_id', classId)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      setError('Failed to load materials.')
-      setMaterials([])
-    } else if (data) {
-      setMaterials(data)
+  const { data: materials = [], isLoading: loading, error, refetch: loadMaterials } = useQuery({
+    queryKey: ['classMaterials', classId],
+    queryFn: async () => {
+      const { materials: data, error } = await getMaterialsByClass(classId)
+      if (error) throw new Error('Failed to load materials.')
+      return (data || []) as any[]
     }
-    setLoading(false)
-  }
-
-  const deleteMaterial = async (id: string, classId: string) => {
-    const { error } = await supabase
-      .from('materials')
-      .delete()
-      .eq('id', id)
-      .eq('class_id', classId)
-    if (error) throw error
-  }
-
-  useEffect(() => { loadMaterials() }, [classId, userId])
+  })
 
   const getDisplayName = (path: string) => {
     const fileName = path.split('/').pop() || 'File'
@@ -70,7 +43,7 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
     if (!confirm('Delete this material? This cannot be undone.')) return
     try { 
       await deleteMaterial(id, classId); 
-      setMaterials((prev) => prev.filter((m) => m.id !== id)) 
+      loadMaterials();
       toast.success("Material deleted");
     }
     catch { toast.error('Failed to delete material') }
@@ -148,7 +121,7 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
         <div className="flex flex-col items-center justify-center gap-4 py-16
           border-2 border-dashed border-border rounded-2xl bg-white text-center">
           <Database size={32} className="text-muted-foreground/40" />
-          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
+          <p className="text-[14px] font-medium text-muted-foreground">{error?.message || String(error)}</p>
           <button
             onClick={() => loadMaterials()}
             className="inline-flex items-center gap-2 bg-navy text-white font-semibold

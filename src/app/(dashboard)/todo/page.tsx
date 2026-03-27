@@ -1,55 +1,16 @@
-
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { getTodoPageData } from "@/lib/data/todo";
 import {
   CheckCircle2, Inbox, Calendar as CalendarIcon,
   ChevronLeft, Users, Clock, AlertCircle,
 } from "lucide-react";
-import { format, isPast, isFuture } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
 
 export default async function TodoPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: classMembersData } = await supabase
-    .from("class_members").select("class_id").eq("user_id", user.id);
-
-  const { data: groupMembersData } = await supabase
-    .from("project_members").select("project_id").eq("user_id", user.id);
-
-    const classIds   = classMembersData?.map((cm: { class_id: string }) => cm.class_id) || [];
-    const myGroupIds = groupMembersData?.map((gm: { project_id: string }) => gm.project_id) || [];
-
-  const { data: assignmentsData } = classIds.length > 0
-    ? await supabase
-        .from("assignments")
-        .select(`
-          id, title, due_date, points, is_group_project,
-          classes(name),
-          submissions!left(status, final_grade, user_id, group_id)
-        `)
-        .in("class_id", classIds)
-        .order("due_date", { ascending: true })
-    : { data: [] };
-
-  const allAssignments = assignmentsData || [];
-
-  const done = allAssignments.filter((a: any) => {
-    if (!a.submissions?.length) return false;
-    return a.submissions.some((sub: any) =>
-      a.is_group_project ? myGroupIds.includes(sub.group_id) : sub.user_id === user.id
-    );
-  });
-
-  const notDone    = allAssignments.filter((a: any) => !done.find((d: any) => d.id === a.id));
-  const missing    = notDone.filter((a: any) => isPast(new Date(a.due_date)));
-  const assigned   = notDone.filter((a: any) => isFuture(new Date(a.due_date)));
+  const { user, done, missing, assigned, myGroupIds } = await getTodoPageData();
 
   return (
     <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8">
-
       {/* Back */}
       <Link href="/dashboard"
         className="inline-flex items-center gap-1.5 text-[13px] font-semibold

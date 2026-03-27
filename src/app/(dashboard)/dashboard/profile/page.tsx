@@ -1,110 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/client'
+import { useProfile } from '@/lib/data/profile'
 import { Loader2, CheckCircle2, AlertCircle, Camera, ArrowLeft } from 'lucide-react'
 
 export default function SettingsPage() {
-  const supabase = createClient()
-  const router   = useRouter()
-
-  const [loading,        setLoading]        = useState(false)
-  const [uploading,      setUploading]      = useState(false)
-  const [userId,         setUserId]         = useState<string | null>(null)
-  const [fullName,       setFullName]       = useState('')
-  const [avatarUrl,      setAvatarUrl]      = useState<string | null>(null)
-  const [file,           setFile]           = useState<File | null>(null)
-  const [preview,        setPreview]        = useState<string | null>(null)
-  const [status,         setStatus]         = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-  const [initialLoading, setInitialLoading] = useState(true)
-
-  // Load profile
-  useEffect(() => {
-    const loadProfile = async () => {
-      setInitialLoading(true)
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setInitialLoading(false); return }
-      setUserId(user.id)
-
-      const { data } = await supabase
-        .from('users')
-        .select('full_name, avatar_url')
-        .eq('id', user.id)
-        .single()
-
-      if (data) {
-        setFullName((data as any).full_name || '')
-        setAvatarUrl((data as any).avatar_url || null)
-      }
-      setInitialLoading(false)
-    }
-    loadProfile()
-  }, [supabase])
-
-  // Live preview before upload
-  useEffect(() => {
-    if (!file) { setPreview(null); return }
-    const url = URL.createObjectURL(file)
-    setPreview(url)
-    return () => URL.revokeObjectURL(url)
-  }, [file])
-
-  // Upload avatar
-  const handleAvatarUpload = async () => {
-    if (!file || !userId) return
-    setUploading(true)
-    setStatus(null)
-    try {
-      const fileExt = file.name.split('.').pop()
-      const filePath = `${userId}-${Math.random()}.${fileExt}`
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true })
-      if (uploadError) throw uploadError
-
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ avatar_url: data.publicUrl } as never)
-        .eq('id', userId)
-      if (updateError) throw updateError
-
-      setAvatarUrl(data.publicUrl)
-      setFile(null)
-      setPreview(null)
-      setStatus({ type: 'success', message: 'Profile photo updated.' })
-    } catch {
-      setStatus({ type: 'error', message: 'Failed to upload image.' })
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  // Save name
-  const handleSaveProfile = async () => {
-    if (!userId) return
-    setLoading(true)
-    setStatus(null)
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ full_name: fullName } as never)
-        .eq('id', userId)
-      if (error) throw error
-
-      setStatus({ type: 'success', message: 'Changes saved! Redirecting...' })
-      setTimeout(() => router.push('/dashboard'), 1500)
-    } catch {
-      setStatus({ type: 'error', message: 'Could not save changes.' })
-      setLoading(false)
-    }
-  }
-
-  const displayAvatar = preview || avatarUrl
-  const initials      = fullName?.[0]?.toUpperCase() || 'U'
+  const {
+    loading, uploading, initialLoading, fullName, avatarUrl, file, 
+    status, displayAvatar, initials, setFullName, setFile, clearFile,
+    handleAvatarUpload, handleSaveProfile, goBack
+  } = useProfile()
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,7 +18,7 @@ export default function SettingsPage() {
         {/* Back + title */}
         <div>
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={goBack}
             className="inline-flex items-center gap-1.5 text-muted-foreground
               hover:text-navy text-[13px] font-semibold mb-5 transition-colors
               cursor-pointer bg-transparent border-none">
@@ -158,7 +63,7 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => { setFile(e.target.files?.[0] || null); setStatus(null) }}
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
               {file ? (
                 <div className="flex flex-col gap-2">
@@ -178,7 +83,7 @@ export default function SettingsPage() {
                         : 'Save photo'}
                     </button>
                     <button
-                      onClick={() => { setFile(null); setPreview(null) }}
+                      onClick={clearFile}
                       className="text-[13px] font-semibold text-muted-foreground
                         hover:text-foreground transition cursor-pointer
                         bg-transparent border-none">
@@ -219,7 +124,7 @@ export default function SettingsPage() {
               type="text"
               value={fullName}
               disabled={initialLoading}
-              onChange={(e) => { setFullName(e.target.value); setStatus(null) }}
+              onChange={(e) => setFullName(e.target.value)}
               placeholder={initialLoading ? 'Loading...' : 'Enter your full name'}
               className="w-full bg-white border border-border rounded-lg px-4 py-3
                 text-[14px] text-foreground placeholder:text-muted-foreground
@@ -260,7 +165,7 @@ export default function SettingsPage() {
             }
           </button>
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={goBack}
             disabled={loading}
             className="inline-flex items-center gap-2 bg-secondary border border-border
               text-foreground font-semibold text-[14px] px-6 py-3 rounded-lg

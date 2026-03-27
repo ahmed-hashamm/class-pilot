@@ -223,13 +223,9 @@ import {
   MoreVertical, Pencil, Trash2, BarChart2, CheckSquare,
   Timer, Lock, XCircle
 } from "lucide-react";
-import {
-  useRealtimeAnnouncements,
-  useRealtimeAssignments,
-  useRealtimeMaterials,
-  useRealtimePolls,
-  useRealtimeAttendances
-} from "@/hooks/useRealtime";
+import { useQuery } from "@tanstack/react-query";
+import { getStreamFeed } from "@/lib/data/stream";
+import { useStreamRealtime } from "@/hooks/useStreamRealtime";
 import AnnouncementInput from "./AnnouncementInput";
 import MaterialUpload from "./MaterialUpload";
 import PollInput from "./PollInput";
@@ -337,31 +333,17 @@ const ACTIONS = [
 /* ─────────────────────────────────────────────────────────────────────────────
    FEED
 ───────────────────────────────────────────────────────────────────────────── */
+const EMPTY_ARRAY: any[] = [];
+
 export default function Feed({ classId, userId, isTeacher }: FeedProps) {
-  const { announcements, hasSettled: annSettled } = useRealtimeAnnouncements(classId, userId);
-  const { assignments, hasSettled: asnSettled } = useRealtimeAssignments(classId, userId);
-  const { materials, hasSettled: matSettled } = useRealtimeMaterials(classId, userId);
-  const { polls, hasSettled: pollSettled } = useRealtimePolls(classId, userId);
-  const { attendances, hasSettled: attSettled } = useRealtimeAttendances(classId, userId);
-
   const [activeAction, setActiveAction] = useState<TeacherAction>("none");
-  const isInitialLoad = !(annSettled && asnSettled && matSettled && pollSettled && attSettled);
 
-  const feedItems = useMemo(() => {
-    const combined = [
-      ...announcements.map((a) => ({ ...a, type: "announcement" as const })),
-      ...assignments.map((a) => ({ ...a, type: "assignment" as const })),
-      ...materials.map((m) => ({ ...m, type: "material" as const })),
-      ...polls.map((p) => ({ ...p, type: "poll" as const })),
-      ...attendances.map((a) => ({ ...a, type: "attendance" as const })),
-    ];
-    return [...combined].sort((a, b) => {
-      const aPinned = a.type === "announcement" && (a as any).pinned ? 1 : 0;
-      const bPinned = b.type === "announcement" && (b as any).pinned ? 1 : 0;
-      if (aPinned !== bPinned) return bPinned - aPinned;
-      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-    });
-  }, [announcements, assignments, materials, polls, attendances]);
+  const { data: initialFeed = EMPTY_ARRAY, isLoading: isInitialLoad } = useQuery({
+    queryKey: ['streamFeed', classId],
+    queryFn: () => getStreamFeed(classId),
+  });
+
+  const feedItems = useStreamRealtime(classId, initialFeed);
 
   return (
     <div className="flex flex-col gap-4">

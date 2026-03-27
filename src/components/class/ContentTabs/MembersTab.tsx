@@ -3,10 +3,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import { Mail, ShieldCheck, GraduationCap, Users, RefreshCw } from 'lucide-react'
 import Loader from '@/components/layout/Loader'
+import { getClassMembers } from '@/lib/data/members'
+import { useQuery } from '@tanstack/react-query'
 
 interface MembersTabProps {
   classId: string
@@ -15,35 +16,14 @@ interface MembersTabProps {
 }
 
 export default function MembersTab({ classId, isTeacher, userId }: MembersTabProps) {
-  const [members, setMembers] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
-
-  const loadMembers = async () => {
-    setLoading(true)
-    setError(null)
-
-    // Refresh auth session to prevent stale JWT
-    await supabase.auth.getUser()
-
-    const { data, error } = await supabase
-      .from('class_members')
-      .select('*, users(full_name, email, avatar_url)')
-      .eq('class_id', classId)
-      .order('role', { ascending: false })
-      .order('joined_at', { ascending: true })
-
-    if (error) {
-      setError('Failed to load members.')
-      setMembers([])
-    } else if (data) {
-      setMembers(data)
+  const { data: members = [], isLoading: loading, error, refetch: loadMembers } = useQuery({
+    queryKey: ['classMembers', classId],
+    queryFn: async () => {
+      const { members: data, error } = await getClassMembers(classId)
+      if (error) throw new Error('Failed to load members.')
+      return (data || []) as any[]
     }
-    setLoading(false)
-  }
-
-  useEffect(() => { loadMembers() }, [classId])
+  })
 
   if (loading) {
     return (
@@ -107,7 +87,7 @@ export default function MembersTab({ classId, isTeacher, userId }: MembersTabPro
         <div className="flex flex-col items-center justify-center gap-4 py-16
           border-2 border-dashed border-border rounded-2xl bg-white text-center">
           <Users size={32} className="text-muted-foreground/40" />
-          <p className="text-[14px] font-medium text-muted-foreground">{error}</p>
+          <p className="text-[14px] font-medium text-muted-foreground">{error?.message || String(error)}</p>
           <button
             onClick={() => loadMembers()}
             className="inline-flex items-center gap-2 bg-navy text-white font-semibold

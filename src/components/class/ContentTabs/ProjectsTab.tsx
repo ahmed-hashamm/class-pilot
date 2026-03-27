@@ -2,7 +2,7 @@
 
 import { Plus, Users2, ArrowRight, FolderOpen } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { classService } from '@/services/classService'
+import { getProjects } from '@/lib/data/groups'
 import { toast } from 'sonner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
@@ -18,7 +18,11 @@ interface ProjectsTabProps {
 export default function ProjectsTab({ classId, isTeacher }: ProjectsTabProps) {
   const { data: projects = [] as any[], isLoading, error, refetch } = useQuery({
     queryKey: ['projects', classId],
-    queryFn: () => classService.getProjects(classId),
+    queryFn: async () => {
+      const { projects: data, error } = await getProjects(classId)
+      if (error) throw new Error(error)
+      return (data || []) as any[]
+    }
   })
 
   if (isLoading) {

@@ -1,24 +1,19 @@
-
-
-import { createClient } from "@/lib/supabase/server";
-import DashboardBanner from "@/components/dashboard/DashboardBanner";
-import ClassCard from "@/components/dashboard/ClassCard";
+import { getUserDashboardData } from '@/lib/data/dashboard'
+import DashboardBanner from '@/components/dashboard/DashboardBanner'
+import ClassCard from '@/components/dashboard/ClassCard'
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  const result = await getUserDashboardData()
+  if (!result) return null
 
-  const { data: dashboardData, error } = await supabase
-    .rpc('get_user_dashboard_data', { p_user_id: user.id } as any);
+  const { user, dashboardData, error } = result
 
   if (error) {
-    console.error("Error loading dashboard:", error);
-    return <p className="p-8 text-muted-foreground text-sm">Error loading dashboard.</p>;
+    return <p className="p-8 text-muted-foreground text-sm">Error loading dashboard.</p>
   }
 
-  const userName = user.user_metadata?.full_name || "User";
-  const isEmpty = !dashboardData || (dashboardData as any[]).length === 0;
+  const userName = user.user_metadata?.full_name || 'User'
+  const isEmpty = !dashboardData || dashboardData.length === 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,7 +21,6 @@ export default async function DashboardPage() {
 
       <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-8">
         {isEmpty ? (
-          /* ── Empty state ────────────────────────────────────────────── */
           <div className="flex flex-col items-center justify-center text-center
             py-20 border-2 border-dashed border-border rounded-2xl bg-white">
 
@@ -69,9 +63,8 @@ export default async function DashboardPage() {
             </div>
           </div>
         ) : (
-          /* ── Classes grid ────────────────────────────────────────────── */
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {(dashboardData as any[]).map((item: any) => (
+            {dashboardData.map((item: any) => (
               <ClassCard
                 key={item.class_id}
                 classId={item.class_id}
@@ -86,5 +79,5 @@ export default async function DashboardPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

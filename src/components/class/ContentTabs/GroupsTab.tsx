@@ -421,7 +421,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { classService } from "@/services/classService";
+import { getGroupsWithMembers, getAllClassMembers } from "@/lib/data/groups";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
@@ -454,12 +454,20 @@ export default function GroupsTab({ classId, isTeacher }: Props) {
   // Data fetching with React Query
   const { data: groups = [] as Group[], isLoading: loadingGroups, error: errorGroups, refetch: refetchGroups } = useQuery({
     queryKey: ['groups', classId],
-    queryFn: () => classService.getGroupsWithMembers(classId),
+    queryFn: async () => {
+      const { groups: data, error } = await getGroupsWithMembers(classId)
+      if (error) throw new Error(error)
+      return (data || []) as Group[]
+    }
   })
 
   const { data: allClassMembers = [] as ClassMember[], isLoading: loadingMembers } = useQuery({
     queryKey: ['classMembers', classId],
-    queryFn: () => classService.getAllClassMembers(classId),
+    queryFn: async () => {
+      const { members: data, error } = await getAllClassMembers(classId)
+      if (error) throw new Error(error)
+      return (data || []) as ClassMember[]
+    }
   })
 
   const loading = loadingGroups || loadingMembers
