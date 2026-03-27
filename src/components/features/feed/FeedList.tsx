@@ -2,19 +2,16 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Inbox } from "lucide-react";
+import { Inbox as InboxIcon } from "lucide-react";
 import { getStreamFeed } from "@/lib/db_data_fetching/stream";
 import { useStreamRealtime } from "@/lib/hooks/useStreamRealtime";
 import FeedCard from "./FeedCard";
-import AnnouncementInput from "@/components/features/classes/Feed/AnnouncementInput";
-import MaterialUpload from "@/components/features/classes/Feed/MaterialUpload";
-import PollInput from "@/components/features/classes/Feed/PollInput";
-import AttendanceInput from "@/components/features/classes/Feed/AttendanceInput";
 import FeedActions from "./FeedActions";
 import PollBody from "./PollBody";
 import AttendanceBody from "./AttendanceBody";
-import { useCountdown } from "@/lib/hooks/useCountdown"; // Need this if I move it
-import StatusBadge from "./StatusBadge";
+import { useCountdown } from "@/lib/hooks/useCountdown";
+import { motion, AnimatePresence } from "framer-motion";
+import { STAGGER_CONTAINER, STAGGER_ITEM } from "@/lib/animations";
 
 interface FeedListProps {
   classId: string;
@@ -61,21 +58,31 @@ export default function FeedList({ classId, userId, isTeacher }: FeedListProps) 
         />
       )}
 
-      <div className="flex flex-col gap-3">
+      <motion.div 
+        variants={STAGGER_CONTAINER}
+        initial="initial"
+        animate="animate"
+        className="flex flex-col gap-3"
+      >
         {feedItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-16 border-2 border-dashed border-border rounded-2xl bg-white text-center">
-            <Inbox size={28} className="text-muted-foreground/40" />
+          <motion.div 
+            variants={STAGGER_ITEM}
+            className="flex flex-col items-center justify-center gap-3 py-16 border-2 border-dashed border-border rounded-2xl bg-white text-center"
+          >
+            <InboxIcon size={28} className="text-muted-foreground/40" />
             <p className="text-[14px] text-muted-foreground font-medium">The feed is empty</p>
-          </div>
+          </motion.div>
         ) : (
-          feedItems.map((item) => (
-            <FeedCard key={`${item.type}-${item.id}`} item={item} classId={classId} userId={userId} isTeacher={isTeacher}>
-              {item.type === "poll" && <PollBodyWrapper item={item} userId={userId} isTeacher={isTeacher} />}
-              {item.type === "attendance" && <AttendanceBodyWrapper item={item} userId={userId} isTeacher={isTeacher} />}
-            </FeedCard>
+          feedItems.map((item: any) => (
+            <motion.div key={`${item.type}-${item.id}`} variants={STAGGER_ITEM}>
+              <FeedCard item={item} classId={classId} userId={userId} isTeacher={isTeacher}>
+                {item.type === "poll" && <PollBodyWrapper item={item} userId={userId} isTeacher={isTeacher} />}
+                {item.type === "attendance" && <AttendanceBodyWrapper item={item} userId={userId} isTeacher={isTeacher} />}
+              </FeedCard>
+            </motion.div>
           ))
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

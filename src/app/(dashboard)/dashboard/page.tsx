@@ -1,6 +1,6 @@
 import { getUserDashboardData } from '@/lib/db_data_fetching/dashboard'
 import DashboardBanner from '@/components/features/dashboard/DashboardBanner'
-import ClassCard from '@/components/features/dashboard/ClassCard'
+import ClassList from '@/components/features/dashboard/ClassList'
 
 export default async function DashboardPage() {
   const result = await getUserDashboardData()
@@ -63,19 +63,7 @@ export default async function DashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {dashboardData.map((item: any) => (
-              <ClassCard
-                key={item.class_id}
-                classId={item.class_id}
-                classData={item.classes}
-                role={item.role}
-                isPinned={item.is_pinned}
-                studentCount={item.student_count || 0}
-                assignments={item.assignments || []}
-              />
-            ))}
-          </div>
+          <ClassList dashboardData={dashboardData} />
         )}
       </div>
     </div>

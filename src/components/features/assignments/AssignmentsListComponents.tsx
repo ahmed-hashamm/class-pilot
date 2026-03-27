@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { ClipboardList, Plus, RefreshCw } from "lucide-react";
 
-export function AssignmentsHeader({ isTeacher, classId }: { isTeacher: boolean; classId: string }) {
+export function AssignmentsHeader({
+  isTeacher,
+  classId,
+}: {
+  isTeacher: boolean;
+  classId: string;
+}) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
@@ -12,16 +18,18 @@ export function AssignmentsHeader({ isTeacher, classId }: { isTeacher: boolean; 
         </div>
         <div>
           <h2 className="font-black text-[18px] tracking-tight">Assignments</h2>
-          <p className="text-[13px] text-muted-foreground">View and manage coursework</p>
+          <p className="text-[13px] text-muted-foreground">Coursework and evaluative materials</p>
         </div>
       </div>
 
       {isTeacher && (
         <Link href={`/classes/${classId}/assignments/create`}>
-          <button className="inline-flex items-center gap-2 bg-navy text-white
-            font-semibold text-[13px] px-5 py-2.5 rounded-xl shadow-sm
-            hover:bg-navy/90 hover:-translate-y-0.5 transition-all
-            cursor-pointer border-none">
+          <button
+            className="inline-flex items-center gap-2 bg-navy text-white
+              font-semibold text-[13px] px-5 py-2.5 rounded-xl shadow-sm
+              hover:bg-navy/90 hover:-translate-y-0.5 transition-all
+              cursor-pointer border-none"
+          >
             <Plus size={14} />
             Create assignment
           </button>

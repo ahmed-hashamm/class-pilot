@@ -42,17 +42,21 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
           {displayName}
         </span>
       </div>
-      {!asDiv && (
-        <div className="pr-2 opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0">
-          <ExternalLink size={14} className="text-navy" />
-        </div>
-      )}
+      <div className="pr-2 opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0">
+        <ExternalLink size={14} className="text-navy" />
+      </div>
     </>
   )
 
   if (asDiv) {
     return (
-      <div className="group flex w-fit items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5">
+      <div 
+        onClick={(e) => {
+          e.stopPropagation();
+          if (url !== '#') window.open(url, '_blank');
+        }}
+        className="group flex w-fit items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5 cursor-pointer"
+      >
         {innerContent}
       </div>
     )

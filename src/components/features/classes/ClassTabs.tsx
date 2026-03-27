@@ -40,7 +40,7 @@
 //           Used gap-2 for mobile and sm:gap-3 for larger screens
 //       */}
 //       <div className="flex flex-wrap items-center md:justify-between gap-2 sm:gap-3 w-full relative z-10">
-        
+
 //         {/* Navigation Tabs */}
 //         <div className="flex flex-wrap gap-2 sm:gap-3">
 
@@ -48,7 +48,7 @@
 //           if (tab.hide) return null;
 //           const Icon = tab.icon;
 //           const isActive = activeTab === tab.id;
-          
+
 //           return (
 //             <button
 //             key={tab.id}
@@ -116,6 +116,8 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { TAB_INDICATOR_TRANSITION } from "@/lib/animations";
 import ClassSettingsModal from "./Modals/ClassSettingsModal";
 import { CLASS_TABS } from "@/lib/data/classes";
 
@@ -143,7 +145,7 @@ export default function ClassTabs({
       <div className="flex flex-wrap items-center gap-2 w-full relative z-10">
         {tabs.map((tab) => {
           if (tab.hide) return null;
-          const Icon     = tab.icon;
+          const Icon = tab.icon;
           const isActive = activeTab === tab.id && !tab.onClick;
 
           return (

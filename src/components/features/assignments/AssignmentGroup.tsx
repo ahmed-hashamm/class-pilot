@@ -21,7 +21,7 @@ export default function AssignmentGroup({
 
   return (
     <div>
-      <p className={`text-[11px] font-bold tracking-[.18em] uppercase mb-3
+      <p className={`text-[11px] font-black tracking-widest uppercase mb-3
         ${muted ? "text-muted-foreground/60" : "text-navy"}`}>
         {label} · {assignments.length}
       </p>
