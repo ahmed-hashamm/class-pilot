@@ -3,6 +3,8 @@
 import { Settings2, Users, Calendar, Award } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
+import { SUBMISSION_TYPES } from "@/lib/data/assignments";
+
 const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3 text-[14px] text-foreground focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy transition`;
 const labelClass = `text-[11px] font-bold tracking-[.18em] uppercase text-navy`;
 
@@ -26,7 +28,11 @@ export function AssignmentConfig({ isGroupProject, setIsGroupProject, rubrics, i
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor="submissionType" className="text-[11px] font-bold uppercase text-navy">Submission type</label>
-        <select name="submissionType" defaultValue={initialData?.submission_type || "file"} className={`${inputClass} text-[13px] py-2 cursor-pointer`}><option value="file">File upload</option><option value="text">Online text</option><option value="both">Both</option></select>
+        <select name="submissionType" defaultValue={initialData?.submission_type || "file"} className={`${inputClass} text-[13px] py-2 cursor-pointer`}>
+          {SUBMISSION_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor="rubricId" className="text-[11px] font-bold uppercase text-navy">Rubric</label>

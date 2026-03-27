@@ -81,12 +81,13 @@
 
 "use client";
 
-import { Calendar, Home, ListTodo, Plus, FileText, Link as LinkIcon } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Plus, Link as LinkIcon } from "lucide-react";
 import CreateClassModal from "@/components/features/classes/Modals/CreateClassModal";
 import JoinClassModal from "@/components/features/classes/Modals/JoinClassModal";
-import { useRouter } from "next/navigation";
+import { DASHBOARD_NAV_LINKS } from "@/lib/data/navigation";
 
 export default function DashboardButtons({
   userId,
@@ -125,25 +126,12 @@ export default function DashboardButtons({
           Join class
         </button>
 
-        <Link href="/dashboard" className={ghostBtn}>
-          <Home size={15} />
-          Home
-        </Link>
-
-        <Link href="/rubrics" className={ghostBtn}>
-          <FileText size={15} />
-          Rubrics
-        </Link>
-
-        <Link href="/todo" className={ghostBtn}>
-          <ListTodo size={15} />
-          To-do
-        </Link>
-
-        <Link href="/calendar" className={ghostBtn}>
-          <Calendar size={15} />
-          Calendar
-        </Link>
+        {DASHBOARD_NAV_LINKS.map((link) => (
+          <Link key={link.href} href={link.href} className={ghostBtn}>
+            {link.icon && <link.icon size={15} />}
+            {link.label}
+          </Link>
+        ))}
       </div>
 
       {showCreateModal && userId && (

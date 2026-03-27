@@ -115,16 +115,9 @@
 
 "use client";
 
-import {
-  PlayCircle,
-  Users,
-  ClipboardList,
-  Users2,
-  Settings,
-  Database,
-} from "lucide-react";
 import { useState } from "react";
 import ClassSettingsModal from "./Modals/ClassSettingsModal";
+import { CLASS_TABS } from "@/lib/data/classes";
 
 interface ClassTabsProps {
   isTeacher: boolean;
@@ -143,20 +136,7 @@ export default function ClassTabs({
 }: ClassTabsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const tabs = [
-    { id: "stream",    label: "Stream",    icon: PlayCircle    },
-    { id: "people",    label: "People",    icon: Users         },
-    { id: "work",      label: "Work",      icon: ClipboardList },
-    { id: "groups",    label: "Groups",    icon: Users2        },
-    { id: "materials", label: "Materials", icon: Database      },
-    {
-      id: "manage",
-      label: "Manage",
-      icon: Settings,
-      hide: !isTeacher,
-      onClick: () => setIsModalOpen(true),
-    },
-  ];
+  const tabs = CLASS_TABS(isTeacher, () => setIsModalOpen(true));
 
   return (
     <>

@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { toast } from "sonner"
 
-const ALLOWED_FILE_TYPES = ['pdf', 'docx', 'ppt', 'pptx']
+import { ALLOWED_FILE_TYPES } from "@/lib/data/materials";
 
 export default function MaterialUpload({
   classId, userId, onSuccess,
@@ -30,7 +30,7 @@ export default function MaterialUpload({
     const selected = Array.from(e.target.files)
     const valid = selected.filter((f) => {
       const ext = f.name.split('.').pop()?.toLowerCase()
-      return ext && ALLOWED_FILE_TYPES.includes(ext)
+      return ext && (ALLOWED_FILE_TYPES as readonly string[]).includes(ext)
     })
     if (valid.length < selected.length)
       toast.error('Only PDF, DOCX, PPT, and PPTX files are allowed.')

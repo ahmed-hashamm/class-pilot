@@ -7,20 +7,16 @@ import AnnouncementInput from "@/components/features/classes/Feed/AnnouncementIn
 import MaterialUpload from "@/components/features/classes/Feed/MaterialUpload";
 import PollInput from "@/components/features/classes/Feed/PollInput";
 import AttendanceInput from "@/components/features/classes/Feed/AttendanceInput";
+import { FEED_ACTIONS } from "@/lib/data/feed";
 
-const ACTIONS = [
-  { id: "announcement", label: "Announcement", icon: Megaphone },
-  { id: "material", label: "Material", icon: FileUp },
-  { id: "poll", label: "Poll", icon: BarChart2 },
-  { id: "attendance", label: "Attendance", icon: CheckSquare },
-] as const;
+// FEED_ACTIONS is imported from @/lib/data/feed
 
 export default function FeedActions({ classId, userId, activeAction, setActiveAction }: any) {
   return (
     <Card className="rounded-2xl shadow-sm bg-white overflow-hidden border-border">
       <CardHeader className="p-0 border-b border-border">
         <div className="flex items-center overflow-x-auto no-scrollbar">
-          {ACTIONS.map(({ id, label, icon: Icon }) => {
+          {FEED_ACTIONS.map(({ id, label, icon: Icon }) => {
             const isActive = activeAction === id;
             return (
               <button

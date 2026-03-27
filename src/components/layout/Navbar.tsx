@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from "react";
 import { Menu, X, ChevronDown, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
+import { MARKETING_NAV_LINKS } from "@/lib/data/navigation";
+
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -48,17 +50,18 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        {/* <nav className="hidden md:flex items-center gap-8">
-          {["Solutions", "Resources", "Pricing"].map((item) => (
-            <div
-              key={item}
+        <nav className="hidden md:flex items-center gap-8">
+          {MARKETING_NAV_LINKS.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
               className="flex items-center gap-1 cursor-pointer hover:text-accent transition-colors"
             >
-              <span>{item}</span>
+              <span>{item.label}</span>
               <ChevronDown size={16} />
-            </div>
+            </Link>
           ))}
-        </nav> */}
+        </nav>
 
         {/* Right Section */}
         <div className="flex items-center  gap-4 relative">

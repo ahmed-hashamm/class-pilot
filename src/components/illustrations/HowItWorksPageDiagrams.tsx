@@ -1,4 +1,5 @@
 "use client"
+import { DEMO_MEMBERS } from "@/lib/data/illustrations";
  /** Teacher — step 1: class setup */
  /* ─────────────────────────────────────────────────────────────────────────────
    THEME CONSTANTS
@@ -137,9 +138,9 @@ export function DiagramSubmit() {
 /** Teacher — step 3: grading */
 export function DiagramGrading() {
     const rows = [
-        { name: "Ahmed", score: "88/100", bar: 0.9, ai: true },
-        { name: "Zohaib Hassan", score: "44/100", bar: 0.4, ai: true },
-        { name: "Anees Asad", score: "—", bar: 0, ai: false },
+        { name: DEMO_MEMBERS[0], score: "88/100", bar: 0.9, ai: true },
+        { name: DEMO_MEMBERS[2] + " Hassan", score: "44/100", bar: 0.4, ai: true },
+        { name: DEMO_MEMBERS[1] + " Asad", score: "—", bar: 0, ai: false },
     ];
     return (
         <svg viewBox="0 0 260 195" fill="none" className="w-full">
@@ -211,7 +212,7 @@ export function DiagramAIChat() {
 
 /** Group collaboration diagram */
 export function DiagramGroupCollab() {
-    const members = ["Ahmed", "Anees", "Zohaib", "Hassan"];
+    const members = DEMO_MEMBERS;
     // const bars = [0.85, 0.6, 0.72, 0.4];
     return (
         <svg viewBox="0 0 260 195" fill="none" className="w-full">

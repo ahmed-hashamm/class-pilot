@@ -7,6 +7,7 @@ import FeedItemIcon from "@/components/features/classes/Feed/FeedItemIcon";
 import AttachmentButton from "@/components/features/classes/Buttons/AttachmentButton";
 import { deleteAnnouncement } from "@/actions/ClassActions";
 import EditAnnouncementModal from "@/components/features/classes/Feed/EditAnnouncementModal";
+import { FEED_TYPE_LABELS, FEED_TYPE_PILLS } from "@/lib/data/feed";
 
 interface FeedCardProps {
   item: any;
@@ -25,21 +26,7 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
   const isAnnouncement = item.type === "announcement";
   const isPinned = isAnnouncement && item.pinned;
 
-  const typeLabel: Record<string, string> = {
-    announcement: "Announcement",
-    assignment: "Assignment",
-    material: "Material",
-    poll: "Poll",
-    attendance: "Attendance",
-  };
-
-  const typePill: Record<string, string> = {
-    announcement: "bg-navy/8 text-navy border-navy/15",
-    assignment: "bg-yellow/20 text-navy border-yellow/40",
-    material: "bg-navy-light/12 text-navy-light border-navy-light/25",
-    poll: "bg-purple-500/10 text-purple-600 border-purple-500/25",
-    attendance: "bg-green-500/10 text-green-600 border-green-500/25",
-  };
+  // Labels and pill styles are imported from @/lib/data/feed
 
   const getDisplayName = (path: string) => {
     const fileName = path.split("/").pop() || "File";
@@ -77,7 +64,7 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
                 </h4>
                 <div className="flex items-center gap-1.5 shrink-0">
                   {isPinned && <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase bg-yellow/20 text-navy border border-yellow/40 rounded-full px-2 py-0.5"><Pin size={9} /> Pinned</span>}
-                  <span className={`text-[10px] font-bold tracking-wide uppercase border rounded-full px-2.5 py-0.5 ${typePill[item.type]}`}>{typeLabel[item.type]}</span>
+                  <span className={`text-[10px] font-bold tracking-wide uppercase border rounded-full px-2.5 py-0.5 ${FEED_TYPE_PILLS[item.type]}`}>{FEED_TYPE_LABELS[item.type]}</span>
                   {isTeacher && isAnnouncement && (
                     <div className="relative">
                       <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all cursor-pointer bg-transparent border-none"><MoreVertical size={14} /></button>
