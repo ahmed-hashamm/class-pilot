@@ -1,7 +1,7 @@
-import { getEditAssignmentData } from '@/lib/data/assignments'
+import { getEditAssignmentData } from '@/lib/db_data_fetching/assignments'
 import Link from 'next/link'
 import { ChevronLeft, Pencil } from 'lucide-react'
-import CreateAssignmentForm from '@/components/assignment/CreateAssignmentForm'
+import CreateAssignmentForm from '@/components/features/assignments/CreateAssignmentForm'
 
 export default async function EditAssignmentPage({
     params,
@@ -17,7 +17,7 @@ export default async function EditAssignmentPage({
     const { user, rubrics, initialData } = await getEditAssignmentData(id, assignmentId)
 
     return (
-        <div className="max-w-5xl mx-auto p-6 flex flex-col gap-8">
+        <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8">
             {/* Back */}
             <Link
                 href={`/classes/${id}/assignments/${assignmentId}?from=${fromTab}`}

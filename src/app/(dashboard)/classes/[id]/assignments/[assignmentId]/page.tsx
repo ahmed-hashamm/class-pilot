@@ -1,5 +1,5 @@
-import { getAssignmentDetail } from '@/lib/data/assignments'
-import AssignmentDetail from '@/components/assignment/AssignmentDetail'
+import { getAssignmentDetail } from '@/lib/db_data_fetching/assignments'
+import AssignmentDetail from '@/components/features/assignments/AssignmentDetail'
 
 export default async function AssignmentDetailPage({
   params,

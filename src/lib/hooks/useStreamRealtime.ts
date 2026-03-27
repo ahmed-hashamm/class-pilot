@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { StreamItem } from '@/lib/data/stream'
+import { StreamItem } from '@/lib/db_data_fetching/stream'
 
 export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
   const [feedItems, setFeedItems] = useState<StreamItem[]>(initialData)
@@ -23,7 +23,7 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
       old: Record<string, any> | null;
     }) => {
       if (!isMounted) return
-      
+
       const { table, eventType, new: newRec, old: oldRec } = payload
 
       // Determine the primary ID of the feed item affected
@@ -42,8 +42,8 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
 
       // Handle DELETE
       if (
-        (table === 'announcements' || table === 'assignments' || table === 'materials' || 
-         table === 'polls' || table === 'attendances') && 
+        (table === 'announcements' || table === 'assignments' || table === 'materials' ||
+          table === 'polls' || table === 'attendances') &&
         eventType === 'DELETE'
       ) {
         setFeedItems((prev) => prev.filter((item) => !(item.type === itemType && item.id === targetId)))
@@ -71,7 +71,7 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
           const formattedRow = { ...(newRow as unknown as any), type: itemType } as StreamItem
           setFeedItems((prev) => {
             const exists = prev.find((item) => item.type === itemType && item.id === targetId)
-            
+
             let updated: StreamItem[] = []
             if (exists) {
               updated = prev.map((item) => (item.type === itemType && item.id === targetId ? formattedRow : item))

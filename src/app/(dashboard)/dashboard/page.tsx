@@ -1,6 +1,6 @@
-import { getUserDashboardData } from '@/lib/data/dashboard'
-import DashboardBanner from '@/components/dashboard/DashboardBanner'
-import ClassCard from '@/components/dashboard/ClassCard'
+import { getUserDashboardData } from '@/lib/db_data_fetching/dashboard'
+import DashboardBanner from '@/components/features/dashboard/DashboardBanner'
+import ClassCard from '@/components/features/dashboard/ClassCard'
 
 export default async function DashboardPage() {
   const result = await getUserDashboardData()

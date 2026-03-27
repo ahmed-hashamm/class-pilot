@@ -1,35 +1,42 @@
 'use client'
 
 import Image from 'next/image'
-import { useProfile } from '@/lib/data/profile'
+import { useProfile } from '@/lib/db_data_fetching/profile'
 import { Loader2, CheckCircle2, AlertCircle, Camera, ArrowLeft } from 'lucide-react'
 
 export default function SettingsPage() {
   const {
-    loading, uploading, initialLoading, fullName, avatarUrl, file, 
+    loading, uploading, initialLoading, fullName, avatarUrl, file,
     status, displayAvatar, initials, setFullName, setFile, clearFile,
     handleAvatarUpload, handleSaveProfile, goBack
   } = useProfile()
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-6 py-10 flex flex-col gap-5">
+    <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8">
 
-        {/* Back + title */}
-        <div>
-          <button
-            onClick={goBack}
-            className="inline-flex items-center gap-1.5 text-muted-foreground
+      {/* Back + title */}
+      <div>
+        <button
+          onClick={goBack}
+          className="inline-flex items-center gap-1.5 text-muted-foreground
               hover:text-navy text-[13px] font-semibold mb-5 transition-colors
               cursor-pointer bg-transparent border-none">
-            <ArrowLeft size={14} />
-            Back to dashboard
-          </button>
-          <h1 className="font-black text-[24px] tracking-tight">Profile Settings</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            Update your name and profile photo.
-          </p>
+          <ArrowLeft size={14} />
+          Back to dashboard
+        </button>
+
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-navy flex items-center justify-center">
+            <Camera size={17} className="text-yellow" />
+          </div>
+          <div>
+            <h1 className="font-black text-[20px] tracking-tight">Profile Settings</h1>
+            <p className="text-[13px] text-muted-foreground">
+              Update your name and profile photo.
+            </p>
+          </div>
         </div>
+      </div>
 
         {/* Avatar card */}
         <div className="bg-white border border-border rounded-2xl p-6">
@@ -174,7 +181,6 @@ export default function SettingsPage() {
           </button>
         </div>
 
-      </div>
     </div>
   )
 }

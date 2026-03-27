@@ -1,7 +1,7 @@
 "use client";
 
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
-import { FREE_FEATURES, FAQS, FUTURE_FEATURES } from "@/lib/data/pricingData";
+import { FREE_FEATURES, FAQS, FUTURE_FEATURES } from "@/lib/db_data_fetching/pricingData";
 import { useReveal } from "@/lib/hooks/useReveal";
 
 import { useState, useEffect } from "react";

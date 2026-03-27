@@ -1,4 +1,4 @@
-import { getRubricsList } from '@/lib/data/rubrics'
+import { getRubricsList } from '@/lib/db_data_fetching/rubrics'
 import Link from 'next/link'
 import { Plus, FileText, ChevronRight, ChevronLeft, BookOpen } from 'lucide-react'
 

@@ -1,4 +1,4 @@
-import { getTodoPageData } from "@/lib/data/todo";
+import { getTodoPageData } from "@/lib/db_data_fetching/todo";
 import {
   CheckCircle2, Inbox, Calendar as CalendarIcon,
   ChevronLeft, Users, Clock, AlertCircle,
@@ -34,8 +34,8 @@ export default async function TodoPage() {
       {/* Summary pills */}
       <div className="flex gap-3 flex-wrap">
         <SummaryPill label="Assigned" count={assigned.length} variant="navy" />
-        <SummaryPill label="Missing"  count={missing.length}  variant="red" />
-        <SummaryPill label="Done"     count={done.length}     variant="green" />
+        <SummaryPill label="Missing" count={missing.length} variant="red" />
+        <SummaryPill label="Done" count={done.length} variant="green" />
       </div>
 
       {/* Tabs implemented as anchor sections */}
@@ -119,25 +119,25 @@ function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
   const submission = assignment.submissions?.find((sub: any) =>
     assignment.is_group_project ? myGroupIds.includes(sub.group_id) : sub.user_id === userId
   );
-  const grade     = submission?.final_grade;
-  const isGraded  = submission?.status === "graded";
+  const grade = submission?.final_grade;
+  const isGraded = submission?.status === "graded";
   const isMissing = status === "missing";
-  const isDone    = status === "done";
+  const isDone = status === "done";
 
   const accentBar = isMissing ? "bg-red-500" : isDone ? "bg-green-500" : "bg-navy";
 
   const statusPill = isMissing
     ? "bg-red-50 text-red-600 border-red-200"
     : isDone && isGraded
-    ? "bg-green-50 text-green-700 border-green-200"
-    : isDone
-    ? "bg-yellow/20 text-navy border-yellow/40"
-    : "bg-navy/8 text-navy border-navy/15";
+      ? "bg-green-50 text-green-700 border-green-200"
+      : isDone
+        ? "bg-yellow/20 text-navy border-yellow/40"
+        : "bg-navy/8 text-navy border-navy/15";
 
   const statusLabel = isMissing ? "Overdue"
     : isDone && isGraded ? "Graded"
-    : isDone ? "Turned in"
-    : "Upcoming";
+      : isDone ? "Turned in"
+        : "Upcoming";
 
   return (
     <div className={`flex items-stretch
@@ -193,8 +193,8 @@ function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
 /* ── Summary pill ── */
 function SummaryPill({ label, count, variant }: { label: string; count: number; variant: string }) {
   const styles: Record<string, string> = {
-    navy:  "bg-navy/8 text-navy border-navy/15",
-    red:   "bg-red-50 text-red-600 border-red-200",
+    navy: "bg-navy/8 text-navy border-navy/15",
+    red: "bg-red-50 text-red-600 border-red-200",
     green: "bg-green-50 text-green-700 border-green-200",
   };
   return (

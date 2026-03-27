@@ -102,7 +102,27 @@ export const ClassService = {
     pinned: boolean
   }) {
     const supabase = await createClient()
-    const { data: dbData, error } = await (supabase.from('announcements') as any)
+
+    // 1. Check if user is the creator OR a teacher in this class
+    const { data: member } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', data.classId)
+      .eq('user_id', data.userId)
+      .maybeSingle()
+
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', data.classId)
+      .maybeSingle()
+
+    const isAuthorized = 
+      member?.role === 'teacher' || 
+      classData?.created_by === data.userId
+
+    // 2. Perform the update
+    let query = (supabase.from('announcements') as any)
       .update({ 
         title: data.title, 
         content: data.content, 
@@ -111,8 +131,14 @@ export const ClassService = {
         updated_at: new Date().toISOString() 
       } as Database['public']['Tables']['announcements']['Update'])
       .eq('id', data.id)
-      .eq('created_by', data.userId)
-      .select()
+      .eq('class_id', data.classId) // Ensure it belongs to the class
+
+    if (!isAuthorized) {
+      // If not a teacher/owner, they MUST be the creator
+      query = query.eq('created_by', data.userId)
+    }
+
+    const { data: dbData, error } = await query.select()
 
     if (error) throw new Error(error.message)
     if (!dbData || dbData.length === 0) {
@@ -122,10 +148,44 @@ export const ClassService = {
 
   async deleteAnnouncement(id: string, userId: string) {
     const supabase = await createClient()
-    const { error } = await supabase.from('announcements')
+
+    // 1. Get announcement to find its class_id
+    const { data: announcement } = await supabase
+      .from('announcements')
+      .select('class_id, created_by')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (!announcement) throw new Error("Announcement not found")
+
+    // 2. Check authorization: creator OR teacher/owner of class
+    const { data: member } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', announcement.class_id)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', announcement.class_id)
+      .maybeSingle()
+
+    const isAuthorized = 
+      announcement.created_by === userId || 
+      member?.role === 'teacher' || 
+      classData?.created_by === userId
+
+    if (!isAuthorized) {
+      throw new Error("You do not have permission to delete this announcement")
+    }
+
+    // 3. Delete
+    const { error } = await supabase
+      .from('announcements')
       .delete()
       .eq('id', id)
-      .eq('created_by', userId)
 
     if (error) throw new Error(error.message)
   },

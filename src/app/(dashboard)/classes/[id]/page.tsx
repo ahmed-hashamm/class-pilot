@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
-import { getClassDetail } from '@/lib/data/class-detail'
-import ClassDashboardClient from '@/components/class/ClassDashboardClient'
+import { getClassDetail } from '@/lib/db_data_fetching/class-detail'
+import ClassDashboardClient from '@/components/features/classes/ClassDashboardClient'
 
 export default async function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

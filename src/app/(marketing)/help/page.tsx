@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
 import { useReveal } from "@/lib/hooks/useReveal";
-import { Article, ARTICLES, Category, CATEGORIES, CategoryId } from "@/lib/data/supportData";
+import { Article, ARTICLES, Category, CATEGORIES, CategoryId } from "@/lib/db_data_fetching/supportData";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    ARTICLE ACCORDION ITEM

@@ -1,16 +1,16 @@
-import { getCalendarPageData } from "@/lib/data/calendar";
+import { getCalendarPageData } from "@/lib/db_data_fetching/calendar";
 import { Calendar as CalendarIcon, ChevronLeft, CheckCircle2, Clock } from "lucide-react";
-import CalenderView from "@/components/dashboard/CalenderView";
+import CalenderView from "@/components/features/dashboard/CalenderView";
 import Link from "next/link";
 
 export default async function CalendarPage() {
   const { assignmentList } = await getCalendarPageData();
 
-  const totalDone    = assignmentList.filter((a) => a.isDone).length;
+  const totalDone = assignmentList.filter((a) => a.isDone).length;
   const totalPending = assignmentList.filter((a) => !a.isDone).length;
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-8 flex flex-col gap-8">
+    <div className="max-w-5xl mx-auto p-6 flex flex-col gap-8">
       {/* Top bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link href="/dashboard"
@@ -60,9 +60,9 @@ function StatPill({
   variant: "navy" | "yellow" | "green"
 }) {
   const styles: Record<string, string> = {
-    navy:   "bg-navy/8 text-navy border-navy/15",
+    navy: "bg-navy/8 text-navy border-navy/15",
     yellow: "bg-yellow/20 text-navy border-yellow/40",
-    green:  "bg-green-50 text-green-700 border-green-200",
+    green: "bg-green-50 text-green-700 border-green-200",
   };
   return (
     <div className={`inline-flex items-center gap-2.5 border rounded-xl px-4 py-2.5

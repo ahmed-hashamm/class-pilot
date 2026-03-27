@@ -7,7 +7,7 @@
 // import { Menu, X, ChevronDown, User, LogOut, Settings, Plus } from "lucide-react";
 // import { useAuth } from "@/contexts/AuthContext";
 // import { createClient } from "@/lib/supabase/client";
-// import CreateClassModal from "@/components/class/Modals/CreateClassModal";
+// import CreateClassModal from "@/components/features/classes/Modals/CreateClassModal";
 
 // const DashboardNavbar = () => {
 //   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -244,7 +244,7 @@ import { useRouter } from "next/navigation";
 import { User, LogOut, Settings, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-import CreateClassModal from "@/components/class/Modals/CreateClassModal";
+import CreateClassModal from "@/components/features/classes/Modals/CreateClassModal";
 
 const DashboardNavbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);

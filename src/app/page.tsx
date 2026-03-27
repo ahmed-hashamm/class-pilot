@@ -1,10 +1,10 @@
 import Navbar from '@/components/layout/Navbar';
-import HeroSection from '@/components/home/HeroSection';
-import FeatureSection from '@/components/home/FeatureSection';
-import ChatFeatureSection from '@/components/home/ChatFeatureSection';
-import LearningSection from '@/components/home/LearningSection';
-import TestimonialsSection from '@/components/home/TestimonialsSection';
-import CTASection from '@/components/home/CTASection';
+import HeroSection from '@/components/features/home/HeroSection';
+import FeatureSection from '@/components/features/home/FeatureSection';
+import ChatFeatureSection from '@/components/features/home/ChatFeatureSection';
+import LearningSection from '@/components/features/home/LearningSection';
+import TestimonialsSection from '@/components/features/home/TestimonialsSection';
+import CTASection from '@/components/features/home/CTASection';
 import Footer from '@/components/layout/Footer';
 
 export default function HomePage() {

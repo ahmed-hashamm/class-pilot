@@ -1,5 +1,5 @@
-import { getSubmissionGradingData } from '@/lib/data/assignments'
-import GradeSubmission from '@/components/grading/GradeSubmission'
+import { getSubmissionGradingData } from '@/lib/db_data_fetching/assignments'
+import GradeSubmission from '@/components/features/grading/GradeSubmission'
 
 export default async function SubmissionGradingPage({
   params,
