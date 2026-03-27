@@ -41,7 +41,7 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
         .from('classes')
         .select('id')
         .eq('code', data.classCode.toUpperCase())
-        .single()
+        .maybeSingle()
 
       if (fetchError || !classroom) {
         throw new Error('Classroom not found. Please check the code.')

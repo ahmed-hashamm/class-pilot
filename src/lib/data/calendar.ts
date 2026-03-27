@@ -6,6 +6,22 @@ import { redirect } from 'next/navigation'
 /**
  * Fetches calendar page data — all assignments with submission status.
  */
+interface CalendarSubmission {
+  status: string;
+  user_id: string;
+  group_id: string | null;
+}
+
+export interface CalendarAssignment {
+  id: string;
+  title: string;
+  due_date: string;
+  points: number;
+  is_group_project: boolean;
+  classes: { name: string; id: string } | null;
+  submissions?: CalendarSubmission[];
+}
+
 export async function getCalendarPageData() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -17,8 +33,8 @@ export async function getCalendarPageData() {
   const { data: groupMembers } = await supabase
     .from('project_members').select('project_id').eq('user_id', user.id)
 
-  const classIds = classMembers?.map((cm: any) => cm.class_id) || []
-  const myGroupIds = groupMembers?.map((gm: any) => gm.project_id) || []
+  const classIds = classMembers?.map((cm: { class_id: string }) => cm.class_id) || []
+  const myGroupIds = groupMembers?.map((gm: { project_id: string }) => gm.project_id) || []
 
   const { data: assignments } = classIds.length > 0
     ? await supabase
@@ -32,9 +48,9 @@ export async function getCalendarPageData() {
         .not('due_date', 'is', null)
     : { data: [] }
 
-  const assignmentList = (assignments || []).map((a: any) => {
-    const hasSubmission = a.submissions?.some((s: any) =>
-      s.user_id === user.id || (a.is_group_project && myGroupIds.includes(s.group_id))
+  const assignmentList = (assignments as CalendarAssignment[] || []).map((a) => {
+    const hasSubmission = a.submissions?.some((s) =>
+      s.user_id === user.id || (a.is_group_project && myGroupIds.includes(s.group_id as string))
     )
     return {
       id:       a.id,

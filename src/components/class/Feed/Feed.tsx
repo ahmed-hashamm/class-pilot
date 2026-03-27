@@ -225,7 +225,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getStreamFeed } from "@/lib/data/stream";
-import { useStreamRealtime } from "@/hooks/useStreamRealtime";
+import { useStreamRealtime } from "@/lib/hooks/useStreamRealtime";
 import AnnouncementInput from "./AnnouncementInput";
 import MaterialUpload from "./MaterialUpload";
 import PollInput from "./PollInput";

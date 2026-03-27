@@ -25,7 +25,7 @@
 //       .select('*, assignments(*, rubrics(*))')
 //       .eq('id', submissionId)
 //       .eq('assignment_id', assignmentId)
-//       .single()
+//       .maybeSingle()
 
 //     if (submissionError || !submission) {
 //       return NextResponse.json({ error: 'Submission not found' }, { status: 404 })
@@ -44,7 +44,7 @@
 //       .select('role')
 //       .eq('class_id', assignment.class_id)
 //       .eq('user_id', user.id)
-//       .single()
+//       .maybeSingle()
 
 //     if (!member || member.role !== 'teacher') {
 //       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
@@ -147,7 +147,7 @@
 //         files (*)
 //       `)
 //       .eq('id', submissionId)
-//       .single();
+//       .maybeSingle();
 
 //     if (subError || !submission) {
 //       return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
@@ -216,7 +216,7 @@ export async function POST(
         )
       `)
       .eq('id', submissionId)
-      .single();
+      .maybeSingle();
 
     if (error || !submission) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 

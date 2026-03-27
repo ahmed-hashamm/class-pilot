@@ -8,7 +8,7 @@ interface UserProfile {
   name: string
   email: string
   role: string
-  avatar_url: any | null
+  avatar_url: string | null
 }
 
 interface AuthContextType {
@@ -47,25 +47,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .from('users')
           .select('full_name, email, avatar_url')
           .eq('id', user.id)
-          .single()
+          .maybeSingle()
 
         if (existingProfile) {
           profileData = existingProfile
           // Update avatar if it's from Google and different
-          if (avatarUrl && (existingProfile as { avatar_url: any }).avatar_url !== avatarUrl) {
-            const { data: updatedProfile } = await supabase
+          if (avatarUrl && (existingProfile as { avatar_url: string | null }).avatar_url !== avatarUrl) {
+            const { data: updatedProfile } = await (supabase as any)
               .from('users')
-              .update({ avatar_url: avatarUrl as any } as never)
+              .update({ avatar_url: avatarUrl } as any)
               .eq('id', user.id)
               .select()
-              .single()
+              .maybeSingle()
             if (updatedProfile) {
               profileData = updatedProfile
             }
           }
         } else {
           // Create new profile for OAuth users
-          const { data: newProfile } = await supabase
+          const { data: newProfile } = await (supabase as any)
             .from('users')
             .insert({
               id: user.id,
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               avatar_url: avatarUrl,
             } as any)
             .select()
-            .single()
+            .maybeSingle()
           
           if (newProfile) {
             profileData = newProfile

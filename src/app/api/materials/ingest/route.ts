@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     .from('materials')
     .select('id, class_id, attachment_paths, file_types, title')
     .eq('id', materialId)
-    .single()
+    .maybeSingle()
 
   if (error || !materialRaw) {
     console.error('[ingest] Material not found:', error)

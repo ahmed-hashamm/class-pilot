@@ -42,3 +42,19 @@ build_error.log
 SETUP_NOTES.md
 TAILWIND_NOTES.md
 GOOGLE_AUTH_SETUP.md
+
+# text files and logs
+*.txt
+ts_errors.txt
+tsc_output.txt
+compile_errors.utf8.txt
+compile_errors.txt
+build_log.txt
+
+# temporary scripts
+tmp_barrel.js
+debug_types.ts
+
+# rules/config
+Gemini.md
+

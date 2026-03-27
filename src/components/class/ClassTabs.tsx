@@ -126,13 +126,21 @@ import {
 import { useState } from "react";
 import ClassSettingsModal from "./Modals/ClassSettingsModal";
 
+interface ClassTabsProps {
+  isTeacher: boolean;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  classData: Record<string, unknown>;
+  classId: string;
+}
+
 export default function ClassTabs({
   isTeacher,
   activeTab,
   setActiveTab,
   classData,
   classId,
-}: any) {
+}: ClassTabsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tabs = [

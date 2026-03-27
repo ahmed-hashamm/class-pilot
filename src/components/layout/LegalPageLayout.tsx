@@ -1,6 +1,6 @@
 "use client";
 
-import { useReveal } from "@/hooks/useReveal";
+import { useReveal } from "@/lib/hooks/useReveal";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
@@ -57,8 +57,7 @@ export default function LegalPageLayout({
 
       {/* ── HERO (navy) ───────────────────────────────────────────────────── */}
       <section className="bg-navy text-white px-6 py-12 text-center relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 55% 40% at 50% 0%, rgba(79,156,249,.15) 0%, transparent 70%)" }} />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,_rgba(79,156,249,.15)_0%,_transparent_70%)]" />
 
         <span className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[.18em]
           uppercase bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-6 text-white/80">

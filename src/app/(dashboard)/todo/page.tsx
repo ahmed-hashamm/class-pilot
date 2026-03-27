@@ -165,7 +165,7 @@ function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
           </p>
           <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
             <CalendarIcon size={11} />
-            Due {format(new Date(assignment.due_date), "MMM d, yyyy")}
+            Due {assignment.due_date ? format(new Date(assignment.due_date), "MMM d, yyyy") : "No due date"}
           </p>
         </div>
 

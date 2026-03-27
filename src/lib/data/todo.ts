@@ -7,6 +7,23 @@ import { isPast, isFuture } from 'date-fns'
 /**
  * Fetches all assignments categorized into done/missing/assigned for the current user.
  */
+interface TodoSubmission {
+  status: string;
+  final_grade: number | null;
+  user_id: string;
+  group_id: string | null;
+}
+
+export interface TodoAssignment {
+  id: string;
+  title: string;
+  due_date: string;
+  points: number;
+  is_group_project: boolean;
+  classes: { name: string } | null;
+  submissions?: TodoSubmission[];
+}
+
 export async function getTodoPageData() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -33,18 +50,18 @@ export async function getTodoPageData() {
         .order('due_date', { ascending: true })
     : { data: [] }
 
-  const allAssignments = assignmentsData || []
+  const allAssignments: TodoAssignment[] = assignmentsData || []
 
-  const done = allAssignments.filter((a: any) => {
+  const done = allAssignments.filter((a) => {
     if (!a.submissions?.length) return false
-    return a.submissions.some((sub: any) =>
-      a.is_group_project ? myGroupIds.includes(sub.group_id) : sub.user_id === user.id
+    return a.submissions.some((sub) =>
+      a.is_group_project ? myGroupIds.includes(sub.group_id as string) : sub.user_id === user.id
     )
   })
 
-  const notDone  = allAssignments.filter((a: any) => !done.find((d: any) => d.id === a.id))
-  const missing  = notDone.filter((a: any) => isPast(new Date(a.due_date)))
-  const assigned = notDone.filter((a: any) => isFuture(new Date(a.due_date)))
+  const notDone  = allAssignments.filter((a) => !done.find((d) => d.id === a.id))
+  const missing  = notDone.filter((a) => isPast(new Date(a.due_date)))
+  const assigned = notDone.filter((a) => isFuture(new Date(a.due_date)))
 
   return { user, done, missing, assigned, myGroupIds }
 }

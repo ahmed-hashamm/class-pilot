@@ -15,7 +15,7 @@ export async function getGroupsWithMembers(classId: string) {
     .select('role')
     .eq('class_id', classId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!enrollment) return { groups: null, error: 'Not enrolled in this class' }
 
@@ -40,7 +40,7 @@ export async function getAllClassMembers(classId: string) {
     .select('role')
     .eq('class_id', classId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!enrollment) return { members: null, error: 'Not enrolled in this class' }
 

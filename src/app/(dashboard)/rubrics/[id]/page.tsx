@@ -15,7 +15,7 @@ interface RubricCriterion {
 interface Rubric {
   id: string
   name: string
-  created_at: string
+  created_at: string | null
   total_points: number
   criteria: RubricCriterion[]
 }
@@ -79,7 +79,7 @@ export default async function RubricDetailPage({
             text-muted-foreground font-medium">
             <span className="flex items-center gap-1.5">
               <Calendar size={12} />
-              {format(new Date(rubric.created_at), 'MMMM d, yyyy')}
+              {rubric.created_at ? format(new Date(rubric.created_at), 'MMMM d, yyyy') : 'No date'}
             </span>
             <span className="text-border">·</span>
             <span className="flex items-center gap-1.5">

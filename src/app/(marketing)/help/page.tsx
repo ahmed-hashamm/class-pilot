@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
-import { useReveal } from "@/hooks/useReveal";
-import { Article, ARTICLES, Category, CATEGORIES, CategoryId } from "@/data/data";
+import { useReveal } from "@/lib/hooks/useReveal";
+import { Article, ARTICLES, Category, CATEGORIES, CategoryId } from "@/lib/data/supportData";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    ARTICLE ACCORDION ITEM

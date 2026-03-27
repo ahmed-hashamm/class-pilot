@@ -32,11 +32,7 @@ export default function MarketingPagesLayout({
         <section className="bg-navy text-white px-6 py-12 text-center relative overflow-hidden">
             <WavePattern />
             <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                    background:
-                        "radial-gradient(ellipse 55% 40% at 50% 0%, rgba(79,156,249,.15) 0%, transparent 70%)",
-                }}
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,_rgba(79,156,249,.15)_0%,_transparent_70%)]"
             />
 
             <span

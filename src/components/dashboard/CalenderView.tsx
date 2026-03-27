@@ -209,7 +209,7 @@ interface Assignment {
   due_date: string
   points: number
   isDone: boolean
-  classes: { id: number; name: string } | null
+  classes: { id: string; name: string } | null
 }
 
 export default function CalendarView({ assignments }: { assignments: Assignment[] }) {

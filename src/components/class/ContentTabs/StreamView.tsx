@@ -108,7 +108,8 @@ import SidebarCard from '@/components/class/Sidebar/Sidebar'
 import Feed from '@/components/class/Feed/Feed'
 import { Copy, Lock, Eye, EyeOff, CheckCheck } from 'lucide-react'
 import { useState } from 'react'
-import { useRealtimeAssignments } from '@/hooks/useRealtime'
+import { useQuery } from '@tanstack/react-query'
+import { getAssignmentsByClass } from '@/lib/data/assignments'
 
 // interface Assignment {
 //   id: string
@@ -121,7 +122,7 @@ interface StreamViewProps {
   classCode: string
   isTeacher: boolean
   userId: string
-  assignments?: any[]
+  assignments?: { id: string; title: string; due_date: string | null }[]
   settings?: {
     showClassCode?: boolean
   }
@@ -136,9 +137,17 @@ export default function StreamView({
   settings,
 }: StreamViewProps) {
   const [copied, setCopied] = useState(false)
-  const { assignments: realtimeAssignments } = useRealtimeAssignments(classId, userId)
 
-  const dueSoon = realtimeAssignments
+  const { data: fetchedAssignments = [] } = useQuery({
+    queryKey: ['classAssignments', classId],
+    queryFn: async () => {
+      const { assignments: data, error } = await getAssignmentsByClass(classId)
+      if (error) throw new Error('Failed to load assignments.')
+      return (data || []) as { id: string; title: string; due_date: string | null }[]
+    }
+  })
+
+  const dueSoon = fetchedAssignments
     .filter((a) => a.due_date && new Date(a.due_date) >= new Date())
     .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime())
     .slice(0, 5)

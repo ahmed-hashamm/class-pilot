@@ -1,7 +1,7 @@
 "use server";
 
-import nodemailer from "nodemailer";
-import { z } from "zod";
+import { ContactService, ContactFormData } from "@/lib/services/contact.service";
+import { contactFormSchema } from "@/lib/validations/contact";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
@@ -11,145 +11,23 @@ export interface ContactFormState {
   message?: string;
 }
 
-export interface ContactFormData {
-  name: string;
-  email: string;
-  type: string;
-  subject: string;
-  body: string;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   TRANSPORTER  — Gmail SMTP, works locally and in production with no domain
-───────────────────────────────────────────────────────────────────────────── */
-function createTransporter() {
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,           // classpilot.edu@gmail.com
-      pass: process.env.GMAIL_APP_PASSWORD,   // 16-char app password (not your Gmail password)
-    },
-  });
-}
+export { type ContactFormData };
 
 /* ─────────────────────────────────────────────────────────────────────────────
    ACTION
 ───────────────────────────────────────────────────────────────────────────── */
-const ContactFormSchema = z.object({
-  name: z.string().min(1, "Please fill in all required fields."),
-  email: z.string().email("Please enter a valid email address."),
-  type: z.string(),
-  subject: z.string().optional(),
-  body: z.string().min(1, "Please fill in all required fields."),
-})
+
 
 export async function sendContactForm(
   data: ContactFormData
 ): Promise<ContactFormState> {
-  const parsed = ContactFormSchema.safeParse(data)
+  const parsed = contactFormSchema.safeParse(data)
   if (!parsed.success) {
     return { status: "error", message: parsed.error.errors[0]?.message || "Invalid input." }
   }
 
-  const transporter = createTransporter();
-
   try {
-    // ── Notification email to YOU ────────────────────────────────────────
-    await transporter.sendMail({
-      from: `"Class Pilot" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,   // lands in your own Gmail inbox
-      replyTo: data.email,               // hit Reply in Gmail → goes straight to sender
-      subject: `[${data.type}] ${data.subject || "New message"} — from ${data.name}`,
-      html: `
-        <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#fff;">
-          <div style="background:#043873;border-radius:12px;padding:24px 28px;margin-bottom:28px;">
-            <h1 style="color:#FFE492;font-size:22px;font-weight:900;margin:0 0 4px;">
-              New message via Class Pilot
-            </h1>
-            <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0;">
-              Contact form submission
-            </p>
-          </div>
-
-          <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-            <tr>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#737373;width:100px;">Name</td>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#0A0A0A;font-weight:600;">${data.name}</td>
-            </tr>
-            <tr>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#737373;">Email</td>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#0A0A0A;font-weight:600;">
-                <a href="mailto:${data.email}" style="color:#043873;">${data.email}</a>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#737373;">Type</td>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;">
-                <span style="background:#FFE492;color:#043873;font-size:11px;font-weight:700;
-                  text-transform:uppercase;letter-spacing:.08em;border-radius:999px;padding:2px 10px;">
-                  ${data.type}
-                </span>
-              </td>
-            </tr>
-            ${data.subject ? `
-            <tr>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#737373;">Subject</td>
-              <td style="padding:10px 0;border-bottom:1px solid #E5E5E5;font-size:13px;color:#0A0A0A;font-weight:600;">${data.subject}</td>
-            </tr>` : ""}
-          </table>
-
-          <div style="background:#F5F5F5;border-radius:10px;padding:20px 22px;">
-            <p style="font-size:12px;font-weight:700;color:#737373;text-transform:uppercase;
-              letter-spacing:.12em;margin:0 0 10px;">Message</p>
-            <p style="font-size:14px;color:#0A0A0A;line-height:1.7;margin:0;white-space:pre-wrap;">${data.body}</p>
-          </div>
-
-          <p style="font-size:12px;color:#737373;margin-top:28px;text-align:center;">
-            Reply directly to this email to respond to ${data.name}.
-          </p>
-        </div>
-      `,
-    });
-
-    // ── Confirmation email to the SENDER ────────────────────────────────
-    await transporter.sendMail({
-      from: `"Class Pilot" <${process.env.GMAIL_USER}>`,
-      to: data.email,
-      subject: "We got your message — Class Pilot",
-      html: `
-        <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#fff;">
-          <div style="background:#043873;border-radius:12px;padding:24px 28px;margin-bottom:28px;">
-            <h1 style="color:#FFE492;font-size:22px;font-weight:900;margin:0 0 4px;">
-              We got your message, ${data.name.split(" ")[0]}.
-            </h1>
-            <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0;">
-              Class Pilot Support
-            </p>
-          </div>
-
-          <p style="font-size:15px;color:#0A0A0A;line-height:1.7;margin:0 0 16px;">
-            Thanks for getting in touch. We've received your message and will
-            get back to you within a few hours.
-          </p>
-
-          <p style="font-size:14px;color:#737373;line-height:1.7;margin:0 0 28px;">
-            In the meantime, you might find an answer in our
-            <a href="https://classpilot.edu/help" style="color:#043873;font-weight:600;">Help Center</a>.
-          </p>
-
-          <div style="background:#F5F5F5;border-radius:10px;padding:20px 22px;margin-bottom:28px;">
-            <p style="font-size:12px;font-weight:700;color:#737373;text-transform:uppercase;
-              letter-spacing:.12em;margin:0 0 10px;">Your message</p>
-            <p style="font-size:13px;color:#0A0A0A;line-height:1.7;margin:0;white-space:pre-wrap;">${data.body}</p>
-          </div>
-
-          <p style="font-size:12px;color:#737373;text-align:center;">
-            — The Class Pilot team
-          </p>
-        </div>
-      `,
-    });
-
+    await ContactService.sendContactForm(data);
     return { status: "success" };
   } catch (err) {
     console.error("Nodemailer error:", err);

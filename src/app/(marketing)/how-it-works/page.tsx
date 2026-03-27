@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, ReactNode } from "react";
-import { useReveal } from "@/hooks/useReveal";
+import { useReveal } from "@/lib/hooks/useReveal";
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
 ───────────────────────────────────────────────────────────────────────────── */
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
-import { TEACHER_STEPS, STUDENT_STEPS, STATS, DIFF_CARDS } from "@/data/data";
+import { TEACHER_STEPS, STUDENT_STEPS, STATS, DIFF_CARDS } from "@/lib/data/marketingData";
 import { DiagramAIChat, DiagramCreateClass, DiagramGrading, DiagramGroupCollab, DiagramPostAssignment, DiagramStudentFeed, DiagramSubmit } from "@/components/illustrations/HowItWorksPageDiagrams";
 type View = "teacher" | "student";
 /* ─────────────────────────────────────────────────────────────────────────────

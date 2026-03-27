@@ -1,7 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { Database } from '@/types/database.utf8'
 import { redirect } from 'next/navigation'
+
+type RubricRow = Database['public']['Tables']['rubrics']['Row']
 
 interface RubricCriterion {
   id: string
@@ -10,12 +13,8 @@ interface RubricCriterion {
   points: number
 }
 
-export interface Rubric {
-  id: string
-  name: string
-  total_points: number
-  criteria: RubricCriterion[] | any
-  created_at: string
+export type Rubric = Omit<RubricRow, 'criteria'> & {
+  criteria: RubricCriterion[]
 }
 
 /**
@@ -26,11 +25,16 @@ export async function getRubricsList() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: rubrics } = await supabase
+  const { data: rubricsData } = await supabase
     .from('rubrics')
-    .select('id, name, total_points, criteria, created_at')
+    .select('*')
     .eq('created_by', user.id)
-    .order('created_at', { ascending: false }) as { data: Rubric[] | null }
+    .order('created_at', { ascending: false })
 
-  return { user, rubrics: rubrics || [] }
+  const rubrics: Rubric[] = (rubricsData || []).map(r => ({
+    ...(r as RubricRow),
+    criteria: (r.criteria as unknown) as RubricCriterion[]
+  }))
+
+  return { user, rubrics }
 }

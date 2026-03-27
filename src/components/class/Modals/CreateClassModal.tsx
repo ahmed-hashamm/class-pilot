@@ -56,7 +56,7 @@ export default function CreateClassModal({ userId, onClose, onSuccess }: CreateC
           created_by: userId,
         } as any)
         .select()
-        .single()
+        .maybeSingle()
 
       if (classError) throw classError
       if (!classData) throw new Error('Class creation failed: No data returned')

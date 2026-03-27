@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database.utf8'
+
+type UserRow = Database['public']['Tables']['users']['Row']
+type UserUpdate = Database['public']['Tables']['users']['Update']
 
 interface ProfileState {
   loading: boolean
@@ -46,13 +50,15 @@ export function useProfile() {
         .from('users')
         .select('full_name, avatar_url')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
+
+      const userData = data as UserRow | null
 
       setState((s) => ({
         ...s,
         userId: user.id,
-        fullName: (data as any)?.full_name || '',
-        avatarUrl: (data as any)?.avatar_url || null,
+        fullName: userData?.full_name || '',
+        avatarUrl: userData?.avatar_url || null,
         initialLoading: false,
       }))
     }
@@ -89,9 +95,9 @@ export function useProfile() {
       if (uploadError) throw uploadError
 
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ avatar_url: data.publicUrl } as never)
+      const { error: updateError } = await (supabase
+        .from('users') as any)
+        .update({ avatar_url: data.publicUrl } as UserUpdate)
         .eq('id', state.userId)
       if (updateError) throw updateError
 
@@ -113,9 +119,9 @@ export function useProfile() {
     if (!state.userId) return
     setState((s) => ({ ...s, loading: true, status: null }))
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ full_name: state.fullName } as never)
+      const { error } = await (supabase
+        .from('users') as any)
+        .update({ full_name: state.fullName } as UserUpdate)
         .eq('id', state.userId)
       if (error) throw error
 

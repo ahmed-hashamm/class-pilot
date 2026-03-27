@@ -80,13 +80,13 @@
 //   //         .update(payload)
 //   //         .eq("id", initialData.id)
 //   //         .select()
-//   //         .single();
+//   //         .maybeSingle();
 //   //     } else {
 //   //       result = await supabase
 //   //         .from("rubrics")
 //   //         .insert(payload)
 //   //         .select()
-//   //         .single();
+//   //         .maybeSingle();
 //   //     }
 
 //   //     if (result.error) throw result.error;
@@ -120,13 +120,13 @@
 //           .update(payload) 
 //           .eq("id", initialData.id)
 //           .select()
-//           .single();
+//           .maybeSingle();
 //       } else {
 //         result = await supabase
 //           .from("rubrics")
 //           .insert(payload as any)
 //           .select()
-//           .single();
+//           .maybeSingle();
 //       }
 
 //       if (result.error) throw result.error;
@@ -355,10 +355,10 @@ export default function RubricForm({ userId, initialData }: RubricFormProps) {
       let result
       if (isEditing && initialData) {
         result = await (supabase as any)
-          .from('rubrics').update(payload).eq('id', initialData.id).select().single()
+          .from('rubrics').update(payload).eq('id', initialData.id).select().maybeSingle()
       } else {
         result = await supabase
-          .from('rubrics').insert(payload as any).select().single()
+          .from('rubrics').insert(payload as any).select().maybeSingle()
       }
 
       if (result.error) throw result.error

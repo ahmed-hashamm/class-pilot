@@ -2,7 +2,7 @@
 
 import BlogsPageClock from "@/components/illustrations/BlogsPageClock";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
-import { useReveal } from "@/hooks/useReveal";
+import { useReveal } from "@/lib/hooks/useReveal";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PAGE

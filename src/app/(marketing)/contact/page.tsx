@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
-import { useReveal } from "@/hooks/useReveal";
+import { useReveal } from "@/lib/hooks/useReveal";
 import { sendContactForm, ContactFormState } from "@/actions/ContactActions";
 
 /* ─────────────────────────────────────────────────────────────────────────────

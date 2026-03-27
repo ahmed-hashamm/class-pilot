@@ -67,9 +67,9 @@ export default async function RubricsPage() {
                   </span>
                 </div>
                 <p className="text-[12px] text-muted-foreground">
-                  Created {new Date(rubric.created_at).toLocaleDateString('en-US', {
+                  Created {rubric.created_at ? new Date(rubric.created_at).toLocaleDateString('en-US', {
                     month: 'short', day: 'numeric', year: 'numeric',
-                  })}
+                  }) : 'recently'}
                 </p>
               </div>
 

@@ -22,7 +22,7 @@ export default async function DashboardLayout({
     .from('users')
     .select('id')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!existingProfile) {
     // Create user profile if it doesn't exist

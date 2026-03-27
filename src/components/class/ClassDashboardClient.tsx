@@ -112,11 +112,7 @@ export default function ClassDashboardClient({
       <div className="relative bg-navy text-white w-full pt-10 pb-0 overflow-hidden">
         {/* Radial glow */}
         <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 50% at 50% -10%, rgba(79,156,249,.18) 0%, transparent 70%)",
-          }}
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,_rgba(79,156,249,.18)_0%,_transparent_70%)]"
         />
 
         <WavePattern />

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { getStreamFeed } from '@/lib/data/stream'
+import { StreamItem } from '@/lib/data/stream'
 
-export function useStreamRealtime(classId: string, initialData: any[]) {
-  const [feedItems, setFeedItems] = useState<any[]>(initialData)
+export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
+  const [feedItems, setFeedItems] = useState<StreamItem[]>(initialData)
 
   useEffect(() => {
     setFeedItems(initialData)
@@ -16,7 +16,12 @@ export function useStreamRealtime(classId: string, initialData: any[]) {
     let isMounted = true
     const supabase = createClient()
 
-    const handlePayload = async (payload: any) => {
+    const handlePayload = async (payload: {
+      table: string;
+      eventType: string;
+      new: Record<string, any> | null;
+      old: Record<string, any> | null;
+    }) => {
       if (!isMounted) return
       
       const { table, eventType, new: newRec, old: oldRec } = payload
@@ -47,26 +52,27 @@ export function useStreamRealtime(classId: string, initialData: any[]) {
 
       // Handle INSERT/UPDATE by refetching the specific row to get joined relationships (users, etc.)
       try {
-        let fetchQuery: any = supabase.from(itemType === 'poll' ? 'polls' : itemType === 'attendance' ? 'attendances' : table)
+        const queryTable = itemType === 'poll' ? 'polls' : itemType === 'attendance' ? 'attendances' : table
+        let query = supabase.from(queryTable as any).select('*')
 
         if (itemType === 'announcement' || itemType === 'assignment') {
-          fetchQuery = fetchQuery.select('*, users(full_name,email)')
+          query = supabase.from(queryTable as any).select('*, users(full_name,email)')
         } else if (itemType === 'material') {
-          fetchQuery = fetchQuery.select('*, users:created_by(full_name)')
+          query = supabase.from(queryTable as any).select('*, users:created_by(full_name)')
         } else if (itemType === 'poll') {
-          fetchQuery = fetchQuery.select('*, users(full_name,email), poll_responses(*)')
+          query = supabase.from(queryTable as any).select('*, users(full_name,email), poll_responses(*)')
         } else if (itemType === 'attendance') {
-          fetchQuery = fetchQuery.select('*, users(full_name,email), attendance_records(*)')
+          query = supabase.from(queryTable as any).select('*, users(full_name,email), attendance_records(*)')
         }
 
-        const { data: newRow } = await fetchQuery.eq('id', targetId).single()
+        const { data: newRow } = await query.eq('id', targetId).maybeSingle()
 
         if (newRow && isMounted) {
-          const formattedRow = { ...newRow, type: itemType }
+          const formattedRow = { ...(newRow as unknown as any), type: itemType } as StreamItem
           setFeedItems((prev) => {
             const exists = prev.find((item) => item.type === itemType && item.id === targetId)
             
-            let updated = []
+            let updated: StreamItem[] = []
             if (exists) {
               updated = prev.map((item) => (item.type === itemType && item.id === targetId ? formattedRow : item))
             } else {
@@ -74,9 +80,9 @@ export function useStreamRealtime(classId: string, initialData: any[]) {
             }
 
             // Re-sort
-            return updated.sort((a, b) => {
-              const aPinned = a.type === 'announcement' && (a as any).pinned ? 1 : 0
-              const bPinned = b.type === 'announcement' && (b as any).pinned ? 1 : 0
+            return [...updated].sort((a, b) => {
+              const aPinned = (a.type === 'announcement' && (a as any).pinned) ? 1 : 0
+              const bPinned = (b.type === 'announcement' && (b as any).pinned) ? 1 : 0
               if (aPinned !== bPinned) return bPinned - aPinned
               return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
             })

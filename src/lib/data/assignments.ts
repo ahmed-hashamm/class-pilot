@@ -94,7 +94,7 @@ export async function getCreateAssignmentData(classId: string) {
     .select('role')
     .eq('class_id', classId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!member || (member as { role: string }).role !== 'teacher') {
     redirect(`/classes/${classId}`)
@@ -122,7 +122,7 @@ export async function getEditAssignmentData(classId: string, assignmentId: strin
     .select('role')
     .eq('class_id', classId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!member || member.role !== 'teacher') redirect(`/dashboard/classes/${classId}`)
 
@@ -131,7 +131,7 @@ export async function getEditAssignmentData(classId: string, assignmentId: strin
     .select('id, title, description, due_date, points, submission_type, rubric_id, is_group_project, attachment_paths')
     .eq('id', assignmentId)
     .eq('class_id', classId)
-    .single()
+    .maybeSingle()
 
   if (!assignment) notFound()
 
@@ -165,7 +165,7 @@ export async function getSubmissionGradingData(classId: string, assignmentId: st
     .select('role')
     .eq('class_id', classId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!member || (member as any).role !== 'teacher') {
     redirect(`/dashboard/classes/${classId}/assignments/${assignmentId}`)
@@ -176,7 +176,7 @@ export async function getSubmissionGradingData(classId: string, assignmentId: st
     .select('*, users(full_name, email, avatar_url), assignments(*, rubrics(*))')
     .eq('id', submissionId)
     .eq('assignment_id', assignmentId)
-    .single()
+    .maybeSingle()
 
   if (submissionError || !submission) notFound()
 

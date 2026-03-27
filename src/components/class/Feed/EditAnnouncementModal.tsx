@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { X, Pin, Loader2, AlertCircle, FileText, Paperclip, UploadCloud } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { updateAnnouncement } from '../../../actions/ClassActions'
 
 interface Props {
@@ -26,6 +28,7 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
     const [content, setContent] = useState(announcement.content)
     const [isPinned, setIsPinned] = useState(announcement.pinned)
     const [newFiles, setNewFiles] = useState<File[]>([])
+    const queryClient = useQueryClient()
 
     // Convert string array to objects for existing files UI
     const [existingFiles, setExistingFiles] = useState<{ name: string; url: string }[]>(
@@ -51,14 +54,17 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
         formData.append('pinned', String(isPinned))
 
         // Handle files
-        newFiles.forEach(file => formData.append('files', file))
+        newFiles.forEach((file: File) => formData.append('files', file))
         formData.append('existingAttachments', JSON.stringify(existingFiles))
 
         try {
             await updateAnnouncement(formData)
+            queryClient.invalidateQueries({ queryKey: ['streamFeed', announcement.classId] })
+            toast.success('Announcement updated successfully')
             onSuccess()
             onClose()
         } catch (err: any) {
+            toast.error(err.message || 'Failed to update')
             setError(err.message || 'Failed to update')
         } finally {
             setLoading(false)
@@ -148,13 +154,13 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                                     Current files
                                 </span>
                                 <div className="flex flex-wrap gap-2">
-                                    {existingFiles.map((file, i) => (
+                                    {existingFiles.map((file: { name: string; url: string }, i: number) => (
                                         <div key={i} className="inline-flex items-center gap-2 bg-secondary
                                             border border-border rounded-lg px-3 py-1.5 text-[12px] font-medium">
                                             <Paperclip size={11} className="text-navy" />
                                             <span className="truncate max-w-[140px]">{file.name}</span>
                                             <button type="button"
-                                                onClick={() => setExistingFiles(existingFiles.filter((_, idx) => idx !== i))}
+                                                onClick={() => setExistingFiles(existingFiles.filter((_: any, idx: number) => idx !== i))}
                                                 className="text-muted-foreground hover:text-red-500 transition
                                                     cursor-pointer bg-transparent border-none p-0 flex">
                                                 <X size={12} />
@@ -172,13 +178,13 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                                     New files
                                 </span>
                                 <div className="flex flex-wrap gap-2">
-                                    {newFiles.map((file, i) => (
+                                    {newFiles.map((file: File, i: number) => (
                                         <div key={i} className="inline-flex items-center gap-2 bg-white
                                             border border-border rounded-lg px-3 py-1.5 text-[12px] font-medium">
                                             <Paperclip size={11} className="text-navy-light" />
                                             <span className="truncate max-w-[140px]">{file.name}</span>
                                             <button type="button"
-                                                onClick={() => setNewFiles(newFiles.filter((_, idx) => idx !== i))}
+                                                onClick={() => setNewFiles(newFiles.filter((_: any, idx: number) => idx !== i))}
                                                 className="text-muted-foreground hover:text-red-500 transition
                                                     cursor-pointer bg-transparent border-none p-0 flex">
                                                 <X size={12} />
