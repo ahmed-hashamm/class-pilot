@@ -3,11 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight } from "lucide-react";
-import FeedItemIcon from "@/components/features/classes/Feed/FeedItemIcon";
-import AttachmentButton from "@/components/features/classes/Buttons/AttachmentButton";
+import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
+import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import { deleteAnnouncement } from "@/actions/ClassActions";
-import EditAnnouncementModal from "@/components/features/classes/Feed/EditAnnouncementModal";
-import { FEED_TYPE_LABELS, FEED_TYPE_PILLS } from "@/lib/data/feed";
+import EditAnnouncementModal from "@/components/features/feed/EditAnnouncementModal";
+import { 
+  FEED_TYPE_LABELS, 
+  FEED_TYPE_PILLS, 
+  FEED_ITEM_THEMES 
+} from "@/lib/data/feed";
+import { ConfirmModal } from "@/components/ui";
 
 interface FeedCardProps {
   item: any;
@@ -21,10 +26,13 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isAssignment = item.type === "assignment";
   const isAnnouncement = item.type === "announcement";
   const isPinned = isAnnouncement && item.pinned;
+
+  const theme = FEED_ITEM_THEMES[item.type] || FEED_ITEM_THEMES.announcement;
 
   // Labels and pill styles are imported from @/lib/data/feed
 
@@ -34,10 +42,10 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
   };
 
   const handleDelete = async () => {
-    if (!confirm("Delete this announcement? This cannot be undone.")) return;
     setDeleting(true);
     try {
       await deleteAnnouncement(item.id, classId);
+      setShowDeleteConfirm(false);
     } catch {
       alert("Failed to delete announcement");
     } finally {
@@ -47,14 +55,23 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
 
   return (
     <>
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete announcement?"
+        message="This action cannot be undone. All students will lose access to this post."
+        confirmLabel="Delete"
+        variant="danger"
+        isLoading={deleting}
+      />
       <div className={`bg-white rounded-xl border transition-all duration-200
         ${isPinned ? "border-navy/30 ring-1 ring-navy/10" : "border-border hover:border-border/80 hover:shadow-sm"}
         ${isAssignment ? "hover:shadow-md" : ""}`}>
         <div className="p-4 flex flex-col gap-3.5">
-          <div className="flex items-start gap-3">
-            <div className={`shrink-0 size-9 rounded-lg flex items-center justify-center text-white shadow-sm
-              ${item.type === "announcement" ? "bg-navy" : item.type === "assignment" ? "bg-yellow" : item.type === "poll" ? "bg-purple-500" : item.type === "attendance" ? "bg-green-500" : "bg-navy-light"}`}>
-              <FeedItemIcon type={item.type} />
+          <div className="flex items-start gap-4">
+            <div className={`shrink-0 size-10 rounded-xl flex items-center justify-center shadow-sm ${theme.bgColor} ${theme.iconColor}`}>
+              <FeedItemIcon type={item.type} size={20} />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -75,7 +92,7 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
                             <button onClick={() => { setMenuOpen(false); setEditOpen(true); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
                               <Pencil size={13} className="text-navy" /> Edit
                             </button>
-                            <button onClick={() => { setMenuOpen(false); handleDelete(); }} disabled={deleting} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
+                            <button onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} disabled={deleting} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
                               <Trash2 size={13} /> Delete
                             </button>
                           </div>

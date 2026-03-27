@@ -212,9 +212,9 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                 </div>
 
                 {/* Footer */}
-                <div className="flex gap-3 px-6 pb-6">
+                <div className="flex flex-col-reverse sm:flex-row gap-3 px-6 pb-6">
                     <button onClick={onClose}
-                        className="flex-1 py-3 text-[14px] font-semibold text-muted-foreground
+                        className="w-full sm:flex-1 py-3 text-[14px] font-semibold text-muted-foreground
               hover:text-foreground hover:bg-secondary rounded-xl transition
               cursor-pointer bg-transparent border-none">
                         Cancel
@@ -222,7 +222,7 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2
+                        className="w-full sm:flex-1 inline-flex items-center justify-center gap-2
               bg-navy text-white font-semibold text-[14px] py-3 rounded-xl
               hover:bg-navy/90 transition disabled:opacity-60 cursor-pointer border-none">
                         {loading

@@ -7,9 +7,15 @@ import { getGroupsWithMembers, getAllClassMembers } from "@/lib/db_data_fetching
 import { saveGroup, deleteGroup, removeGroupMember } from "@/actions/ClassActions";
 import GroupCard from "./GroupCard";
 import GroupModal from "./GroupModal";
-import { GroupHeader, GroupEmptyState } from "./GroupListComponents";
-import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
-import { ErrorState } from "@/components/ui/ErrorState";
+import { 
+  PageHeader, 
+  EmptyState, 
+  SkeletonLoader, 
+  FeatureButton,
+  ErrorState,
+  ConfirmModal 
+} from "@/components/ui";
+import { Users2, Plus } from "lucide-react";
 
 interface GroupListProps {
   classId: string;
@@ -22,6 +28,7 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
   const [editingGroup, setEditingGroup] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [groupToDelete, setGroupToDelete] = useState<any>(null);
 
   const { data: groups = [], isLoading: loadingGroups, error: errorGroups, refetch: refetchGroups } = useQuery({
     queryKey: ["groups", classId],
@@ -57,14 +64,18 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Dissolve this group? Members will become unassigned.")) return;
+  const handleDelete = async () => {
+    if (!groupToDelete) return;
+    setSubmitting(true);
     try {
-      await deleteGroup(id, classId);
+      await deleteGroup(groupToDelete.id, classId);
       queryClient.invalidateQueries({ queryKey: ["groups", classId] });
+      setGroupToDelete(null);
       toast.success("Group dissolved");
     } catch {
       toast.error("Error deleting group");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -97,12 +108,33 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
      return <ErrorState message="Failed to load groups." onRetry={() => refetchGroups()} />;
   }
 
-  return (
-    <div className="flex flex-col gap-6 py-6">
-      <GroupHeader isTeacher={isTeacher} onNewGroup={() => setShowModal(true)} />
+  const HeaderAction = isTeacher ? (
+    <FeatureButton 
+      label="New group" 
+      icon={Plus} 
+      onClick={() => setShowModal(true)} 
+    />
+  ) : null;
+ 
+   return (
+     <div className="flex flex-col gap-6 py-6">
+      <PageHeader 
+        icon={Users2}
+        title="Collaboration Groups"
+        description="Manage student teams and project pairs"
+        action={HeaderAction}
+      />
 
       {groups.length === 0 ? (
-        <GroupEmptyState isTeacher={isTeacher} onNewGroup={() => setShowModal(true)} />
+        <EmptyState 
+          icon={Users2}
+          title="No groups yet"
+          description={isTeacher 
+            ? "Create a group and assign students to collaborate on projects." 
+            : "Your teacher hasn't created any groups yet."}
+          actionLabel={isTeacher ? "Create first group" : undefined}
+          onAction={isTeacher ? () => setShowModal(true) : undefined}
+        />
       ) : (
         <div className="flex flex-col gap-4">
           {groups.map((group) => (
@@ -111,13 +143,25 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
               group={group}
               isTeacher={isTeacher}
               onEdit={openEdit}
-              onDelete={handleDelete}
+              onDelete={() => setGroupToDelete(group)}
               onRemoveMember={handleRemoveMember}
             />
           ))}
         </div>
       )}
 
+      {groupToDelete && (
+        <ConfirmModal
+          isOpen={!!groupToDelete}
+          onClose={() => setGroupToDelete(null)}
+          onConfirm={handleDelete}
+          title="Dissolve group?"
+          message={`Are you sure you want to dissolve "${groupToDelete.title}"? Members will become unassigned.`}
+          confirmLabel="Dissolve"
+          variant="danger"
+          isLoading={submitting}
+        />
+      )}
       {showModal && (
         <GroupModal
           editingGroup={editingGroup}

@@ -30,9 +30,11 @@ export default function GroupModal({
     (Array.isArray(profiles) ? profiles[0] : profiles)?.full_name ?? "Unknown";
 
   const filteredMembers = useMemo(() => {
-    return allMembers.filter((m) =>
-      getName(m.profiles).toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return allMembers
+      .filter((m) => m.role !== "teacher" && m.role !== "owner")
+      .filter((m) =>
+        getName(m.profiles).toLowerCase().includes(searchQuery.toLowerCase())
+      );
   }, [allMembers, searchQuery]);
 
   const handleToggle = (id: string) => {

@@ -46,7 +46,7 @@ export async function getAllClassMembers(classId: string) {
 
   const { data, error } = await supabase
     .from('class_members')
-    .select('user_id, profiles:user_id(full_name)')
+    .select('user_id, role, profiles:user_id(full_name)')
     .eq('class_id', classId)
 
   if (error) return { members: null, error: error.message }

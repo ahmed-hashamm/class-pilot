@@ -2,7 +2,7 @@
 
 import { User, ClipboardList, Clock, Award, CheckCircle2, BookOpen } from "lucide-react";
 import { format } from "date-fns";
-import AttachmentButton from "@/components/features/classes/Buttons/AttachmentButton";
+import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import { SubmissionsList } from "@/components/features/submissions";
 
 export function AssignmentHeader({ assignment }: { assignment: any }) {

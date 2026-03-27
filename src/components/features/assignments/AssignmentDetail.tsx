@@ -9,11 +9,14 @@ import {
   AssignmentHeader, AssignmentInfo, AssignmentInstructions,
   StudentStatus, TeacherProgress
 } from "./AssignmentDetailComponents";
+import { ConfirmModal } from "@/components/ui";
 
 export default function AssignmentDetail({
   assignment, isTeacher, submission, submissions, classId,
 }: any) {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromTab = searchParams.get("from") || "stream";
@@ -22,13 +25,15 @@ export default function AssignmentDetail({
   const isTurnedIn = !!submission;
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this assignment?")) return;
+    setIsDeleting(true);
     const { deleteAssignment } = await import("@/actions/ClassActions");
     try {
       await deleteAssignment(assignment.id, classId);
+      setShowDeleteConfirm(false);
       toast.success("Assignment deleted");
       router.push(`/classes/${classId}?tab=${fromTab}`);
     } catch { toast.error("Failed to delete assignment"); }
+    finally { setIsDeleting(false); }
   };
 
   return (
@@ -38,10 +43,21 @@ export default function AssignmentDetail({
         {isTeacher && (
           <div className="flex items-center gap-2">
             <button onClick={() => router.push(`/classes/${classId}/assignments/${assignment.id}/edit?from=${fromTab}`)} className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-secondary text-foreground hover:bg-navy hover:text-white border border-border rounded-xl px-3 py-2 transition-all cursor-pointer"><Pencil size={11} /> Edit</button>
-            <button onClick={handleDelete} className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 rounded-xl px-3 py-2 transition-all cursor-pointer"><Trash2 size={11} /> Delete</button>
+            <button onClick={() => setShowDeleteConfirm(true)} className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 rounded-xl px-3 py-2 transition-all cursor-pointer"><Trash2 size={11} /> Delete</button>
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete assignment?"
+        message="This action cannot be undone. All student submissions and grades for this assignment will be permanently removed."
+        confirmLabel="Delete"
+        variant="danger"
+        isLoading={isDeleting}
+      />
 
       <AssignmentHeader assignment={assignment} />
 

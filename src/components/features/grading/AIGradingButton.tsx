@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Sparkles, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 import { GradingSubmissionProps } from './GradeSubmission'
+import { ConfirmModal } from '@/components/ui'
 
 interface AIGradingButtonProps {
   submission: GradingSubmissionProps
@@ -15,11 +16,12 @@ export default function AIGradingButton({
 }: AIGradingButtonProps) {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const alreadyGraded = submission.ai_grade !== null
 
   const handleAIGrading = async () => {
-    if (!confirm('Start AI grading? This will analyze the submission against the rubric.')) return
+    setShowConfirm(false)
 
     setLoading(true); setError(null)
     onGradingStart()
@@ -62,8 +64,19 @@ export default function AIGradingButton({
       </div>
 
       {/* CTA */}
+      <ConfirmModal 
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleAIGrading}
+        title="Start AI grading?"
+        message="This will analyze the submission against the rubric criteria and produce a suggested grade. This may take a few seconds."
+        confirmLabel="Start Grading"
+        variant="info"
+        isLoading={loading}
+      />
+
       <button
-        onClick={handleAIGrading}
+        onClick={() => setShowConfirm(true)}
         disabled={loading}
         className="w-full inline-flex items-center justify-center gap-2
           bg-navy text-white font-bold text-[14px] py-3 rounded-xl

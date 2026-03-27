@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { createAssignment, updateAssignment } from "@/actions/ClassActions";
 import { toast } from "sonner";
+import { FeatureButton } from "@/components/ui";
 import { AssignmentBasics, AssignmentAttachments } from "./AssignmentFormComponents";
 import { AssignmentConfig } from "./AssignmentFormConfig";
 
@@ -44,9 +44,14 @@ export default function CreateAssignmentForm({ classId, userId, rubrics, initial
       </div>
       <div className="w-full lg:w-64 shrink-0 flex flex-col gap-4">
         <AssignmentConfig isGroupProject={isGroupProject} setIsGroupProject={setIsGroupProject} rubrics={rubrics} initialData={initialData} />
-        <button type="submit" disabled={loading} className="w-full inline-flex items-center justify-center gap-2 bg-navy text-white font-bold text-[14px] py-3 rounded-xl hover:bg-navy/90 transition shadow-sm disabled:opacity-60 cursor-pointer border-none">
-          {loading ? <><Loader2 size={15} className="animate-spin" /> {isEditing ? "Saving..." : "Creating..."}</> : (isEditing ? "Save changes" : "Create assignment")}
-        </button>
+        <FeatureButton
+          type="submit"
+          loading={loading}
+          label={isEditing ? "Save changes" : "Create assignment"}
+          loadingLabel={isEditing ? "Saving changes..." : "Creating assignment..."}
+          className="w-full py-4 shadow-md"
+          size="lg"
+        />
       </div>
     </form>
   );

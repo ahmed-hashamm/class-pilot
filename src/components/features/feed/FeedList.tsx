@@ -89,11 +89,11 @@ export default function FeedList({ classId, userId, isTeacher }: FeedListProps) 
 
 // Wrapper to use countdown logic per item
 function PollBodyWrapper({ item, userId, isTeacher }: any) {
-  const { isActive } = useCountdown(item.deadline, item.closed_at);
-  return <PollBody item={item} userId={userId} isTeacher={isTeacher} isActive={isActive} />;
+  const { isActive, remaining } = useCountdown(item.deadline, item.closed_at);
+  return <PollBody item={item} userId={userId} isTeacher={isTeacher} isActive={isActive} remaining={remaining} />;
 }
 
 function AttendanceBodyWrapper({ item, userId, isTeacher }: any) {
-  const { isActive } = useCountdown(item.deadline, item.closed_at);
-  return <AttendanceBody item={item} userId={userId} isTeacher={isTeacher} isActive={isActive} />;
+  const { isActive, remaining } = useCountdown(item.deadline, item.closed_at);
+  return <AttendanceBody item={item} userId={userId} isTeacher={isTeacher} isActive={isActive} remaining={remaining} />;
 }

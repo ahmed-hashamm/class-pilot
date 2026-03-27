@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getAssignmentsByClass } from "@/lib/db_data_fetching/assignments";
-import Feed from "@/components/features/classes/Feed/Feed";
-import StickyNotes from "@/components/features/classes/Sidebar/StickyNotes";
-import ClassCodeCard from "@/components/features/classes/Sidebar/ClassCodeCard";
-import DueSoonCard from "@/components/features/classes/Sidebar/DueSoonCard";
+import Feed from "@/components/features/feed/Feed";
+import StickyNotes from "@/components/features/classes/sidebar/StickyNotes";
+import ClassCodeCard from "@/components/features/classes/sidebar/ClassCodeCard";
+import DueSoonCard from "@/components/features/classes/sidebar/DueSoonCard";
 
 interface StreamViewProps {
   classId: string;

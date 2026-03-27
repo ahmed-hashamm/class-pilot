@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Database, RefreshCw } from "lucide-react";
+import { Database, Plus, RefreshCw, X } from "lucide-react";
 import { getMaterialsByClass } from "@/lib/db_data_fetching/materials";
 import { deleteMaterial } from "@/actions/ClassActions";
 import MaterialRow from "./MaterialRow";
-import {
-  MaterialsHeader,
-  MaterialsEmptyState,
-  MaterialsLoadingSkeleton
-} from "./MaterialsListComponents";
-import MaterialUpload from "@/components/features/classes/Feed/MaterialUpload";
-import EditMaterialModal from "@/components/features/classes/ContentTabs/EditMaterialModal";
+import { 
+  PageHeader, 
+  EmptyState, 
+  SkeletonLoader,
+  FeatureButton,
+  ConfirmModal 
+} from "@/components/ui";
+import { MaterialUpload } from "@/components/features/feed";
+import EditMaterialModal from "./EditMaterialModal";
 
 interface MaterialsListProps {
   classId: string;
@@ -25,6 +27,8 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
   const [isUploading, setIsUploading] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [materialToDelete, setMaterialToDelete] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data: materials = [], isLoading, error, refetch } = useQuery({
     queryKey: ["classMaterials", classId],
@@ -35,14 +39,18 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
     },
   });
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this material? This cannot be undone.")) return;
+  const handleDelete = async () => {
+    if (!materialToDelete) return;
+    setIsDeleting(true);
     try {
-      await deleteMaterial(id, classId);
+      await deleteMaterial(materialToDelete.id, classId);
       refetch();
+      setMaterialToDelete(null);
       toast.success("Material deleted");
     } catch {
       toast.error("Failed to delete material");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -73,37 +81,60 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
     return fileName.includes("-") ? fileName.split("-").slice(1).join("-") : fileName;
   };
 
+  const HeaderAction = isTeacher ? (
+    <FeatureButton 
+      label={isUploading ? "Close" : "Upload material"}
+      icon={isUploading ? X : Plus}
+      variant={isUploading ? "secondary" : "primary"}
+      onClick={() => setIsUploading(!isUploading)}
+    />
+  ) : null;
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-6 py-6">
-        <MaterialsHeader isTeacher={isTeacher} isUploading={false} onToggleUpload={() => {}} />
-        <MaterialsLoadingSkeleton />
+        <PageHeader 
+          icon={Database} 
+          title="Class Materials" 
+          description="Shared documents and resources"
+          action={HeaderAction}
+        />
+        <SkeletonLoader variant="list" />
       </div>
     );
   }
 
   if (error) {
     return (
-       <div className="flex flex-col py-16 gap-4 items-center justify-center border-2 border-dashed border-border rounded-2xl bg-white text-center">
-         <Database size={32} className="text-muted-foreground/40" />
-         <p className="text-[14px] font-medium text-muted-foreground">Error loading materials</p>
-         <button onClick={() => refetch()} className="inline-flex items-center gap-2 bg-navy text-white font-semibold text-[13px] px-5 py-2.5 rounded-xl border-none cursor-pointer">
-           <RefreshCw size={14} /> Retry
-         </button>
-       </div>
+      <div className="flex flex-col gap-6 py-6">
+        <PageHeader 
+          icon={Database} 
+          title="Class Materials" 
+          description="Shared documents and resources"
+          action={HeaderAction}
+        />
+        <EmptyState 
+          icon={RefreshCw}
+          title="Error loading materials"
+          description="We couldn't load the materials for this class. Please try again."
+          actionLabel="Retry"
+          onAction={() => refetch()}
+        />
+      </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-6 py-6">
-      <MaterialsHeader
-        isTeacher={isTeacher}
-        isUploading={isUploading}
-        onToggleUpload={() => setIsUploading(!isUploading)}
+      <PageHeader 
+        icon={Database} 
+        title="Class Materials" 
+        description="Shared documents and resources"
+        action={HeaderAction}
       />
 
       {isUploading && (
-        <div className="bg-white border border-border rounded-2xl p-5 animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="bg-white border border-border rounded-2xl p-5 animate-in fade-in slide-in-from-top-1 duration-200 shadow-sm">
           <MaterialUpload
             classId={classId}
             userId={userId}
@@ -113,7 +144,15 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
       )}
 
       {materials.length === 0 && !isUploading ? (
-        <MaterialsEmptyState isTeacher={isTeacher} onToggleUpload={() => setIsUploading(true)} />
+        <EmptyState 
+          icon={Database}
+          title="No materials yet"
+          description={isTeacher 
+            ? "Upload documents, slides, or files for your students to access." 
+            : "Your teacher has not uploaded any materials yet."}
+          actionLabel={isTeacher ? "Upload first material" : undefined}
+          onAction={isTeacher ? () => setIsUploading(true) : undefined}
+        />
       ) : (
         <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
           {materials.map((material, i) => (
@@ -125,13 +164,28 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
               syncingId={syncingId}
               onSync={handleSyncForAI}
               onEdit={setEditing}
-              onDelete={handleDelete}
+              onDelete={(id) => {
+                const m = materials.find(mat => mat.id === id);
+                if (m) setMaterialToDelete(m);
+              }}
               getDisplayName={getDisplayName}
             />
           ))}
         </div>
       )}
 
+      {materialToDelete && (
+        <ConfirmModal
+          isOpen={!!materialToDelete}
+          onClose={() => setMaterialToDelete(null)}
+          onConfirm={handleDelete}
+          title="Delete material?"
+          message={`Are you sure you want to delete "${getDisplayName(materialToDelete.attachment_paths?.[0] || "")}"? This cannot be undone.`}
+          confirmLabel="Delete"
+          variant="danger"
+          isLoading={isDeleting}
+        />
+      )}
       {editing && (
         <EditMaterialModal
           material={{ ...editing, classId, files: editing.attachment_paths || [] }}

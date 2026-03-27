@@ -155,14 +155,19 @@ useEffect(() => {
         </div>
 
         {/* Footer */}
-        <div className="p-6 bg-zinc-50/80 border-t border-zinc-100 flex gap-3">
-          <button type="button" onClick={onClose} disabled={isSaving} className="flex-1 px-4 py-3 rounded-xl font-bold text-zinc-600 hover:bg-zinc-200 transition-all disabled:opacity-50">
+        <div className="p-6 bg-zinc-50/80 border-t border-zinc-100 flex flex-col-reverse sm:flex-row gap-3">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            disabled={isSaving} 
+            className="w-full sm:flex-1 px-4 py-3 rounded-xl font-bold text-zinc-600 hover:bg-zinc-200 transition-all disabled:opacity-50"
+          >
             Cancel
           </button>
           <button 
             onClick={handleSave}
             disabled={isSaving || !name.trim()}
-            className="flex-1 px-4 py-3 rounded-xl font-bold bg-navy text-accent hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
+            className="w-full sm:flex-1 px-4 py-3 rounded-xl font-bold bg-navy text-accent hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
           >
             {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
             <span>{isSaving ? "Updating..." : "Save Changes"}</span>

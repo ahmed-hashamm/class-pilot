@@ -1,7 +1,5 @@
 export { default as AssignmentsTab } from './AssignmentsTab';
 export * from './AssignmentsTab';
-export { default as EditMaterialModal } from './EditMaterialModal';
-export * from './EditMaterialModal';
 export { default as GroupsTab } from './GroupsTab';
 export * from './GroupsTab';
 export { default as MaterialsTab } from './MaterialsTab';

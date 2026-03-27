@@ -78,7 +78,7 @@
 //           >
 //             <Settings size={20} />
 //           </Link>
-          
+
 //           {isAuthenticated && profile ? (
 //             <div ref={profileRef} className="relative">
 //               {/* Profile Button with Avatar */}
@@ -143,7 +143,7 @@
 //                       <User size={18} />
 //                       <span>Dashboard</span>
 //                     </Link>
-                    
+
 //                     <Link
 //                       href="/dashboard/profile"
 //                       onClick={() => setProfileOpen(false)}
@@ -244,7 +244,7 @@ import { useRouter } from "next/navigation";
 import { User, LogOut, Settings, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-import CreateClassModal from "@/components/features/classes/Modals/CreateClassModal";
+import CreateClassModal from "@/components/features/classes/modals/CreateClassModal";
 
 const DashboardNavbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -278,10 +278,10 @@ const DashboardNavbar = () => {
   return (
     <nav className="border-b border-gray-200 bg-navy text-primary-foreground sticky top-0 z-50">
       <div className="w-full max-w-[1600px] mx-auto flex h-16 items-center justify-between px-8 md:px-12 lg:px-16">
-        
+
         {/* Left Section: Logo */}
-           {/* Logo */}
-           <Link href="/" className="flex items-center  group">
+        {/* Logo */}
+        <Link href="/" className="flex items-center  group">
           <div className="relative w-14 h-14"> {/* Added a wrapper with specific dimensions */}
             <Image
               src="/logo.png"
@@ -296,7 +296,7 @@ const DashboardNavbar = () => {
 
         {/* Right Section: Actions & Profile */}
         <div className="flex items-center gap-2 sm:gap-4">
-          
+
           {/* Quick Action: Create Class */}
           {/* <button
             onClick={() => setShowCreateModal(true)}
@@ -334,7 +334,7 @@ const DashboardNavbar = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0 overflow-hidden text-white">
                         {profile.avatar_url ? (
-                           <Image src={profile.avatar_url} alt="Avatar" width={40} height={40} />
+                          <Image src={profile.avatar_url} alt="Avatar" width={40} height={40} />
                         ) : <User size={20} />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -358,7 +358,7 @@ const DashboardNavbar = () => {
                       <User size={18} className="text-gray-400" />
                       <span>Dashboard</span>
                     </Link>
-                    
+
                     <Link
                       href="/dashboard/profile"
                       onClick={() => setProfileOpen(false)}

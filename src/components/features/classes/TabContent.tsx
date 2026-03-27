@@ -1,8 +1,8 @@
-import StreamView from "./ContentTabs/StreamView";
-import MembersTab from "./ContentTabs/MembersTab";
-import AssignmentsTab from "./ContentTabs/AssignmentsTab";
-import MaterialsTab from "./ContentTabs/MaterialsTab";
-import GroupsTab from "./ContentTabs/GroupsTab";
+import StreamView from "./contentTabs/StreamView";
+import MembersTab from "./contentTabs/MembersTab";
+import AssignmentsTab from "./contentTabs/AssignmentsTab";
+import MaterialsTab from "./contentTabs/MaterialsTab";
+import GroupsTab from "./contentTabs/GroupsTab";
 
 export default function TabContent({
   activeTab,
@@ -16,7 +16,7 @@ export default function TabContent({
     case "stream":
       return (
         <StreamView
-        key={classId}
+          key={classId}
           classId={classId}
           classCode={classCode}
           isTeacher={isTeacher}
@@ -33,7 +33,7 @@ export default function TabContent({
     case "work":
       return (
         <AssignmentsTab
-        key={classId}
+          key={classId}
           classId={classId}
           isTeacher={isTeacher}
           userId={userId}
@@ -42,13 +42,21 @@ export default function TabContent({
 
     case "groups":
       return (
-        <GroupsTab key={classId} classId={classId} 
-        isTeacher={isTeacher} />
+        <GroupsTab 
+          key={classId} 
+          classId={classId} 
+          isTeacher={isTeacher} 
+        />
       );
 
     case "materials":
       return (
-        <MaterialsTab key={classId} classId={classId} isTeacher={isTeacher} userId={userId} />
+        <MaterialsTab 
+          key={classId} 
+          classId={classId} 
+          isTeacher={isTeacher} 
+          userId={userId}
+        />
       );
 
     default:

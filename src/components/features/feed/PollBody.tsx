@@ -3,20 +3,44 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Lock } from "lucide-react";
+import { Lock, Clock } from "lucide-react";
 import { submitPollResponse, closePoll } from "@/actions/ClassFeaturesActions";
+import { ConfirmModal } from "@/components/ui";
 
-export default function PollBody({ item, userId, isTeacher, isActive }: { item: any; userId: string; isTeacher: boolean; isActive: boolean }) {
+export default function PollBody({ 
+  item, 
+  userId, 
+  isTeacher, 
+  isActive,
+  remaining 
+}: { 
+  item: any; 
+  userId: string; 
+  isTeacher: boolean; 
+  isActive: boolean;
+  remaining: number;
+}) {
   const [closing, setClosing] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const router = useRouter();
 
+  const formatTime = (seconds: number) => {
+    if (seconds === Infinity) return "";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const handleClose = async () => {
-    if (!confirm("Close this poll? Students will no longer be able to vote.")) return;
     setClosing(true);
     try {
       const res = await closePoll(item.id);
       if (!res.success) toast.error(res.error || "Failed to close poll");
-      else { toast.success("Poll closed successfully"); router.refresh(); }
+      else { 
+        toast.success("Poll closed successfully"); 
+        setShowCloseConfirm(false);
+        router.refresh(); 
+      }
     } finally { setClosing(false); }
   };
 
@@ -52,10 +76,30 @@ export default function PollBody({ item, userId, isTeacher, isActive }: { item: 
           </button>
         );
       })}
+      <ConfirmModal
+        isOpen={showCloseConfirm}
+        onClose={() => setShowCloseConfirm(false)}
+        onConfirm={handleClose}
+        title="Close this poll?"
+        message="Students will no longer be able to submit votes. Results will remain visible."
+        confirmLabel="Close Poll"
+        variant="warning"
+        isLoading={closing}
+      />
       <div className="flex items-center justify-between mt-1">
-        <p className="text-xs text-muted-foreground">{item.poll_responses?.length || 0} vote(s)</p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-muted-foreground">{item.poll_responses?.length || 0} vote(s)</p>
+          {isActive && remaining !== Infinity && (
+            <span className="text-[10px] font-bold bg-navy/5 text-navy px-1.5 py-0.5 rounded border border-navy/10 flex items-center gap-1">
+              <Clock size={10} /> {formatTime(remaining)}
+            </span>
+          )}
+          {!isActive && (
+            <span className="text-[10px] font-black uppercase text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">Closed</span>
+          )}
+        </div>
         {isTeacher && isActive && (
-          <button onClick={handleClose} disabled={closing} className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50">
+          <button onClick={() => setShowCloseConfirm(true)} disabled={closing} className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50">
             <Lock size={12} /> {closing ? "Closing…" : "Close Poll"}
           </button>
         )}

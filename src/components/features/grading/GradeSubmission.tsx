@@ -7,7 +7,7 @@ import {
   PenLine, CheckCircle2, Loader2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import AttachmentButton from "@/components/features/classes/Buttons/AttachmentButton";
+import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import AIGradingButton from "./AIGradingButton";
 import ManualGradingForm from "./ManualGradingForm";
 
@@ -32,15 +32,15 @@ export default function GradeSubmission({
   submission: GradingSubmissionProps;
   classId: string;
 }) {
-  const [gradingMode,    setGradingMode]    = useState<"ai" | "manual" | null>(null);
-  const [isUpdating,     setIsUpdating]     = useState(false);
+  const [gradingMode, setGradingMode] = useState<"ai" | "manual" | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const router   = useRouter();
+  const router = useRouter();
   const supabase = createClient();
 
   const assignment = submission.assignments;
-  const student    = submission.users;
-  const files      = submission.files || [];
+  const student = submission.users;
+  const files = submission.files || [];
 
   const handleSetFinalGrade = async (type: "ai" | "manual") => {
     setIsUpdating(true);
@@ -88,43 +88,43 @@ export default function GradeSubmission({
         </div>
       </div>
 
-        {/* Main Content Areas */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Main Content Areas */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-          {/* Left — submission */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
+        {/* Left — submission */}
+        <div className="lg:col-span-7 flex flex-col gap-8">
 
-            {/* Premium Student Header */}
-            <div className="flex items-center gap-4">
-              <div className="shrink-0 size-12 rounded-2xl bg-navy flex items-center
+          {/* Premium Student Header */}
+          <div className="flex items-center gap-4">
+            <div className="shrink-0 size-12 rounded-2xl bg-navy flex items-center
                 justify-center text-yellow font-black text-[20px] shadow-sm">
-                {student?.full_name?.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="font-black text-[22px] tracking-tight leading-tight text-foreground">
-                  {student?.full_name}
-                </h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="inline-flex items-center gap-1.5 text-[12px]
+              {student?.full_name?.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-black text-[22px] tracking-tight leading-tight text-foreground">
+                {student?.full_name}
+              </h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="inline-flex items-center gap-1.5 text-[12px]
                     font-bold uppercase tracking-wide text-muted-foreground">
-                    <ClipboardList size={13} className="text-navy/60" />
-                    {assignment?.title}
-                  </span>
-                </div>
+                  <ClipboardList size={13} className="text-navy/60" />
+                  {assignment?.title}
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* Response */}
-            <div className="flex flex-col gap-3">
-              <p className="text-[11px] font-bold uppercase tracking-[.18em] text-navy/60">
-                Student Response
+          {/* Response */}
+          <div className="flex flex-col gap-3">
+            <p className="text-[11px] font-bold uppercase tracking-[.18em] text-navy/60">
+              Student Response
+            </p>
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm min-h-[200px]">
+              <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/80">
+                {submission.content || "This submission has no text content."}
               </p>
-              <div className="bg-white border border-border rounded-2xl p-6 shadow-sm min-h-[200px]">
-                <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/80">
-                  {submission.content || "This submission has no text content."}
-                </p>
-              </div>
             </div>
+          </div>
 
           {/* Files */}
           {files.length > 0 && (

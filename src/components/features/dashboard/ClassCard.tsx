@@ -6,9 +6,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Plus, MoreVertical, Users, Eye, LogOut, Pin, PinOff } from 'lucide-react'
-import { format } from 'date-fns'
-import { useState, useRef, useEffect } from 'react'
+import { format, isAfter, startOfDay } from 'date-fns'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { ConfirmModal } from '@/components/ui'
 
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
@@ -39,12 +40,11 @@ export default function ClassCard({
   assignments,
   isPinned: initialIsPinned,
 }: ClassCardProps) {
-  const [menuOpen, setMenuOpen] = useState(false)
   const [imgError, setImgError] = useState(false)
   const [isLeaving, setIsLeaving] = useState(false)
   const [isPinned, setIsPinned] = useState(initialIsPinned)
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
   const [isPinning, setIsPinning] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -52,13 +52,21 @@ export default function ClassCard({
   const teacher = classData?.owner_profile
   const teacherName = teacher?.full_name || 'Teacher'
 
+  // Filter for upcoming assignments only (due date is null or in the future)
+  const upcomingAssignments = (assignments || []).filter((a: any) => {
+    if (!a.due_date) return true;
+    // Include if due today or in the future
+    return isAfter(new Date(a.due_date), startOfDay(new Date())) || 
+           format(new Date(a.due_date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+  }).slice(0, 3); // Limit to top 3
+
   /* ── Pin toggle ── */
   const togglePin = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (isPinning) return
     setIsPinning(true)
     try {
-      // Refresh auth session so RLS works on client-side navigation
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -69,7 +77,6 @@ export default function ClassCard({
         .eq('user_id', user.id)
       if (error) throw error
       setIsPinned(!isPinned)
-      setMenuOpen(false)
       router.refresh()
     } catch (err) {
       console.error('Pinning error:', err)
@@ -78,22 +85,11 @@ export default function ClassCard({
     }
   }
 
-  /* ── Close menu on outside click ── */
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node))
-        setMenuOpen(false)
-    }
-    if (menuOpen) document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [menuOpen])
-
   /* ── Leave class ── */
   const handleLeaveClass = async () => {
-    if (!confirm('Are you sure you want to leave this class?')) return
+    setShowLeaveConfirm(false)
     setIsLeaving(true)
     try {
-      // Refresh auth session so RLS works on client-side navigation
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -109,172 +105,152 @@ export default function ClassCard({
       alert('Failed to leave class.')
     } finally {
       setIsLeaving(false)
-      setMenuOpen(false)
     }
   }
 
   return (
-    <div className={`relative flex flex-col bg-white border border-border rounded-2xl
+    <>
+      <ConfirmModal
+        isOpen={showLeaveConfirm}
+        onClose={() => setShowLeaveConfirm(false)}
+        onConfirm={handleLeaveClass}
+        title="Leave this class?"
+        message="You will lose access to all materials and assignments in this classroom."
+        confirmLabel="Leave Class"
+        variant="danger"
+        isLoading={isLeaving}
+      />
+      <div className={`group relative flex flex-col bg-white border border-border rounded-2xl
       overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5
       ${isLeaving ? 'opacity-50 pointer-events-none' : ''}`}>
 
-      {/* ── Top colour stripe — navy for teacher, navy-light for student ── */}
-      <div className={`h-1.5 w-full shrink-0 ${isTeacher ? 'bg-navy' : 'bg-navy-light'}`} />
+        {/* ── Top colour stripe — navy for teacher, navy-light for student ── */}
+        <div className={`h-1.5 w-full shrink-0 ${isTeacher ? 'bg-navy' : 'bg-navy-light'}`} />
 
-      {/* ── Pinned badge ── */}
-      {isPinned && (
-        <div className="absolute top-2.5 right-0 z-20">
-          <div className=" text-navy size-6 flex items-center justify-center">
-            <Pin size={11} fill="currentColor" />
-          </div>
-        </div>
-      )}
+        <div className="flex flex-col flex-1 p-5">
 
-      <div className="flex flex-col flex-1 p-5">
+          {/* ── Header ── */}
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex-1 min-w-0 pr-1">
+              <Link href={`/classes/${classId}`}>
+                <h3 className="font-bold text-[16px] text-foreground hover:text-navy
+                  transition-colors line-clamp-1 tracking-tight mb-1">
+                  {classData?.name}
+                </h3>
+              </Link>
 
-        {/* ── Header ── */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex-1 min-w-0">
-            <Link href={`/classes/${classId}`}>
-              <h3 className="font-bold text-[16px] text-foreground hover:text-navy
-                transition-colors line-clamp-1 tracking-tight mb-1">
-                {classData?.name}
-              </h3>
-            </Link>
+              {/* Role badge */}
+              <span className={`inline-flex items-center text-[10px] font-bold
+                tracking-widest uppercase rounded-full px-2.5 py-0.5
+                ${isTeacher
+                  ? 'bg-navy/8 text-navy border border-navy/15'
+                  : 'bg-navy-light/12 text-navy-light border border-navy-light/25'
+                }`}>
+                {role}
+              </span>
 
-            {/* Role badge */}
-            <span className={`inline-flex items-center text-[10px] font-bold
-              tracking-widest uppercase rounded-full px-2.5 py-0.5
-              ${isTeacher
-                ? 'bg-navy/8 text-navy border border-navy/15'
-                : 'bg-navy-light/12 text-navy-light border border-navy-light/25'
-              }`}>
-              {role}
-            </span>
+              {/* Student count */}
+              <div className="flex items-center gap-1 mt-2 text-[12px] text-muted-foreground">
+                <Users size={11} />
+                <span>{studentCount} student{studentCount !== 1 ? 's' : ''}</span>
+              </div>
+            </div>
 
-            {/* Student count */}
-            <div className="flex items-center gap-1 mt-2 text-[12px] text-muted-foreground">
-              <Users size={11} />
-              <span>{studentCount} student{studentCount !== 1 ? 's' : ''}</span>
+            {/* Teacher avatar */}
+            <div className="shrink-0 size-11 rounded-xl overflow-hidden border border-border
+              bg-secondary flex items-center justify-center relative shadow-sm">
+              {teacher?.avatar_url && !imgError ? (
+                <Image
+                  src={teacher.avatar_url}
+                  alt={teacherName}
+                  fill
+                  className="object-cover"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span className="text-[15px] font-black text-navy">
+                  {teacherName.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Teacher avatar */}
-          <div className="shrink-0 size-11 rounded-xl overflow-hidden border border-border
-            bg-secondary flex items-center justify-center relative">
-            {teacher?.avatar_url && !imgError ? (
-              <Image
-                src={teacher.avatar_url}
-                alt={teacherName}
-                fill
-                className="object-cover"
-                onError={() => setImgError(true)}
-              />
-            ) : (
-              <span className="text-[15px] font-black text-navy">
-                {teacherName.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-        </div>
+          {/* ── Teacher name ── */}
+          <p className="text-[11px] font-semibold text-muted-foreground mb-3 truncate">
+            {isTeacher ? 'Your class' : `By ${teacherName}`}
+          </p>
 
-        {/* ── Teacher name ── */}
-        <p className="text-[11px] font-semibold text-muted-foreground mb-3 truncate">
-          {isTeacher ? 'Your class' : `By ${teacherName}`}
-        </p>
-
-        {/* ── Assignments list ── */}
-        <div className="flex flex-col gap-1.5 flex-1 mb-5">
-          {assignments && assignments.length > 0 ? (
-            assignments.map((a: any) => (
-              <div key={a.id}
-                className="flex items-center justify-between gap-2 px-3 py-2
-                  bg-secondary rounded-lg border border-border/60">
-                <span className="truncate text-[12px] font-medium text-foreground">
-                  {a.title}
-                </span>
-                {a.due_date && (
-                  <span className="shrink-0 text-[11px] text-muted-foreground font-medium">
-                    {format(new Date(a.due_date), 'MMM d')}
+          {/* ── Assignments list (Upcoming only) ── */}
+          <div className="flex flex-col gap-1.5 flex-1 mb-5">
+            {upcomingAssignments.length > 0 ? (
+              upcomingAssignments.map((a: any) => (
+                <div key={a.id}
+                  className="flex items-center justify-between gap-2 px-3 py-2
+                    bg-secondary/50 rounded-lg border border-border/40 hover:border-border/80 transition-colors">
+                  <span className="truncate text-[12px] font-medium text-foreground">
+                    {a.title}
                   </span>
-                )}
-              </div>
-            ))
-          ) : (
-            <p className="text-[12px] text-muted-foreground italic py-1">
-              No upcoming assignments
-            </p>
-          )}
-        </div>
-
-        {/* ── Footer actions ── */}
-        <div className="flex items-center justify-between pt-4 border-t border-border">
-          <div className="flex gap-1">
-            <Link href={`/classes/${classId}`}
-              className="p-2 rounded-lg text-muted-foreground hover:text-navy
-                hover:bg-navy/8 transition-colors">
-              <Eye size={15} />
-            </Link>
-            {isTeacher && (
-              <button
-                onClick={() => router.push(`/classes/${classId}/assignments/create`)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-navy
-                  hover:bg-navy/8 transition-colors cursor-pointer">
-                <Plus size={15} />
-              </button>
+                  {a.due_date && (
+                    <span className="shrink-0 text-[11px] text-muted-foreground font-medium">
+                      {format(new Date(a.due_date), 'MMM d')}
+                    </span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-[12px] text-muted-foreground italic py-1 pl-1">
+                No upcoming deadlines
+              </p>
             )}
           </div>
 
-          {/* ⋯ menu */}
-          <div ref={menuRef} className="relative">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 rounded-lg text-muted-foreground hover:bg-secondary
-                transition-colors cursor-pointer">
-              <MoreVertical size={15} />
-            </button>
-
-            {menuOpen && (
-              <div className="absolute right-0 bottom-full mb-2 w-44 bg-white border
-                border-border rounded-xl shadow-xl z-50 py-1.5
-                animate-in fade-in slide-in-from-bottom-1">
-
+          {/* ── Footer actions ── */}
+          <div className="flex items-center justify-between pt-4 border-t border-border/60">
+            <div className="flex gap-1 items-center">
+              <Link href={`/classes/${classId}`}
+                title="Open Classroom"
+                className="p-2 rounded-lg text-muted-foreground hover:text-navy
+                  hover:bg-navy/8 transition-colors">
+                <Eye size={16} />
+              </Link>
+              {isTeacher && (
                 <button
-                  onClick={togglePin}
-                  disabled={isPinning}
-                  className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px]
-                    text-foreground hover:bg-secondary transition-colors
-                    disabled:opacity-50 cursor-pointer">
-                  {isPinned ? (
-                    <><PinOff size={13} className="text-navy" />Unpin class</>
-                  ) : (
-                    <><Pin size={13} className="text-muted-foreground" />Pin class</>
-                  )}
+                  onClick={() => router.push(`/classes/${classId}/assignments/create`)}
+                  title="Create Assignment"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-navy
+                    hover:bg-navy/8 transition-colors cursor-pointer bg-transparent border-none">
+                  <Plus size={16} />
                 </button>
+              )}
+            </div>
 
-                <div className="h-px bg-border my-1" />
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={togglePin}
+                disabled={isPinning}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[12px] font-bold tracking-tight transition-all duration-200 cursor-pointer border-none
+                  ${isPinned 
+                    ? 'text-navy bg-navy/8 hover:bg-navy/12' 
+                    : 'text-muted-foreground hover:text-navy hover:bg-navy/8'
+                  } ${isPinning ? 'opacity-50 cursor-wait' : ''}`}
+              >
+                {isPinned ? <Pin size={13} fill="currentColor" /> : <Pin size={13} />}
+                <span>{isPinned ? 'Unpin' : 'Pin'} class</span>
+              </button>
 
-                {isTeacher ? (
-                  <Link href={`/classes/${classId}`}
-                    className="flex items-center gap-2.5 px-4 py-2 text-[13px]
-                      text-foreground hover:bg-secondary transition-colors">
-                    <Eye size={13} className="text-muted-foreground" />
-                    Open classroom
-                  </Link>
-                ) : (
-                  <button
-                    onClick={handleLeaveClass}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px]
-                      text-red-500 hover:bg-red-50 transition-colors cursor-pointer">
-                    <LogOut size={13} />
-                    Leave class
-                  </button>
-                )}
-              </div>
-            )}
+              {!isTeacher && (
+                <button
+                  onClick={() => setShowLeaveConfirm(true)}
+                  title="Leave Class"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-red-500
+                    hover:bg-red-50 transition-colors cursor-pointer bg-transparent border-none">
+                  <LogOut size={16} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

@@ -118,7 +118,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TAB_INDICATOR_TRANSITION } from "@/lib/animations";
-import ClassSettingsModal from "./Modals/ClassSettingsModal";
+import ClassSettingsModal from "./modals/ClassSettingsModal";
 import { CLASS_TABS } from "@/lib/data/classes";
 
 interface ClassTabsProps {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { FileText, Clock, CheckCircle2, MoreVertical, Pencil, Trash2, Sparkles, Loader2 } from "lucide-react";
-import AttachmentButton from "@/components/features/classes/Buttons/AttachmentButton";
+import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 
 interface MaterialRowProps {
   material: any;
@@ -45,21 +45,33 @@ export default function MaterialRow({
           {material.title}
         </h3>
 
-        <p className="flex items-center gap-2 text-[12px] text-muted-foreground mb-1">
-          <Clock size={11} />
-          {format(new Date(material.created_at), "MMM d, yyyy")}
-          <span className="text-border">·</span>
-          <span className="font-medium">{material.users?.full_name || "Teacher"}</span>
+        <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground mb-1 w-full overflow-hidden">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Clock size={11} />
+            <span className="hidden sm:inline">
+              {format(new Date(material.created_at), "MMM d, yyyy")}
+            </span>
+            <span className="sm:hidden">
+              {format(new Date(material.created_at), "MMM d")}
+            </span>
+          </div>
+          
+          <span className="text-border shrink-0">·</span>
+          
+          <span className="font-medium truncate min-w-0 flex-1 sm:flex-none sm:max-w-none max-w-[100px]">
+            {material.users?.full_name || "Teacher"}
+          </span>
+
           {material.ai_synced && (
             <>
-              <span className="text-border">·</span>
-              <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
+              <span className="text-border shrink-0">·</span>
+              <span className="inline-flex items-center gap-1 text-emerald-600 font-medium shrink-0">
                 <CheckCircle2 size={10} />
-                AI synced
+                <span className="hidden sm:inline">AI synced</span>
               </span>
             </>
           )}
-        </p>
+        </div>
 
         {material.description && (
           <p className="text-[13px] text-muted-foreground line-clamp-2 leading-relaxed mt-2">

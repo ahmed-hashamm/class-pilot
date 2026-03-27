@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { ClipboardList, Award, Calendar, ArrowRight } from "lucide-react";
-import AttachmentButton from "@/components/features/classes/Buttons/AttachmentButton";
+import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 
 interface AssignmentCardProps {
   assignment: any;
@@ -51,7 +51,7 @@ export default function AssignmentCard({
 
         <p className="flex items-center gap-2 text-[12px] text-muted-foreground mb-1">
           <Calendar size={11} />
-          {assignment.due_date 
+          {assignment.due_date
             ? `Due ${format(new Date(assignment.due_date), "MMM d, h:mm a")}`
             : "No due date"}
           <span className="text-border">·</span>

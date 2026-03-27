@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Megaphone, FileUp, BarChart2, CheckSquare, PlusCircle } from "lucide-react";
-import AnnouncementInput from "@/components/features/classes/Feed/AnnouncementInput";
-import MaterialUpload from "@/components/features/classes/Feed/MaterialUpload";
-import PollInput from "@/components/features/classes/Feed/PollInput";
-import AttendanceInput from "@/components/features/classes/Feed/AttendanceInput";
+import { PlusCircle } from "lucide-react";
+import AnnouncementInput from "./AnnouncementInput";
+import MaterialUpload from "./MaterialUpload";
+import PollInput from "./PollInput";
+import AttendanceInput from "./AttendanceInput";
 import { FEED_ACTIONS } from "@/lib/data/feed";
 import { HEIGHT_TRANSITION, TAB_INDICATOR_TRANSITION } from "@/lib/animations";
 

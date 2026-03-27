@@ -2,12 +2,11 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { UploadCloud, X, Loader2, Paperclip, SendHorizontal, FileText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { UploadCloud, SendHorizontal } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { toast } from "sonner"
+import { FeatureButton, FileChip, FormSection } from '@/components/ui'
 
 import { ALLOWED_FILE_TYPES } from "@/lib/data/materials";
 
@@ -86,41 +85,27 @@ export default function MaterialUpload({
 
   return (
     <div className="space-y-6">
-      
-      {/* Inputs */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="mat-title" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Material Title
-          </Label>
+      <div className="grid gap-5">
+        <FormSection label="Material Title" description="e.g. Week 1 Lecture Slides">
           <Input 
-            id="mat-title"
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
-            placeholder="e.g. Week 1 Lecture Slides"
+            placeholder="Enter a descriptive title..."
             className="rounded-xl border-border bg-gray-50/50 py-6"
           />
-        </div>
+        </FormSection>
 
-        <div className="space-y-2">
-          <Label htmlFor="mat-desc" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Description (Optional)
-          </Label>
+        <FormSection label="Description (Optional)" description="Add context for these materials...">
           <Textarea 
-            id="mat-desc"
             value={description} 
             onChange={(e) => setDescription(e.target.value)} 
-            placeholder="Add context for these materials..."
-            className="min-h-[80px] rounded-xl border-border bg-gray-50/50 resize-none p-4"
+            placeholder="What should students know about these files?"
+            className="min-h-[100px] rounded-xl border-border bg-gray-50/50 resize-none p-4"
           />
-        </div>
+        </FormSection>
       </div>
 
-      {/* Dropzone area */}
-      <div className="space-y-3">
-        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          Files
-        </Label>
+      <FormSection label="Files" description="PDF, DOCX, PPT, PPTX files only">
         <div 
           onClick={() => fileInputRef.current?.click()}
           className="relative flex flex-col items-center justify-center gap-3
@@ -132,7 +117,7 @@ export default function MaterialUpload({
           </div>
           <div className="text-center">
             <p className="text-sm font-bold text-foreground">Click or drag to upload</p>
-            <p className="text-[11px] text-muted-foreground mt-1">PDF, DOCX, PPT, PPTX only</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Select files from your device</p>
           </div>
           <input 
             type="file" 
@@ -143,45 +128,36 @@ export default function MaterialUpload({
           />
         </div>
 
-        {/* File Chips */}
         {files.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex flex-wrap gap-2 pt-3">
             {files.map((file, i) => (
-              <div key={i} className="inline-flex items-center gap-2 bg-navy/5 text-navy
-                border border-navy/10 rounded-lg px-3 py-1.5 text-[12px] font-semibold">
-                <FileText size={12} />
-                <span className="truncate max-w-[140px]">{file.name}</span>
-                <button type="button" 
-                  onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
-                  className="hover:text-red-500 transition cursor-pointer bg-transparent border-none"
-                >
-                  <X size={14} />
-                </button>
-              </div>
+              <FileChip
+                key={i}
+                name={file.name}
+                onRemove={() => setFiles(files.filter((_, idx) => idx !== i))}
+              />
             ))}
           </div>
         )}
-      </div>
+      </FormSection>
 
-      {/* Actions */}
-      <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-6 mt-2">
+      <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-6">
         {hasContent && (
-          <Button variant="ghost" onClick={resetForm} className="text-muted-foreground hover:text-red-500 rounded-xl">
-            Clear
-          </Button>
+          <FeatureButton
+            variant="ghost"
+            label="Clear everything"
+            onClick={resetForm}
+          />
         )}
-        <Button 
-          onClick={handleUpload} 
-          disabled={loading || files.length === 0}
-          className="rounded-xl bg-navy hover:bg-navy/90 text-white min-w-[160px] py-6 shadow-md"
-        >
-          {loading ? (
-            <Loader2 size={18} className="animate-spin mr-2" />
-          ) : (
-            <SendHorizontal size={18} className="mr-2" />
-          )}
-          Upload Materials
-        </Button>
+        <FeatureButton
+          label="Upload materials"
+          icon={SendHorizontal}
+          loading={loading}
+          disabled={files.length === 0}
+          onClick={handleUpload}
+          className="min-w-[180px] py-6 shadow-md"
+          size="lg"
+        />
       </div>
     </div>
   )

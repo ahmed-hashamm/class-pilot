@@ -25,7 +25,7 @@
 //     <>
 //       {/* Reduced mt-14 to mt-8 for better mobile spacing, kept flex-wrap */}
 //       <div className="flex flex-wrap gap-3 mt-8 sm:mt-14">
-        
+
 //         {/* Create Classroom - Usually for Teachers only, but kept as per your logic */}
 //         <button onClick={() => setShowCreateModal(true)} className={buttonStyle}>
 //           <Plus size={18} className="text-navy-light" />
@@ -85,8 +85,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Link as LinkIcon } from "lucide-react";
-import CreateClassModal from "@/components/features/classes/Modals/CreateClassModal";
-import JoinClassModal from "@/components/features/classes/Modals/JoinClassModal";
+import CreateClassModal from "@/components/features/classes/modals/CreateClassModal";
+import JoinClassModal from "@/components/features/classes/modals/JoinClassModal";
 import { DASHBOARD_NAV_LINKS } from "@/lib/data/navigation";
 
 export default function DashboardButtons({
@@ -97,7 +97,7 @@ export default function DashboardButtons({
   role: string;
 }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showJoinModal,   setShowJoinModal]   = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const router = useRouter();
 
   const handleSuccess = () => router.refresh();
