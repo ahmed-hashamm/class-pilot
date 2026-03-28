@@ -117,26 +117,28 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
   ) : null;
  
    return (
-     <div className="flex flex-col gap-6 py-6">
+    <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
       <PageHeader 
         icon={Users2}
         title="Collaboration Groups"
-        description="Manage student teams and project pairs"
+        description="Organize your class into vibrant teams, project pairs, and study groups."
         action={HeaderAction}
       />
 
       {groups.length === 0 ? (
-        <EmptyState 
-          icon={Users2}
-          title="No groups yet"
-          description={isTeacher 
-            ? "Create a group and assign students to collaborate on projects." 
-            : "Your teacher hasn't created any groups yet."}
-          actionLabel={isTeacher ? "Create first group" : undefined}
-          onAction={isTeacher ? () => setShowModal(true) : undefined}
-        />
+        <div className="mt-4">
+          <EmptyState 
+            icon={Users2}
+            title="No groups yet"
+            description={isTeacher 
+              ? "Create a group and assign students to collaborate on projects." 
+              : "Your teacher hasn't created any groups yet."}
+            actionLabel={isTeacher ? "Create first group" : undefined}
+            onAction={isTeacher ? () => setShowModal(true) : undefined}
+          />
+        </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           {groups.map((group) => (
             <GroupCard
               key={group.id}
@@ -165,6 +167,7 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
       {showModal && (
         <GroupModal
           editingGroup={editingGroup}
+          groups={groups}
           allMembers={allMembers}
           onClose={closeModal}
           onSave={handleSave}

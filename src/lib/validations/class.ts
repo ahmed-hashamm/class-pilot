@@ -81,6 +81,7 @@ export const deleteAssignmentSchema = z.object({
 
 export const submitAssignmentSchema = z.object({
   assignmentId: z.string().min(1),
+  classId: z.string().min(1),
   userId: z.string().min(1),
   groupId: z.string().nullable().optional(),
   content: z.string().optional(),

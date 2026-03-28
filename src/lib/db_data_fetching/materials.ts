@@ -12,7 +12,7 @@ export async function getMaterialsByClass(classId: string) {
 
   const { data, error } = await supabase
     .from('materials')
-    .select('*, users(full_name, email)')
+    .select('*, users(full_name, email, avatar_url)')
     .eq('class_id', classId)
     .order('created_at', { ascending: false })
 

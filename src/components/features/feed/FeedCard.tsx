@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users } from "lucide-react";
+import { format } from "date-fns";
 import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import { deleteAnnouncement, deleteAssignment, deleteMaterial } from "@/actions/ClassActions";
@@ -98,6 +99,12 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                       <Users size={9} /> Group
                     </span>
                   )}
+                  {isAssignment && item.due_date && (
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider bg-navy/5 text-navy border border-navy/10 rounded-full px-2.5 py-1 shadow-sm">
+                      <Clock size={10} className="text-navy/60" />
+                      Due: {format(new Date(item.due_date), "MMM d, h:mm a")}
+                    </span>
+                  )}
                   <span className={`text-[10px] font-bold tracking-wide uppercase border rounded-full px-2.5 py-0.5 ${FEED_TYPE_PILLS[item.type]}`}>{FEED_TYPE_LABELS[item.type]}</span>
                   {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material") && (
                     <div className="relative">
@@ -121,11 +128,11 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                   )}
                 </div>
               </div>
-              <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
                 <span className="font-medium">{item.users?.full_name || "Teacher"}</span>
                 <span className="text-border">·</span>
                 <Clock size={11} />
-                {new Date(item.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                {item.created_at ? format(new Date(item.created_at), "MMM d, h:mm a") : "Recently"}
               </p>
             </div>
           </div>

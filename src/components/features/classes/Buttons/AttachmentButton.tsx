@@ -55,7 +55,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
           e.stopPropagation();
           if (url !== '#') window.open(url, '_blank');
         }}
-        className="group flex w-fit items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5 cursor-pointer"
+        className="group flex w-fit max-w-full items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5 cursor-pointer"
       >
         {innerContent}
       </div>
@@ -67,7 +67,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex w-fit items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5"
+      className="group flex w-fit max-w-full items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5"
     >
       {innerContent}
     </a>

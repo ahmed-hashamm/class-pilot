@@ -21,7 +21,7 @@ export async function getGroupsWithMembers(classId: string) {
 
   const { data, error } = await supabase
     .from('group_projects')
-    .select('id, title, project_members(user_id, profiles:user_id(full_name))')
+    .select('id, title, project_members(user_id, profiles:user_id(full_name, avatar_url))')
     .eq('class_id', classId)
     .order('created_at', { ascending: false })
 
@@ -46,7 +46,7 @@ export async function getAllClassMembers(classId: string) {
 
   const { data, error } = await supabase
     .from('class_members')
-    .select('user_id, role, profiles:user_id(full_name)')
+    .select('user_id, role, profiles:user_id(full_name, avatar_url)')
     .eq('class_id', classId)
 
   if (error) return { members: null, error: error.message }

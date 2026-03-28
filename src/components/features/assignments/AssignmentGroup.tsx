@@ -21,12 +21,20 @@ export default function AssignmentGroup({
 
   return (
     <div>
-      <p className={`text-[11px] font-black tracking-widest uppercase mb-3
-        ${muted ? "text-muted-foreground/60" : "text-navy"}`}>
-        {label} · {assignments.length}
-      </p>
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3 px-1">
+        <p className={`text-[12px] font-black tracking-[.2em] uppercase
+          ${muted ? "text-muted-foreground/40" : "text-navy/80"}`}>
+          {label}
+        </p>
+        <div className={`h-1 flex-1 rounded-full ${muted ? "bg-secondary/40" : "bg-navy/5"}`} />
+        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-lg
+          ${muted ? "bg-secondary/50 text-muted-foreground/50" : "bg-navy/10 text-navy"}`}>
+          {assignments.length}
+        </span>
+      </div>
 
-      <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="flex flex-col gap-4">
         {assignments.map((assignment) => (
           <AssignmentCard
             key={assignment.id}
@@ -37,6 +45,7 @@ export default function AssignmentGroup({
           />
         ))}
       </div>
+    </div>
     </div>
   );
 }

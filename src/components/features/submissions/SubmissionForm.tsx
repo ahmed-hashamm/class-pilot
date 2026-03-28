@@ -261,10 +261,11 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-export default function SubmissionForm({ assignment, onClose, onSuccess }: any) {
+export default function SubmissionForm({ assignment, classId, onClose, onSuccess }: any) {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
   const [submissionData, setSubmissionData] = useState<any>(null)
+  const [isEditing, setIsEditing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [content, setContent] = useState('')
   const [files, setFiles] = useState<File[]>([])
@@ -277,7 +278,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      let query = supabase.from('submissions').select('id, assignment_id, user_id, final_grade, status, feedback, group_id').eq('assignment_id', assignment.id)
+      let query = supabase.from('submissions').select('id, assignment_id, user_id, content, final_grade, status, feedback, group_id').eq('assignment_id', assignment.id)
 
       if (assignment.is_group_project) {
         const { data: memberData } = await supabase
@@ -291,7 +292,11 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
       }
 
       const { data: existing } = await query.maybeSingle()
-      if (existing) setSubmissionData(existing)
+      if (existing) {
+        const data = existing as any
+        setSubmissionData(data)
+        setContent(data.content || '')
+      }
     } catch (err) {
       console.error('Check error:', err)
     } finally {
@@ -317,6 +322,9 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
       }
 
       const uploadedFiles: any[] = []
+      // Keep existing files if editing? 
+      // For now, let's just handle content and new files.
+      
       for (const file of files) {
         const filePath = `submissions/${assignment.id}/${user.id}/${Date.now()}-${file.name}`
         const { error: uploadError } = await supabase.storage.from('assignments').upload(filePath, file)
@@ -327,6 +335,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
 
       await submitAssignment({
         assignmentId: assignment.id,
+        classId: classId || assignment.class_id,
         userId: user.id,
         groupId,
         content: assignment.submission_type !== 'file' ? content : undefined,
@@ -338,7 +347,9 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
       onSuccess()
       checkExistingSubmission()
     } catch (err: any) {
+      console.error('Submission error:', err)
       setError(err.message)
+      toast.error(err.message || 'Failed to submit work')
     } finally {
       setLoading(false)
     }
@@ -357,12 +368,12 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
   }
 
   /* ── Already submitted ── */
-  if (submissionData) {
+  if (submissionData && !isEditing) {
     const grade = submissionData.final_grade
     const isGraded = submissionData.status === 'graded' || grade !== null
 
     return (
-      <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full mx-auto">
+      <div className="w-full">
 
         {/* Status banner */}
         <div className={`flex items-center justify-between px-6 py-4
@@ -417,7 +428,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
               </div>
               <div>
                 <h3 className="font-black text-[18px] tracking-tight">Submitted & pending</h3>
-                <p className="text-[13px] text-muted-foreground mt-2 leading-relaxed max-w-xs">
+                <p className="text-[13px] text-muted-foreground mt-2 leading-relaxed">
                   {assignment.is_group_project
                     ? "Your team's work has been received. You'll see the grade here once the teacher finishes review."
                     : "Your work is in! Your teacher will review and grade it soon."}
@@ -426,13 +437,23 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
             </>
           )}
 
-          <button
-            onClick={onClose}
-            className="w-full py-3 font-semibold text-[14px] text-muted-foreground
-              border border-border rounded-xl hover:text-foreground hover:border-navy/30
-              transition cursor-pointer bg-white">
-            Close
-          </button>
+          <div className="flex flex-col gap-3 w-full">
+            {!isGraded && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="w-full py-3 font-bold text-[14px] bg-navy text-white rounded-xl hover:bg-navy/90 transition cursor-pointer border-none"
+              >
+                Edit Submission
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-full py-3 font-semibold text-[14px] text-muted-foreground
+                border border-border rounded-xl hover:text-foreground hover:border-navy/30
+                transition cursor-pointer bg-white">
+              Close
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -441,7 +462,7 @@ export default function SubmissionForm({ assignment, onClose, onSuccess }: any) 
   /* ── Submission form ── */
   return (
     <form onSubmit={handleSubmit}
-      className="flex flex-col gap-5 p-6 bg-white rounded-2xl max-w-lg w-full">
+      className="flex flex-col gap-5 p-6 w-full">
 
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-border">

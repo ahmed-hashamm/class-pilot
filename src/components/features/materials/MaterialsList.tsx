@@ -127,16 +127,16 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6">
+    <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
       <PageHeader 
         icon={Database} 
         title="Class Materials" 
-        description="Shared documents and resources"
+        description="Access lecture notes, project resources, and shared documents."
         action={HeaderAction}
       />
 
       {isUploading && (
-        <div className="bg-white border border-border rounded-2xl p-5 animate-in fade-in slide-in-from-top-1 duration-200 shadow-sm">
+        <div className="bg-white border border-border rounded-3xl p-8 animate-in fade-in slide-in-from-top-2 duration-300 shadow-xl shadow-navy/5">
           <MaterialUpload
             classId={classId}
             userId={userId}
@@ -146,17 +146,19 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
       )}
 
       {materials.length === 0 && !isUploading ? (
-        <EmptyState 
-          icon={Database}
-          title="No materials yet"
-          description={isTeacher 
-            ? "Upload documents, slides, or files for your students to access." 
-            : "Your teacher has not uploaded any materials yet."}
-          actionLabel={isTeacher ? "Upload first material" : undefined}
-          onAction={isTeacher ? () => setIsUploading(true) : undefined}
-        />
+        <div className="mt-4">
+          <EmptyState 
+            icon={Database}
+            title="No materials yet"
+            description={isTeacher 
+              ? "Upload documents, slides, or files for your students to access." 
+              : "Your teacher has not uploaded any materials yet."}
+            actionLabel={isTeacher ? "Upload first material" : undefined}
+            onAction={isTeacher ? () => setIsUploading(true) : undefined}
+          />
+        </div>
       ) : (
-        <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="flex flex-col gap-5">
           {materials.map((material, i) => (
             <MaterialRow
               key={material.id}

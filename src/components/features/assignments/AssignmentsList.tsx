@@ -80,26 +80,28 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
   const past = assignments.filter((a) => a.due_date && new Date(a.due_date) < now);
 
   return (
-    <div className="flex flex-col gap-6 py-6">
+    <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
       <PageHeader 
         icon={ClipboardList} 
         title="Assignments" 
-        description="Coursework and evaluative materials"
+        description="Manage your coursework, projects, and evaluative materials in one place."
         action={HeaderAction}
       />
 
       {assignments.length === 0 ? (
-        <EmptyState 
-          icon={ClipboardList}
-          title="No assignments yet"
-          description={isTeacher 
-            ? "Create your first assignment for students to complete." 
-            : "Your teacher has not posted any assignments yet."}
-          actionLabel={isTeacher ? "Create first assignment" : undefined}
-          onAction={isTeacher ? () => {} : undefined} // Handled by Link above? No, let's just use the header action
-        />
+        <div className="mt-4">
+          <EmptyState 
+            icon={ClipboardList}
+            title="No assignments yet"
+            description={isTeacher 
+              ? "Start by creating your first assignment. You can include attachments, set deadlines, and assign rubrics." 
+              : "Your teacher has not posted any assignments yet. Check back later for updates."}
+            actionLabel={isTeacher ? "Create first assignment" : undefined}
+            onAction={isTeacher ? () => {} : undefined}
+          />
+        </div>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-12">
           <AssignmentGroup
             label="Upcoming"
             assignments={upcoming}

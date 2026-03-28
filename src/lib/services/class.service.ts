@@ -436,15 +436,66 @@ export const ClassService = {
       group_id: (data.isGroupProject && data.groupId) ? data.groupId : null
     }
 
-    const { data: result, error } = await (supabase
-      .from('submissions') as any)
-      .upsert(submissionData, {
-        onConflict: data.isGroupProject ? 'assignment_id,group_id' : 'assignment_id,user_id',
-      })
-      .select()
-      .maybeSingle()
+    const admin = createAdminClient()
+    console.log('[ClassService] Admin client initialized. checking table: submissions')
+    
+    // 1. Check for existing submission
+    let existingQuery = admin.from('submissions').select('id')
+      .eq('assignment_id', data.assignmentId)
+    
+    if (data.isGroupProject && data.groupId) {
+      existingQuery = existingQuery.eq('group_id', data.groupId)
+    } else {
+      existingQuery = existingQuery.eq('user_id', data.userId)
+    }
+    
+    console.log('[ClassService] Fetching existing...')
+    const { data: existing, error: findError } = await existingQuery.maybeSingle()
+    if (findError) {
+      console.error('[ClassService] Find Error:', findError)
+      throw findError
+    }
 
-    if (error) throw new Error(error.message)
+    let result
+    if (existing) {
+      console.log('[ClassService] Found existing. Updating:', existing.id)
+      const { data: updated, error: updateError } = await (admin.from('submissions') as any)
+        .update({
+          content: data.content ?? null,
+          files: data.files as any,
+          status: 'submitted',
+          submitted_at: new Date().toISOString(),
+          user_id: data.userId
+        })
+        .eq('id', existing.id)
+        .select()
+        .maybeSingle()
+      
+      if (updateError) {
+        console.error('[ClassService] Update Error:', updateError)
+        throw updateError
+      }
+      result = updated
+    } else {
+      console.log('[ClassService] No existing. Inserting...')
+      const { data: inserted, error: insertError } = await (admin.from('submissions') as any)
+        .insert(submissionData)
+        .select()
+        .maybeSingle()
+      
+      if (insertError) {
+        console.error('[ClassService] Insert Error:', insertError)
+        throw insertError
+      }
+      result = inserted
+    }
+
+    if (!result) {
+      console.warn('[ClassService] DB operation returned no result row (but no error).')
+    } else {
+      console.log('[ClassService] Operation complete. Result ID:', result.id)
+    }
+
     return result as Submission
   },
 

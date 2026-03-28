@@ -465,6 +465,7 @@ export async function deleteAssignment(id: string, classId: string) {
 /* ---------------- SUBMIT ASSIGNMENT ---------------- */
 interface SubmitAssignmentProps {
   assignmentId: string
+  classId: string
   userId: string
   groupId?: string | null
   content?: string
@@ -472,34 +473,56 @@ interface SubmitAssignmentProps {
   isGroupProject: boolean
 }
 
-
-
 export async function submitAssignment({
   assignmentId,
+  classId,
   userId,
   groupId,
   content,
   files,
   isGroupProject,
 }: SubmitAssignmentProps) {
-  const parsed = submitAssignmentSchema.safeParse({ assignmentId, userId, groupId, content, isGroupProject })
+  const parsed = submitAssignmentSchema.safeParse({ assignmentId, classId, userId, groupId, content, isGroupProject })
   if (!parsed.success) throw new Error("Invalid input")
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.id !== parsed.data.userId) throw new Error("Unauthorized") // ensures the submitter is the logged in user
+  if (!user || user.id !== parsed.data.userId) throw new Error("Unauthorized")
 
-  const data = await ClassService.submitAssignment({
-    assignmentId: parsed.data.assignmentId,
-    userId: parsed.data.userId,
-    groupId: parsed.data.groupId,
-    content: parsed.data.content,
-    files,
-    isGroupProject: parsed.data.isGroupProject,
+  console.log('[submitAssignment] START:', { 
+    assignmentId: parsed.data.assignmentId, 
+    userId: parsed.data.userId, 
+    classId, 
+    hasContent: !!parsed.data.content,
+    isGroup: parsed.data.isGroupProject,
+    groupId: parsed.data.groupId 
   })
 
-  revalidatePath('/todo')
-  return data
+  try {
+    const data = await ClassService.submitAssignment({
+      assignmentId: parsed.data.assignmentId,
+      userId: parsed.data.userId,
+      groupId: parsed.data.groupId,
+      content: parsed.data.content,
+      files,
+      isGroupProject: parsed.data.isGroupProject,
+    })
+
+    if (!data) {
+      console.warn('[submitAssignment] Service returned NULL data!')
+    } else {
+      console.log('[submitAssignment] Success! ID:', data.id)
+    }
+    
+    revalidatePath(`/classes/${classId}/assignments/${assignmentId}`)
+    revalidatePath(`/classes/${classId}`)
+    revalidatePath('/todo')
+    
+    return data
+  } catch (err: any) {
+    console.error('[submitAssignment] FATAL ERROR:', err)
+    throw err
+  }
 }
 
 /* ---------------- SAVE GROUP ---------------- */

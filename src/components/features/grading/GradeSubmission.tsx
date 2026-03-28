@@ -6,6 +6,7 @@ import {
   ArrowLeft, ClipboardList, Sparkles,
   PenLine, CheckCircle2, Loader2,
 } from "lucide-react";
+import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import AIGradingButton from "./AIGradingButton";
@@ -22,6 +23,7 @@ export interface GradingSubmissionProps {
   ai_feedback: string | null;
   teacher_feedback: string | null;
   status: string;
+  submitted_at: string | null;
   users: { full_name: string; avatar_url: string | null } | null;
   assignments: { title: string; points: number; rubrics?: Record<string, unknown> } | null;
 }
@@ -60,10 +62,10 @@ export default function GradeSubmission({
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto p-6 flex flex-col gap-8 min-h-screen">
-
+    <div className="max-w-5xl mx-auto p-6 flex flex-col gap-6 h-full max-h-screen overflow-hidden">
+      
       {/* Top bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center justify-between shrink-0">
         <button
           onClick={() => router.back()}
           className="inline-flex items-center gap-1.5 text-[13px] font-semibold
@@ -74,81 +76,73 @@ export default function GradeSubmission({
 
         <div className="flex items-center gap-2.5">
           {submission.final_grade !== null && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-black
-              tracking-widest uppercase bg-green-50 text-green-700 border border-green-200
-              rounded-full px-4 py-1.5">
-              <CheckCircle2 size={13} /> Final grade: {submission.final_grade}
+            <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
+              uppercase tracking-wider rounded-full px-4 py-1.5 border
+              bg-navy text-white border-navy">
+              <CheckCircle2 size={13} /> Grade: {submission.final_grade} / {assignment?.points}
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-black
-            tracking-widest uppercase bg-yellow/15 text-navy border border-yellow/30
-            rounded-full px-4 py-1.5">
+          <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
+            uppercase tracking-wider rounded-full px-4 py-1.5 border
+            bg-yellow/10 text-navy border-yellow/30">
             <ClipboardList size={13} /> Grading View
           </span>
         </div>
       </div>
 
       {/* Main Content Areas */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-        {/* Left — submission */}
-        <div className="lg:col-span-7 flex flex-col gap-8">
-
-          {/* Premium Student Header */}
-          <div className="flex items-center gap-4">
-            <div className="shrink-0 size-12 rounded-2xl bg-navy flex items-center
-                justify-center text-yellow font-black text-[20px] shadow-sm">
-              {student?.full_name?.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="font-black text-[22px] tracking-tight leading-tight text-foreground">
-                {student?.full_name}
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="inline-flex items-center gap-1.5 text-[12px]
-                    font-bold uppercase tracking-wide text-muted-foreground">
-                  <ClipboardList size={13} className="text-navy/60" />
-                  {assignment?.title}
-                </span>
+      <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0 overflow-hidden">
+        
+        {/* Left — Submission Content */}
+        <div className="flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2 min-w-0">
+          
+          {/* Simple Header */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="shrink-0 size-12 rounded-2xl bg-navy flex items-center justify-center text-yellow shadow-sm font-black text-lg">
+                {student?.full_name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="font-black text-[24px] tracking-tight leading-tight text-foreground break-words">{student?.full_name}</h1>
+                <div className="flex flex-wrap items-center gap-3 mt-1 text-[13px] text-muted-foreground font-medium">
+                  <span className="flex items-center gap-1.5"><ClipboardList size={13} className="text-navy/60" />{assignment?.title}</span>
+                  <span className="text-border">·</span>
+                  <span>Submitted {submission.submitted_at ? format(new Date(submission.submitted_at), "MMM d, h:mm a") : "Recently"}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Response */}
-          <div className="flex flex-col gap-3">
-            <p className="text-[11px] font-bold uppercase tracking-[.18em] text-navy/60">
-              Student Response
-            </p>
-            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm min-h-[200px]">
-              <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/80">
-                {submission.content || "This submission has no text content."}
-              </p>
+          {/* Response area */}
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Response</p>
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+              <p className="whitespace-pre-wrap break-words text-[14px] leading-relaxed text-foreground/80">{submission.content || "No text content."}</p>
             </div>
           </div>
 
           {/* Files */}
           {files.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {files.map((file, i: number) => (
-                <AttachmentButton key={i} path={file.url} type="assignment" label={file.name} />
-              ))}
+            <div className="flex flex-col gap-2.5">
+              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Attachments</p>
+              <div className="flex flex-wrap gap-2">
+                {files.map((file, i: number) => (
+                  <AttachmentButton key={i} path={file.url} type="assignment" label={file.name} />
+                ))}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Right — grading */}
-        <aside className="lg:col-span-5 flex flex-col gap-5 overflow-y-auto">
+        {/* Right — Sidebar */}
+        <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar pt-1">
+          
+          <div className="flex flex-col gap-6">
+            <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Grading & Feedback</p>
 
-          {/* Grade comparison */}
-          {(submission.ai_grade !== null || submission.manual_grade !== null) && (
-            <div className="flex flex-col gap-3">
-              <p className="text-[10px] font-black uppercase tracking-[.25em]
-                text-muted-foreground/60">
-                Finalize grading
-              </p>
-
+            {/* Assessment results */}
+            {(submission.ai_grade !== null || submission.manual_grade !== null) && (
               <div className="flex flex-col gap-3">
-                {/* AI grade card */}
                 {submission.ai_grade !== null && (
                   <GradeCard
                     label="AI suggested"
@@ -163,7 +157,6 @@ export default function GradeSubmission({
                   />
                 )}
 
-                {/* Manual grade card */}
                 {submission.manual_grade !== null && (
                   <GradeCard
                     label="Manual grade"
@@ -178,77 +171,53 @@ export default function GradeSubmission({
                   />
                 )}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Grading method panel */}
-          <div className="bg-white border border-border rounded-2xl p-6 flex flex-col gap-5">
-            {!gradingMode ? (
-              <>
-                <div className="flex flex-col gap-1">
-                  <p className="text-[10px] font-black uppercase tracking-[.25em]
-                    text-muted-foreground/60">
-                    Grading methods
-                  </p>
-                  <p className="text-[12px] text-muted-foreground">
-                    Choose how to evaluate this submission
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-3">
+            {/* Grading panel */}
+            <div className="flex flex-col gap-3">
+              {!gradingMode ? (
+                <>
                   <MethodButton
-                    icon={<Sparkles size={20} />}
-                    title="AI rubric scan"
-                    subtitle="Automated feedback"
+                    icon={<Sparkles size={18} />}
+                    title="AI Evaluation"
+                    subtitle="Scan with rubric"
                     variant="navy-light"
                     onClick={() => setGradingMode("ai")}
                   />
                   <MethodButton
-                    icon={<PenLine size={20} />}
-                    title="Manual evaluation"
-                    subtitle="Teacher input"
+                    icon={<PenLine size={18} />}
+                    title="Manual Grade"
+                    subtitle="Teacher feedback"
                     variant="yellow"
                     onClick={() => setGradingMode("manual")}
                   />
+                </>
+              ) : (
+                <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/60">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-navy">
+                      {gradingMode === "ai" ? "AI Evaluation" : "Manual Grading"}
+                    </span>
+                    <button onClick={() => setGradingMode(null)} className="text-[12px] font-bold text-muted-foreground hover:text-navy transition cursor-pointer bg-transparent border-none">Cancel</button>
+                  </div>
+                  {gradingMode === "ai" ? (
+                    <AIGradingButton
+                      submission={submission}
+                      onGradingStart={() => setIsAiProcessing(true)}
+                      onGradingComplete={() => { setIsAiProcessing(false); setGradingMode(null); router.refresh(); }}
+                    />
+                  ) : (
+                    <ManualGradingForm
+                      submission={submission}
+                      rubric={assignment?.rubrics}
+                      assignment={assignment}
+                      onCancel={() => setGradingMode(null)}
+                      onSuccess={() => { setGradingMode(null); router.refresh(); }}
+                    />
+                  )}
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-between pb-4 border-b border-border">
-                  <span className="text-[11px] font-bold uppercase tracking-widest
-                    text-navy">
-                    {gradingMode === "ai" ? "AI evaluation" : "Manual grading"}
-                  </span>
-                  <button
-                    onClick={() => setGradingMode(null)}
-                    className="text-[12px] font-semibold text-muted-foreground
-                      hover:text-foreground transition cursor-pointer
-                      bg-transparent border-none">
-                    Cancel
-                  </button>
-                </div>
-
-                {gradingMode === "ai" ? (
-                  <AIGradingButton
-                    submission={submission}
-                    onGradingStart={() => setIsAiProcessing(true)}
-                    onGradingComplete={() => {
-                      setIsAiProcessing(false);
-                      setGradingMode(null);
-                      router.refresh();
-                    }}
-                  />
-                ) : (
-                  <ManualGradingForm
-                    submission={submission}
-                    rubric={assignment?.rubrics}
-                    assignment={assignment}
-                    onCancel={() => setGradingMode(null)}
-                    onSuccess={() => { setGradingMode(null); router.refresh(); }}
-                  />
-                )}
-              </>
-            )}
+              )}
+            </div>
           </div>
         </aside>
       </div>

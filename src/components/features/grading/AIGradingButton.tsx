@@ -48,18 +48,18 @@ export default function AIGradingButton({
     <div className="flex flex-col gap-4">
 
       {/* Info card */}
-      <div className="bg-navy/5 border border-navy/12 rounded-2xl p-5 flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <div className="size-7 rounded-lg bg-navy flex items-center justify-center">
-            <Sparkles size={13} className="text-yellow" />
+      <div className="bg-navy/5 border border-navy/10 rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="size-8 rounded-xl bg-navy flex items-center justify-center shadow-inner">
+            <Sparkles size={14} className="text-yellow" />
           </div>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-navy">
-            AI evaluation
+          <p className="text-[12px] font-black uppercase tracking-wider text-navy">
+            AI Rubric Scan
           </p>
         </div>
-        <p className="text-[13px] text-muted-foreground leading-relaxed">
-          The AI will analyze the submission text and files against your specific rubric criteria
-          and produce a suggested grade with feedback.
+        <p className="text-[13px] text-muted-foreground leading-relaxed font-medium">
+          The AI will analyze the submission against your rubric criteria
+          and produce a suggested grade with detailed feedback.
         </p>
       </div>
 
@@ -79,22 +79,23 @@ export default function AIGradingButton({
         onClick={() => setShowConfirm(true)}
         disabled={loading}
         className="w-full inline-flex items-center justify-center gap-2
-          bg-navy text-white font-bold text-[14px] py-3 rounded-xl
-          hover:bg-navy/90 transition disabled:opacity-60 cursor-pointer border-none">
+          bg-navy text-white font-black text-[14px] py-3.5 rounded-xl
+          hover:bg-navy/90 transition shadow-md hover:-translate-y-0.5
+          disabled:opacity-60 disabled:translate-y-0 cursor-pointer border-none">
         {loading ? (
-          <><Loader2 size={15} className="animate-spin" />Analyzing…</>
+          <><Loader2 size={16} className="animate-spin" /> Analyzing Submission…</>
         ) : alreadyGraded ? (
-          <><RefreshCw size={15} />Re-run AI grade</>
+          <><RefreshCw size={16} /> Re-run AI Grading</>
         ) : (
-          <><Sparkles size={15} />Start AI grading</>
+          <><Sparkles size={16} /> Start AI Evaluation</>
         )}
       </button>
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2.5 bg-red-50 border border-red-200
-          text-red-600 text-[13px] font-semibold px-4 py-3 rounded-xl">
-          <AlertCircle size={14} /> {error}
+        <div className="flex items-center gap-2.5 bg-red-50 border border-red-100
+          text-red-600 text-[13px] font-bold px-4 py-3 rounded-xl animate-in shake duration-300">
+          <AlertCircle size={15} /> {error}
         </div>
       )}
     </div>

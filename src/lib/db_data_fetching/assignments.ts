@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect, notFound } from 'next/navigation'
 
 /**
@@ -13,7 +14,7 @@ export async function getAssignmentDetail(classId: string, assignmentId: string)
 
   const { data: assignment, error: assignmentError } = await supabase
     .from('assignments')
-    .select('id, title, description, due_date, points, submission_type, attachment_paths, is_group_project, created_by, created_at, rubrics(*), users:created_by(full_name), classes(name)')
+    .select('id, class_id, title, description, due_date, points, submission_type, attachment_paths, is_group_project, created_by, created_at, rubrics(*), users:created_by(full_name), classes(name)')
     .eq('id', assignmentId)
     .eq('class_id', classId)
     .maybeSingle()
@@ -32,24 +33,44 @@ export async function getAssignmentDetail(classId: string, assignmentId: string)
   const isTeacher = (member as { role: string }).role === 'teacher'
   const created_by = (assignment as { created_by: string }).created_by
 
-  // Get student's own submission
+  // Get student's own submission (supporting both individual and group projects)
+  const admin = createAdminClient()
   let submission = null
+
   if (!isTeacher) {
-    const { data: submissionData } = await supabase
-      .from('submissions')
-      .select('id, assignment_id, user_id, final_grade, status, feedback, group_id, submitted_at')
-      .eq('assignment_id', assignmentId)
+    // 1. Get user's group IDs for this class
+    const { data: memberGroups } = await admin
+      .from('project_members')
+      .select('project_id, group_projects!inner(class_id)')
       .eq('user_id', user.id)
-      .maybeSingle()
-    submission = submissionData
+      .eq('group_projects.class_id', classId)
+
+    const groupIds = (memberGroups || []).map((m: any) => m.project_id)
+
+    // 2. Query for ALL submissions for this assignment and filter in JS
+    const { data: allAssignmentSubmissions, error: subError } = await admin
+      .from('submissions')
+      .select('id, assignment_id, user_id, final_grade, status, teacher_feedback, ai_feedback, group_id, submitted_at, content, files')
+      .eq('assignment_id', assignmentId)
+      .order('submitted_at', { ascending: false })
+    
+    if (subError) console.error('[getAssignmentDetail] Sub Query Error:', subError)
+
+    // Find first submission matching user OR any of their groups
+    submission = allAssignmentSubmissions?.find(s => 
+      s.user_id === user.id || 
+      (s.group_id && groupIds.includes(s.group_id))
+    ) || null
   }
+
+  console.log(`[getAssignmentDetail] Fetching for ${assignment.title}: ${submission ? 'Turned in' : 'Assigned'}`)
 
   // Get all submissions for teacher
   let submissions = null
   if (isTeacher) {
     const { data: submissionsData } = await supabase
       .from('submissions')
-      .select('id, assignment_id, user_id, final_grade, status, feedback, group_id, submitted_at, users(full_name, email, avatar_url)')
+      .select('id, assignment_id, user_id, final_grade, status, teacher_feedback, group_id, submitted_at, users(full_name, email, avatar_url), group_projects(title, project_members(users(full_name, avatar_url)))')
       .eq('assignment_id', assignmentId)
       .order('submitted_at', { ascending: false })
     submissions = submissionsData
@@ -72,13 +93,38 @@ export async function getAssignmentsByClass(classId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { assignments: [], error: 'Unauthorized' }
 
+  // Fetch assignments with creator info and submission counts
   const { data, error } = await supabase
     .from('assignments')
-    .select('id, class_id, title, description, points, due_date, attachment_paths, created_at')
+    .select(`
+      id, 
+      class_id, 
+      title, 
+      description, 
+      points, 
+      due_date, 
+      attachment_paths, 
+      is_group_project,
+      created_at,
+      users:created_by(full_name, avatar_url),
+      submissions!left(id, user_id, group_id, status)
+    `)
     .eq('class_id', classId)
     .order('created_at', { ascending: false })
 
-  return { assignments: data || [], error: error?.message || null }
+  if (error) return { assignments: [], error: error.message }
+
+  // Post-process to get counts and personal status
+  const processed = (data || []).map((a: any) => {
+    const userSubmission = a.submissions?.find((s: any) => s.user_id === user.id)
+    return {
+      ...a,
+      submission_count: a.submissions?.length || 0,
+      user_submission: userSubmission || null
+    }
+  })
+
+  return { assignments: processed, error: null }
 }
 
 /**

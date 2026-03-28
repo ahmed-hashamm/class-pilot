@@ -1,11 +1,38 @@
 "use client";
 
-import { User, ClipboardList, Clock, Award, CheckCircle2, BookOpen, Users } from "lucide-react";
-import { format } from "date-fns";
+import { User, ClipboardList, Clock, Award, CheckCircle2, BookOpen, Users, AlertCircle } from "lucide-react";
+import { format, isPast } from "date-fns";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import { SubmissionsList } from "@/components/features/submissions";
 
-export function AssignmentHeader({ assignment, isTurnedIn }: { assignment: any; isTurnedIn?: boolean }) {
+export function AssignmentHeader({ 
+  assignment, 
+  isTeacher, 
+  isTurnedIn, 
+  isGraded 
+}: { 
+  assignment: any; 
+  isTeacher?: boolean; 
+  isTurnedIn?: boolean; 
+  isGraded?: boolean 
+}) {
+  const isExpired = assignment.due_date ? isPast(new Date(assignment.due_date)) : false;
+
+  const getStatus = () => {
+    // Teacher Specific Status
+    if (isTeacher) {
+      if (isExpired) return { label: "Ended", icon: AlertCircle, classes: "bg-red-50 text-red-700 border-red-200" };
+      return { label: "Active", icon: Clock, classes: "bg-green-50 text-green-700 border-green-200" };
+    }
+
+    // Student Status
+    if (isGraded) return { label: "Graded", classes: "bg-navy text-white border-navy" };
+    if (isTurnedIn) return { label: "Turned in", classes: "bg-green-50 text-green-700 border-green-200" };
+    return { label: "Assigned", classes: "bg-yellow/10 text-navy border-yellow/30" };
+  };
+
+  const status = getStatus();
+
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-center gap-4 min-w-0">
@@ -21,19 +48,19 @@ export function AssignmentHeader({ assignment, isTurnedIn }: { assignment: any; 
           </div>
         </div>
       </div>
-      
-      {isTurnedIn !== undefined && (
-        <span className={`shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider rounded-full px-4 py-1.5 border ${isTurnedIn ? "bg-green-50 text-green-700 border-green-200" : "bg-yellow/10 text-navy border-yellow/30"}`}>
-          {isTurnedIn ? <><CheckCircle2 size={13} /> Turned in</> : "Assigned"}
-        </span>
-      )}
+
+      <span className={`shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider rounded-full px-4 py-1.5 border ${status.classes}`}>
+        {isTeacher && status.icon && <status.icon size={13} />}
+        {(isGraded || isTurnedIn) && !isTeacher && <CheckCircle2 size={13} />} 
+        {status.label}
+      </span>
     </div>
   );
 }
 
 export function AssignmentInfo({ assignment, submission }: { assignment: any; submission?: any }) {
   const isGraded = submission?.status === 'graded';
-  
+
   return (
     <div className="flex flex-col gap-3">
       {isGraded && (
@@ -97,10 +124,12 @@ export function AssignmentInstructions({ assignment }: { assignment: any }) {
   );
 }
 
-export function StudentStatus({ isTurnedIn, onShowForm }: { isTurnedIn: boolean; onShowForm: () => void }) {
+export function StudentStatus({ isTurnedIn, isGraded, onShowForm }: { isTurnedIn: boolean; isGraded?: boolean; onShowForm: () => void }) {
+  if (isGraded) return null;
+
   return (
-    <button 
-      onClick={onShowForm} 
+    <button
+      onClick={onShowForm}
       className={`w-full inline-flex items-center justify-center gap-2 font-black text-[13px] py-3.5 rounded-xl border-2 transition-all cursor-pointer ${isTurnedIn ? "bg-navy text-white border-navy hover:bg-navy/90" : "bg-white text-navy border-navy hover:bg-navy hover:text-white"}`}
     >
       <BookOpen size={16} /> {isTurnedIn ? "Edit Submission" : "Add Submission"}
@@ -115,7 +144,7 @@ export function TeacherProgress({ submissions, assignment, classId }: any) {
         <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40">Classwork Overview</p>
         <span className="inline-flex items-center gap-1.5 text-[10px] font-black bg-navy/5 text-navy border border-navy/10 rounded-full px-3 py-1">{submissions?.length || 0} Submissions</span>
       </div>
-      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
+      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden min-h-[200px]">
         <SubmissionsList submissions={submissions} assignment={assignment} classId={classId} />
       </div>
     </div>
