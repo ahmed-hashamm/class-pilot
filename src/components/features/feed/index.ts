@@ -11,3 +11,4 @@ export { default as FeedList } from './FeedList';
 export { default as StatusBadge } from './StatusBadge';
 export { default as AttendanceBody } from './AttendanceBody';
 export { default as PollBody } from './PollBody';
+export * from './PinToggle'

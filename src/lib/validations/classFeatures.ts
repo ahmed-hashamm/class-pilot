@@ -6,6 +6,7 @@ export const createAttendanceSchema = z.object({
   date: z.string().min(1),
   title: z.string().optional(),
   deadline: z.string().optional(),
+  pinned: z.boolean().default(false),
 })
 export const markAttendancePresentSchema = z.object({
   attendanceId: z.string().min(1),
@@ -20,6 +21,7 @@ export const createPollSchema = z.object({
   question: z.string().min(1),
   options: z.array(z.string()).min(1),
   deadline: z.string().optional(),
+  pinned: z.boolean().default(false),
 })
 export const submitPollResponseSchema = z.object({
   pollId: z.string().min(1),

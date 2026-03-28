@@ -32,14 +32,16 @@ export const deleteAnnouncementSchema = z.object({
 export const ALLOWED_FILE_TYPES = ['pdf', 'docx', 'ppt', 'pptx']
 export const createMaterialSchema = z.object({
   classId: z.string().min(1),
-  title: z.string().optional(),
+  title: z.string().min(1),
   description: z.string().nullable().optional(),
+  pinned: z.boolean().default(false),
 })
 export const updateMaterialSchema = z.object({
   materialId: z.string().min(1),
   classId: z.string().min(1),
   title: z.string().min(1),
   description: z.string().nullable().optional(),
+  pinned: z.boolean().default(false),
 })
 export const deleteMaterialSchema = z.object({
   id: z.string().min(1),
@@ -56,6 +58,7 @@ export const createAssignmentSchema = z.object({
   submissionType: z.string().default('file'),
   rubricId: z.string().nullable().optional(),
   isGroupProject: z.boolean().default(false),
+  pinned: z.boolean().default(false),
 })
 
 export const updateAssignmentSchema = z.object({
@@ -68,6 +71,7 @@ export const updateAssignmentSchema = z.object({
   submissionType: z.string().default('file'),
   rubricId: z.string().nullable().optional(),
   isGroupProject: z.boolean().default(false),
+  pinned: z.boolean().default(false),
 })
 
 export const deleteAssignmentSchema = z.object({

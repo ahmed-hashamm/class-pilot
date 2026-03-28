@@ -21,7 +21,7 @@ export function FormSection({
   return (
     <div className={`space-y-2.5 ${className}`}>
       <div className="flex flex-col gap-0.5">
-        <Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/80 pl-0.5">
+        <Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground pl-0.5">
           {label}
         </Label>
         {description && (
@@ -30,7 +30,7 @@ export function FormSection({
           </p>
         )}
       </div>
-      
+
       <div className="relative">
         {children}
         {error && (

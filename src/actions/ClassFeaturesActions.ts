@@ -13,8 +13,8 @@ import {
 import { ClassFeaturesService } from '@/lib/services/classFeatures.service'
 
 
-export async function createAttendance(classId: string, date: string, title?: string, deadline?: string) {
-  const parsed = createAttendanceSchema.safeParse({ classId, date, title, deadline })
+export async function createAttendance(classId: string, date: string, title?: string, deadline?: string, pinned: boolean = false) {
+  const parsed = createAttendanceSchema.safeParse({ classId, date, title, deadline, pinned })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
   const supabase = await createClient()
@@ -30,7 +30,8 @@ export async function createAttendance(classId: string, date: string, title?: st
       date: parsed.data.date,
       title: parsed.data.title || null,
       deadline: parsed.data.deadline || null,
-      userId: user.id
+      userId: user.id,
+      pinned: parsed.data.pinned
     })
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { success: true, data: result }
@@ -88,8 +89,8 @@ export async function closeAttendance(attendanceId: string) {
 
 
 
-export async function createPoll(classId: string, question: string, options: string[], deadline?: string) {
-  const parsed = createPollSchema.safeParse({ classId, question, options, deadline })
+export async function createPoll(classId: string, question: string, options: string[], deadline?: string, pinned: boolean = false) {
+  const parsed = createPollSchema.safeParse({ classId, question, options, deadline, pinned })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
   const supabase = await createClient()
@@ -105,7 +106,8 @@ export async function createPoll(classId: string, question: string, options: str
       question: parsed.data.question,
       options: parsed.data.options,
       deadline: parsed.data.deadline || null,
-      userId: user.id
+      userId: user.id,
+      pinned: parsed.data.pinned
     })
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { success: true, data: result }

@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Plus, Timer, SendHorizontal, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { FeatureButton, FormSection } from '@/components/ui'
+import { PinToggle } from './PinToggle'
 
 interface PollInputProps {
   classId: string
@@ -17,6 +18,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
   const [question, setQuestion] = useState('')
   const [options, setOptions] = useState<string[]>(['', ''])
   const [deadline, setDeadline] = useState('')
+  const [isPinned, setIsPinned] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -33,7 +35,8 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         classId,
         question,
         validOptions,
-        deadline ? new Date(deadline).toISOString() : undefined
+        deadline ? new Date(deadline).toISOString() : undefined,
+        isPinned
       )
 
       if (result.success) {
@@ -41,6 +44,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         setQuestion('')
         setOptions(['', ''])
         setDeadline('')
+        setIsPinned(false)
         if (onSuccess) onSuccess()
         router.refresh()
       } else {
@@ -114,7 +118,25 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         </FormSection>
       </div>
 
-      <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-6">
+      <div className="flex items-center justify-between border-t border-border/40 pt-6">
+        <div className="flex items-center gap-3">
+          <PinToggle 
+            pinned={isPinned} 
+            onToggle={setIsPinned} 
+          />
+          {(question.trim() || options.some(o => o.trim()) || deadline) && (
+            <FeatureButton
+              label="Clear"
+              variant="ghost"
+              onClick={() => {
+                setQuestion('')
+                setOptions(['', ''])
+                setDeadline('')
+                setIsPinned(false)
+              }}
+            />
+          )}
+        </div>
         <FeatureButton
           label="Create Poll"
           icon={SendHorizontal}

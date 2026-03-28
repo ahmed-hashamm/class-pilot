@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight } from "lucide-react";
+import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users } from "lucide-react";
 import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 import { deleteAnnouncement, deleteAssignment, deleteMaterial } from "@/actions/ClassActions";
@@ -32,7 +32,7 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
 
   const isAssignment = item.type === "assignment";
   const isAnnouncement = item.type === "announcement";
-  const isPinned = isAnnouncement && item.pinned;
+  const isPinned = !!item.pinned;
 
   const theme = FEED_ITEM_THEMES[item.type] || FEED_ITEM_THEMES.announcement;
 
@@ -93,6 +93,11 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                 </h4>
                 <div className="flex items-center gap-1.5 shrink-0">
                   {isPinned && <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase bg-yellow/20 text-navy border border-yellow/40 rounded-full px-2 py-0.5"><Pin size={9} /> Pinned</span>}
+                  {item.is_group_project && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase bg-navy/5 text-navy border border-navy/10 rounded-full px-2 py-0.5">
+                      <Users size={9} /> Group
+                    </span>
+                  )}
                   <span className={`text-[10px] font-bold tracking-wide uppercase border rounded-full px-2.5 py-0.5 ${FEED_TYPE_PILLS[item.type]}`}>{FEED_TYPE_LABELS[item.type]}</span>
                   {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material") && (
                     <div className="relative">

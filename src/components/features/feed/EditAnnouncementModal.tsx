@@ -2,6 +2,7 @@
 
 import { X, Pin, Loader2, AlertCircle, FileText, Paperclip, UploadCloud } from 'lucide-react'
 import { useEditAnnouncement } from '@/lib/hooks'
+import { PinToggle } from './PinToggle'
 
 interface Props {
     announcement: {
@@ -157,18 +158,12 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                     </div>
 
                     {/* Pin toggle */}
-                    <button
-                        type="button"
-                        onClick={() => setIsPinned(!isPinned)}
-                        className={`inline-flex items-center gap-2.5 px-4 py-3 rounded-xl border
-              text-[13px] font-semibold transition cursor-pointer
-              ${isPinned
-                                ? 'bg-navy/8 border-navy/20 text-navy'
-                                : 'bg-white border-border text-muted-foreground hover:border-navy/20 hover:bg-secondary'
-                            }`}>
-                        <Pin size={14} className={isPinned ? 'fill-navy' : ''} />
-                        {isPinned ? 'Pinned to top' : 'Pin this announcement'}
-                    </button>
+                    <div className="pt-2">
+                        <PinToggle 
+                            pinned={isPinned} 
+                            onToggle={setIsPinned} 
+                        />
+                    </div>
                 </div>
 
                 {/* Footer */}

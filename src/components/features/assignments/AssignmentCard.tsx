@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { format } from "date-fns";
-import { ClipboardList, Award, Calendar, ArrowRight } from "lucide-react";
+import { ClipboardList, Award, Calendar, ArrowRight, Users } from "lucide-react";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
 
 interface AssignmentCardProps {
@@ -33,10 +33,19 @@ export default function AssignmentCard({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3 mb-1">
-          <h3 className="font-bold text-[15px] truncate transition-colors
-            group-hover:text-navy text-foreground">
-            {assignment.title}
-          </h3>
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="font-bold text-[15px] truncate transition-colors
+              group-hover:text-navy text-foreground">
+              {assignment.title}
+            </h3>
+            {assignment.is_group_project && (
+              <span className="shrink-0 inline-flex items-center gap-1
+                bg-navy/5 text-navy border border-navy/10
+                text-[10px] font-black uppercase tracking-wider rounded-full px-2 py-0.5">
+                <Users size={10} /> Group
+              </span>
+            )}
+          </div>
 
           {/* Points badge */}
           {assignment.points != null && (

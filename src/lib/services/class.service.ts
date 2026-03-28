@@ -198,6 +198,7 @@ export const ClassService = {
     userId: string
     attachmentPaths: string[]
     fileTypes: string[]
+    pinned: boolean
   }) {
     const supabase = await createClient()
     const { data: inserted, error } = await (supabase.from('materials') as any).insert({
@@ -207,6 +208,7 @@ export const ClassService = {
       created_by: data.userId,
       attachment_paths: data.attachmentPaths,
       file_types: data.fileTypes,
+      pinned: data.pinned,
     } as Database['public']['Tables']['materials']['Insert']).select('id').maybeSingle()
 
     if (error) throw error
@@ -220,6 +222,7 @@ export const ClassService = {
     description: string | null
     allPaths: string[]
     fileTypes: string[]
+    pinned: boolean
   }) {
     const supabase = await createClient()
     const { error } = await (supabase.from('materials') as any)
@@ -227,7 +230,8 @@ export const ClassService = {
         title: data.title, 
         description: data.description, 
         attachment_paths: data.allPaths, 
-        file_types: data.fileTypes 
+        file_types: data.fileTypes,
+        pinned: data.pinned,
       } as Database['public']['Tables']['materials']['Update'])
       .eq('id', data.materialId)
       .eq('class_id', data.classId)
@@ -295,6 +299,7 @@ export const ClassService = {
     rubricId: string | null
     attachmentPaths: string[]
     isGroupProject: boolean
+    pinned: boolean
   }) {
     const supabase = await createClient()
     const { data: inserted, error: dbError } = await (supabase
@@ -310,6 +315,7 @@ export const ClassService = {
         rubric_id: data.rubricId,
         attachment_paths: data.attachmentPaths,
         is_group_project: data.isGroupProject,
+        pinned: data.pinned,
       } as Database['public']['Tables']['assignments']['Insert'])
       .select()
       .maybeSingle()
@@ -329,6 +335,7 @@ export const ClassService = {
     rubricId: string | null
     isGroupProject: boolean
     allPaths: string[]
+    pinned: boolean
   }) {
     const supabase = await createClient()
     const { data: updated, error } = await (supabase.from('assignments') as any)
@@ -341,6 +348,7 @@ export const ClassService = {
         rubric_id: data.rubricId,
         is_group_project: data.isGroupProject,
         attachment_paths: data.allPaths,
+        pinned: data.pinned,
       } as Database['public']['Tables']['assignments']['Update'])
       .eq('id', data.assignmentId)
       .eq('class_id', data.classId)

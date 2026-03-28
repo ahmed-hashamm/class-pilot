@@ -84,8 +84,8 @@ export async function getStreamFeed(classId: string) {
 
   // Sort by pinned first, then by created_at descending
   combined.sort((a, b) => {
-    const aPinned = a.type === 'announcement' && (a as AnnouncementRow).pinned ? 1 : 0
-    const bPinned = b.type === 'announcement' && (b as AnnouncementRow).pinned ? 1 : 0
+    const aPinned = (a as any).pinned ? 1 : 0
+    const bPinned = (b as any).pinned ? 1 : 0
     if (aPinned !== bPinned) return bPinned - aPinned
     
     return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()

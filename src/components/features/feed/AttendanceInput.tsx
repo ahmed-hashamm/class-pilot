@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Calendar, Timer, SendHorizontal } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { FeatureButton, FormSection } from '@/components/ui'
+import { PinToggle } from './PinToggle'
 
 interface AttendanceInputProps {
   classId: string
@@ -17,6 +18,7 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
   const [topic, setTopic] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [deadline, setDeadline] = useState('')
+  const [isPinned, setIsPinned] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -32,13 +34,15 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
         classId,
         date,
         topic || undefined,
-        deadline ? new Date(deadline).toISOString() : undefined
+        deadline ? new Date(deadline).toISOString() : undefined,
+        isPinned
       )
 
       if (result.success) {
         toast.success('Attendance session created')
         setTopic('')
         setDeadline('')
+        setIsPinned(false)
         if (onSuccess) onSuccess()
         router.refresh()
       } else {
@@ -84,14 +88,31 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
                 value={deadline} 
                 onChange={(e) => setDeadline(e.target.value)} 
                 min={new Date().toISOString().slice(0, 16)}
-                className="pl-10 rounded-xl border-border bg-gray-50/50 py-6"
+                className="pl-10 rounded-xl border-border bg-gray-50/50 py-6 w-full"
               />
             </div>
           </FormSection>
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-6">
+      <div className="flex items-center justify-between border-t border-border/40 pt-6">
+        <div className="flex items-center gap-3">
+          <PinToggle 
+            pinned={isPinned} 
+            onToggle={setIsPinned} 
+          />
+          {(topic.trim() || deadline) && (
+            <FeatureButton
+              label="Clear"
+              variant="ghost"
+              onClick={() => {
+                setTopic('')
+                setDeadline('')
+                setIsPinned(false)
+              }}
+            />
+          )}
+        </div>
         <FeatureButton
           label="Create Session"
           icon={SendHorizontal}

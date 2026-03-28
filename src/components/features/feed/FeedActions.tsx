@@ -65,7 +65,7 @@ export default function FeedActions({ classId, userId, activeAction, setActiveAc
             className="overflow-hidden"
           >
             <CardContent className="p-6">
-              {activeAction === "announcement" && <AnnouncementInput classId={classId} userId={userId} />}
+              {activeAction === "announcement" && <AnnouncementInput classId={classId} userId={userId} onSuccess={() => setActiveAction("none")} />}
               {activeAction === "material" && <MaterialUpload classId={classId} userId={userId} onSuccess={() => setActiveAction("none")} />}
               {activeAction === "poll" && <PollInput classId={classId} onSuccess={() => setActiveAction("none")} />}
               {activeAction === "attendance" && <AttendanceInput classId={classId} onSuccess={() => setActiveAction("none")} />}

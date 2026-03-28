@@ -6,7 +6,16 @@ import { FormSection, FileChip } from "@/components/ui";
 const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3 text-[14px] text-foreground 
   focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy transition shadow-sm`;
 
-export function AssignmentBasics({ initialData }: { initialData?: any }) {
+interface AssignmentBasicsProps {
+  title: string;
+  setTitle: (v: string) => void;
+  description: string;
+  setDescription: (v: string) => void;
+}
+
+export function AssignmentBasics({ 
+  title, setTitle, description, setDescription 
+}: AssignmentBasicsProps) {
   return (
     <div className="flex flex-col gap-5">
       <FormSection label="Title" description="The primary name for this assignment">
@@ -16,7 +25,8 @@ export function AssignmentBasics({ initialData }: { initialData?: any }) {
             id="title" 
             name="title" 
             required 
-            defaultValue={initialData?.title || ""} 
+            value={title} 
+            onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Midterm Essay" 
             className={`${inputClass} pl-10`} 
           />
@@ -27,7 +37,8 @@ export function AssignmentBasics({ initialData }: { initialData?: any }) {
         <textarea 
           id="description" 
           name="description" 
-          defaultValue={initialData?.description || ""} 
+          value={description} 
+          onChange={(e) => setDescription(e.target.value)}
           placeholder="Detailed instructions..." 
           rows={6} 
           className={`${inputClass} resize-none py-4`} 

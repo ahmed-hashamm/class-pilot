@@ -74,6 +74,7 @@ export interface Database {
           id: string
           is_group_project: boolean | null
           points: number
+          pinned: boolean | null
           rubric_id: string | null
           submission_type: string | null
           title: string
@@ -89,6 +90,7 @@ export interface Database {
           id?: string
           is_group_project?: boolean | null
           points?: number
+          pinned?: boolean | null
           rubric_id?: string | null
           submission_type?: string | null
           title: string
@@ -104,6 +106,7 @@ export interface Database {
           id?: string
           is_group_project?: boolean | null
           points?: number
+          pinned?: boolean | null
           rubric_id?: string | null
           submission_type?: string | null
           title?: string
@@ -181,6 +184,7 @@ export interface Database {
           date: string
           deadline: string | null
           id: string
+          pinned: boolean | null
           title: string | null
           updated_at: string | null
         }
@@ -192,6 +196,7 @@ export interface Database {
           date: string
           deadline?: string | null
           id?: string
+          pinned?: boolean | null
           title?: string | null
           updated_at?: string | null
         }
@@ -203,6 +208,7 @@ export interface Database {
           date?: string
           deadline?: string | null
           id?: string
+          pinned?: boolean | null
           title?: string | null
           updated_at?: string | null
         }
@@ -440,6 +446,7 @@ export interface Database {
           description: string | null
           file_types: string[] | null
           id: string
+          pinned: boolean | null
           title: string
           updated_at: string | null
         }
@@ -451,6 +458,7 @@ export interface Database {
           description?: string | null
           file_types?: string[] | null
           id?: string
+          pinned?: boolean | null
           title: string
           updated_at?: string | null
         }
@@ -462,6 +470,7 @@ export interface Database {
           description?: string | null
           file_types?: string[] | null
           id?: string
+          pinned?: boolean | null
           title?: string
           updated_at?: string | null
         }
@@ -529,6 +538,7 @@ export interface Database {
           created_by: string
           deadline: string | null
           id: string
+          pinned: boolean | null
           options: Json
           question: string
           updated_at: string | null
@@ -540,6 +550,7 @@ export interface Database {
           created_by: string
           deadline?: string | null
           id?: string
+          pinned?: boolean | null
           options: Json
           question: string
           updated_at?: string | null
@@ -551,6 +562,7 @@ export interface Database {
           created_by?: string
           deadline?: string | null
           id?: string
+          pinned?: boolean | null
           options?: Json
           question?: string
           updated_at?: string | null

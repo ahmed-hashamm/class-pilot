@@ -226,8 +226,9 @@ export async function createMaterial(formData: FormData) {
   const classId = formData.get('classId') as string
   const title = formData.get('title') as string || 'Class Material'
   const description = formData.get('description') as string || null
+  const pinned = formData.get('pinned') === 'true'
 
-  const parsed = createMaterialSchema.safeParse({ classId, title, description })
+  const parsed = createMaterialSchema.safeParse({ classId, title, description, pinned })
   if (!parsed.success) throw new Error("Invalid input")
 
   const files = formData.getAll('files') as File[]
@@ -249,6 +250,7 @@ export async function createMaterial(formData: FormData) {
     userId: user.id,
     attachmentPaths,
     fileTypes,
+    pinned: parsed.data.pinned,
   })
 
   revalidatePath(`/classes/${parsed.data.classId}`)
@@ -266,8 +268,9 @@ export async function updateMaterial(formData: FormData) {
   const classId = formData.get('classId') as string
   const title = formData.get('title') as string
   const description = formData.get('description') as string || null
+  const pinned = formData.get('pinned') === 'true'
 
-  const parsed = updateMaterialSchema.safeParse({ materialId, classId, title, description })
+  const parsed = updateMaterialSchema.safeParse({ materialId, classId, title, description, pinned })
   if (!parsed.success) throw new Error("Invalid input")
 
   // Upload any newly added files
@@ -302,6 +305,7 @@ export async function updateMaterial(formData: FormData) {
     description: parsed.data.description ?? null,
     allPaths,
     fileTypes,
+    pinned: parsed.data.pinned,
   })
 
   revalidatePath(`/classes/${parsed.data.classId}`)
@@ -342,8 +346,9 @@ export async function createAssignment(formData: FormData) {
   const submissionType = (formData.get('submissionType') as string) || 'file'
   const rubricId = (formData.get('rubricId') as string) || null
   const isGroupProject = formData.get('isGroupProject') === 'true'
+  const pinned = formData.get('pinned') === 'true'
 
-  const parsed = createAssignmentSchema.safeParse({ classId, title, description, dueDate, points, submissionType, rubricId, isGroupProject })
+  const parsed = createAssignmentSchema.safeParse({ classId, title, description, dueDate, points, submissionType, rubricId, isGroupProject, pinned })
   if (!parsed.success) throw new Error("Invalid input")
 
   const files = formData.getAll('files') as File[]
@@ -361,6 +366,7 @@ export async function createAssignment(formData: FormData) {
       rubricId: parsed.data.rubricId ?? null,
       attachmentPaths,
       isGroupProject: parsed.data.isGroupProject,
+      pinned: parsed.data.pinned,
     })
 
     revalidatePath(`/classes/${parsed.data.classId}`)
@@ -386,8 +392,9 @@ export async function updateAssignment(formData: FormData) {
   const submissionType = (formData.get('submissionType') as string) || 'file'
   const rubricId = (formData.get('rubricId') as string) || null
   const isGroupProject = formData.get('isGroupProject') === 'true'
+  const pinned = formData.get('pinned') === 'true'
 
-  const parsed = updateAssignmentSchema.safeParse({ assignmentId, classId, title, description, dueDate, points, submissionType, rubricId, isGroupProject })
+  const parsed = updateAssignmentSchema.safeParse({ assignmentId, classId, title, description, dueDate, points, submissionType, rubricId, isGroupProject, pinned })
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
   try {
@@ -424,6 +431,7 @@ export async function updateAssignment(formData: FormData) {
       rubricId: parsed.data.rubricId ?? null,
       isGroupProject: parsed.data.isGroupProject,
       allPaths,
+      pinned: parsed.data.pinned,
     })
 
     revalidatePath(`/classes/${parsed.data.classId}`)

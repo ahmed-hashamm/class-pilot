@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from "sonner"
 import { FeatureButton, FileChip, FormSection } from '@/components/ui'
+import { PinToggle } from './PinToggle'
 
 import { ALLOWED_FILE_TYPES } from "@/lib/data/materials";
 
@@ -20,6 +21,7 @@ export default function MaterialUpload({
   const [loading, setLoading] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [isPinned, setIsPinned] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -45,6 +47,7 @@ export default function MaterialUpload({
     formData.append('description', description)
     formData.append('classId', classId)
     formData.append('userId', userId)
+    formData.append('pinned', String(isPinned))
     files.forEach((f) => formData.append('files', f))
 
     try {
@@ -79,6 +82,7 @@ export default function MaterialUpload({
 
   const resetForm = () => {
     setTitle(''); setDescription(''); setFiles([])
+    setIsPinned(false)
   }
 
   const hasContent = title.trim() || description.trim() || files.length > 0
@@ -103,54 +107,59 @@ export default function MaterialUpload({
             className="min-h-[100px] rounded-xl border-border bg-gray-50/50 resize-none p-4"
           />
         </FormSection>
+
+        <FormSection label="Files" description="PDF, DOCX, PPT, PPTX files only">
+          <div className="flex flex-col gap-4">
+            <label className="relative flex flex-col items-center justify-center gap-2 
+              border-2 border-dashed border-border/60 rounded-2xl py-10 cursor-pointer
+              hover:border-navy/30 hover:bg-navy/5 transition-all bg-gray-50/30 group">
+              <div className="size-12 rounded-full bg-navy/5 flex items-center justify-center text-navy group-hover:scale-110 transition">
+                <UploadCloud size={24} />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-bold text-foreground">Click or drag to upload</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Select files from your device</p>
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                multiple 
+                className="hidden" 
+                onChange={handleFileChange} 
+              />
+            </label>
+
+            {files.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-3">
+                {files.map((file, i) => (
+                  <FileChip
+                    key={i}
+                    name={file.name}
+                    onRemove={() => setFiles(files.filter((_, idx) => idx !== i))}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </FormSection>
       </div>
 
-      <FormSection label="Files" description="PDF, DOCX, PPT, PPTX files only">
-        <div 
-          onClick={() => fileInputRef.current?.click()}
-          className="relative flex flex-col items-center justify-center gap-3
-          border-2 border-dashed border-border/60 rounded-2xl py-10 cursor-pointer
-          hover:border-navy/30 hover:bg-navy/5 transition-all bg-gray-50/30 group"
-        >
-          <div className="size-12 rounded-full bg-navy/5 flex items-center justify-center text-navy group-hover:scale-110 transition">
-            <UploadCloud size={24} />
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-bold text-foreground">Click or drag to upload</p>
-            <p className="text-[11px] text-muted-foreground mt-1">Select files from your device</p>
-          </div>
-          <input 
-            type="file" 
-            ref={fileInputRef}
-            multiple 
-            className="hidden" 
-            onChange={handleFileChange} 
+      <div className="flex items-center justify-between border-t border-border/40 pt-6">
+        <div className="flex items-center gap-3">
+          <PinToggle 
+            pinned={isPinned} 
+            onToggle={setIsPinned} 
           />
+          {hasContent && (
+            <FeatureButton
+              variant="ghost"
+              label="Clear"
+              onClick={resetForm}
+            />
+          )}
         </div>
-
-        {files.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-3">
-            {files.map((file, i) => (
-              <FileChip
-                key={i}
-                name={file.name}
-                onRemove={() => setFiles(files.filter((_, idx) => idx !== i))}
-              />
-            ))}
-          </div>
-        )}
-      </FormSection>
-
-      <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-6">
-        {hasContent && (
-          <FeatureButton
-            variant="ghost"
-            label="Clear everything"
-            onClick={resetForm}
-          />
-        )}
         <FeatureButton
-          label="Upload materials"
+          label="Upload Materials"
           icon={SendHorizontal}
           loading={loading}
           disabled={files.length === 0}

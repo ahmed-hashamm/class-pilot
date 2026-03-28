@@ -8,7 +8,7 @@ type Poll = Database['public']['Tables']['polls']['Row']
 type PollResponse = Database['public']['Tables']['poll_responses']['Row']
 
 export const ClassFeaturesService = {
-  async createAttendance(data: { classId: string; date: string; title: string | null; deadline: string | null; userId: string }) {
+  async createAttendance(data: { classId: string; date: string; title: string | null; deadline: string | null; userId: string; pinned: boolean }) {
     const supabase = (await createClient()) as unknown as SupabaseClient<Database>
     const { data: result, error } = await (supabase
       .from('attendances') as any)
@@ -17,7 +17,8 @@ export const ClassFeaturesService = {
         date: data.date,
         title: data.title,
         deadline: data.deadline,
-        created_by: data.userId
+        created_by: data.userId,
+        pinned: data.pinned
       } as Database['public']['Tables']['attendances']['Insert'])
       .select()
       .maybeSingle()
@@ -71,7 +72,7 @@ export const ClassFeaturesService = {
     return (att as Attendance | null)?.class_id
   },
 
-  async createPoll(data: { classId: string; question: string; options: string[]; deadline: string | null; userId: string }) {
+  async createPoll(data: { classId: string; question: string; options: string[]; deadline: string | null; userId: string; pinned: boolean }) {
     const supabase = await createClient()
     const { data: result, error } = await (supabase
       .from('polls') as any)
@@ -80,7 +81,8 @@ export const ClassFeaturesService = {
         question: data.question,
         options: data.options,
         deadline: data.deadline,
-        created_by: data.userId
+        created_by: data.userId,
+        pinned: data.pinned
       } as Database['public']['Tables']['polls']['Insert'])
       .select()
       .maybeSingle()
