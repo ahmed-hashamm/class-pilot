@@ -23,8 +23,8 @@ export default function AssignmentDetail({
   const isTurnedIn = !!submission;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="max-w-5xl mx-auto p-6 flex flex-col gap-6 h-full max-h-screen overflow-hidden">
+      <div className="flex items-center justify-between shrink-0">
         <button onClick={() => router.push(`/classes/${classId}?tab=${fromTab}`)} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-navy transition-colors cursor-pointer bg-transparent border-none w-fit"><ArrowLeft size={15} /> Back to Class</button>
         {isTeacher && (
           <div className="flex items-center gap-2">
@@ -45,12 +45,27 @@ export default function AssignmentDetail({
         isLoading={isDeleting}
       />
 
-      <AssignmentHeader assignment={assignment} />
+      <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0 overflow-hidden">
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2 min-w-0">
+          <AssignmentHeader assignment={assignment} isTurnedIn={isTurnedIn} />
+          <AssignmentInstructions assignment={assignment} />
+          {isTeacher && <TeacherProgress submissions={submissions} assignment={assignment} classId={classId} />}
+        </div>
 
-      <div className="flex flex-col gap-8">
-        <AssignmentInfo assignment={assignment} />
-        <AssignmentInstructions assignment={assignment} />
-        {isTeacher ? <TeacherProgress submissions={submissions} assignment={assignment} classId={classId} /> : <StudentStatus isTurnedIn={isTurnedIn} isGraded={isGraded} submission={submission} assignment={assignment} onShowForm={() => setShowSubmissionForm(true)} />}
+        {/* Sidebar Controls */}
+        <div className="w-full lg:w-80 shrink-0 flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar pt-1">
+          <div className="flex flex-col gap-6">
+            <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Configuration & Status</p>
+            {!isTeacher && (
+              <StudentStatus 
+                isTurnedIn={isTurnedIn} 
+                onShowForm={() => setShowSubmissionForm(true)} 
+              />
+            )}
+            <AssignmentInfo assignment={assignment} submission={submission} />
+          </div>
+        </div>
       </div>
 
       {showSubmissionForm && (
