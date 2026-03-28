@@ -25,7 +25,7 @@ export default function ClassCodeCard({
 
   return (
     <SidebarCard title="Class Code">
-      {isCodeHidden ? (
+      {isCodeHidden && !isTeacher ? (
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Lock size={13} className="shrink-0" />
@@ -59,24 +59,26 @@ export default function ClassCodeCard({
             </button>
           </div>
 
-          {isTeacher && isCodeHidden && (
-            <div className="flex items-center gap-2 bg-yellow/15 border
-              border-yellow/40 rounded-lg px-3 py-2">
-              <EyeOff size={12} className="text-navy shrink-0" />
-              <p className="text-[11px] font-semibold text-navy">
-                Hidden from students
-              </p>
-            </div>
-          )}
-
-          {isTeacher && !isCodeHidden && (
-            <div className="flex items-center gap-2 bg-secondary border
-              border-border rounded-lg px-3 py-2">
-              <Eye size={12} className="text-muted-foreground shrink-0" />
-              <p className="text-[11px] font-medium text-muted-foreground">
-                Visible to students
-              </p>
-            </div>
+          {isTeacher && (
+            isCodeHidden ? (
+              <div className="flex items-center gap-2 bg-yellow/15 border
+                border-yellow/40 rounded-lg px-3 py-2">
+                <span className="size-1.5 rounded-full bg-yellow animate-pulse" />
+                <EyeOff size={11} className="text-navy shrink-0" />
+                <p className="text-[11px] font-bold text-navy">
+                  Hidden from students
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 bg-emerald-50 border
+                border-emerald-100 rounded-lg px-3 py-2">
+                <span className="size-1.5 rounded-full bg-emerald-500" />
+                <Eye size={11} className="text-emerald-600 shrink-0" />
+                <p className="text-[11px] font-bold text-emerald-600">
+                  Visible to students
+                </p>
+              </div>
+            )
           )}
         </div>
       )}

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { Database } from "@/types/database.utf8"
 
 type Announcement = Database['public']['Tables']['announcements']['Row']
@@ -234,14 +235,53 @@ export const ClassService = {
     if (error) throw new Error(error.message)
   },
 
-  async deleteMaterial(id: string, classId: string) {
+  async deleteMaterial(id: string, userId: string) {
     const supabase = await createClient()
-    const { error } = await supabase.from('materials')
+
+    // 1. Get material to find its class_id and creator
+    const { data: material } = await supabase
+      .from('materials')
+      .select('class_id, created_by')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (!material) throw new Error("Material not found")
+
+    // 2. Check authorization: creator OR teacher/owner of class
+    const { data: member } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', material.class_id)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', material.class_id)
+      .maybeSingle()
+
+    const isAuthorized = 
+      material.created_by === userId || 
+      member?.role === 'teacher' || 
+      classData?.created_by === userId
+
+    if (!isAuthorized) {
+      throw new Error("You do not have permission to delete this material")
+    }
+
+    // 3. Delete the material (using admin client to bypass RLS, authorized by service layer)
+    const admin = createAdminClient()
+    const { error, data: deletedItems } = await admin
+      .from('materials')
       .delete()
       .eq('id', id)
-      .eq('class_id', classId)
+      .select()
 
     if (error) throw new Error(error.message)
+    if (!deletedItems || deletedItems.length === 0) {
+      throw new Error("Deletion failed. The record might still exist due to database constraints.")
+    }
   },
 
   async createAssignment(data: {
@@ -313,14 +353,60 @@ export const ClassService = {
     return { id: updated[0].id }
   },
 
-  async deleteAssignment(id: string, classId: string) {
+  async deleteAssignment(id: string, userId: string) {
     const supabase = await createClient()
-    const { error } = await supabase.from('assignments')
+
+    // 1. Get assignment to find its class_id and creator
+    const { data: assignment } = await supabase
+      .from('assignments')
+      .select('class_id, created_by')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (!assignment) throw new Error("Assignment not found")
+
+    // 2. Check authorization: creator OR teacher/owner of class
+    const { data: member } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', assignment.class_id)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', assignment.class_id)
+      .maybeSingle()
+
+    const isAuthorized = 
+      assignment.created_by === userId || 
+      member?.role === 'teacher' || 
+      classData?.created_by === userId
+
+    if (!isAuthorized) {
+      throw new Error("You do not have permission to delete this assignment")
+    }
+
+    // 3. Delete related submissions (using admin client to bypass RLS, authorized by service layer)
+    const admin = createAdminClient()
+    const { error: subError } = await (admin.from('submissions') as any)
+      .delete()
+      .eq('assignment_id', id)
+
+    if (subError) throw new Error(`Failed to delete related submissions: ${subError.message}`)
+
+    // 4. Delete the assignment
+    const { error, data: deletedItems } = await admin
+      .from('assignments')
       .delete()
       .eq('id', id)
-      .eq('class_id', classId)
+      .select()
 
     if (error) throw new Error(error.message)
+    if (!deletedItems || deletedItems.length === 0) {
+      throw new Error("Deletion failed. The record might still exist due to database constraints.")
+    }
   },
 
   async submitAssignment(data: {
@@ -415,5 +501,60 @@ export const ClassService = {
 
     if (error || !data) return 'Class'
     return (data as any).name
+  },
+
+  async deleteClass(classId: string, userId: string) {
+    const supabase = await createClient()
+
+    // 1. Verify ownership (only the creator can delete)
+    const { data: classData, error: fetchError } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', classId)
+      .maybeSingle()
+
+    if (fetchError || !classData) throw new Error("Class not found")
+    if (classData.created_by !== userId) {
+      throw new Error("You do not have permission to delete this class")
+    }
+
+    // 2. Delete the class (CASCADE should handle the rest)
+    const { error: deleteError } = await supabase
+      .from('classes')
+      .delete()
+      .eq('id', classId)
+
+    if (deleteError) throw new Error(deleteError.message)
+  },
+
+  async updateClassSettings(data: {
+    classId: string,
+    name: string,
+    description: string,
+    settings: any,
+    userId: string
+  }) {
+    const supabase = await createClient()
+    
+    // Ownership check
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', data.classId)
+      .maybeSingle()
+
+    if (!classData || classData.created_by !== data.userId) {
+      throw new Error("Unauthorized to update class settings")
+    }
+
+    const { error } = await (supabase.from('classes') as any)
+      .update({
+        name: data.name,
+        description: data.description,
+        settings: data.settings
+      })
+      .eq('id', data.classId)
+
+    if (error) throw error
   }
 }

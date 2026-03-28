@@ -1,40 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import { SubmissionForm } from "@/components/features/submissions";
 import {
   AssignmentHeader, AssignmentInfo, AssignmentInstructions,
   StudentStatus, TeacherProgress
 } from "./AssignmentDetailComponents";
 import { ConfirmModal } from "@/components/ui";
+import { useAssignmentDetail } from "@/lib/hooks";
 
 export default function AssignmentDetail({
   assignment, isTeacher, submission, submissions, classId,
 }: any) {
-  const [showSubmissionForm, setShowSubmissionForm] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const fromTab = searchParams.get("from") || "stream";
+  const {
+    showSubmissionForm, setShowSubmissionForm,
+    showDeleteConfirm, setShowDeleteConfirm,
+    isDeleting, handleDelete,
+    fromTab, router
+  } = useAssignmentDetail(assignment, classId);
 
   const isGraded = submission?.status === "graded";
   const isTurnedIn = !!submission;
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    const { deleteAssignment } = await import("@/actions/ClassActions");
-    try {
-      await deleteAssignment(assignment.id, classId);
-      setShowDeleteConfirm(false);
-      toast.success("Assignment deleted");
-      router.push(`/classes/${classId}?tab=${fromTab}`);
-    } catch { toast.error("Failed to delete assignment"); }
-    finally { setIsDeleting(false); }
-  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8">

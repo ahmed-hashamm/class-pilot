@@ -12,7 +12,7 @@ export function AssignmentHeader({ assignment }: { assignment: any }) {
         <ClipboardList size={22} />
       </div>
       <div className="flex-1 min-w-0">
-        <h1 className="font-black text-[24px] tracking-tight leading-tight text-foreground">{assignment.title}</h1>
+        <h1 className="font-black text-[24px] tracking-tight leading-tight text-foreground break-words">{assignment.title}</h1>
         <div className="flex flex-wrap items-center gap-3 mt-1 text-[13px] text-muted-foreground font-medium">
           <span className="flex items-center gap-1.5"><User size={13} className="text-navy/60" />{assignment.users?.full_name || "Instructor"}</span>
           <span className="text-border">·</span>
@@ -55,8 +55,8 @@ export function AssignmentInstructions({ assignment }: { assignment: any }) {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <p className="text-[11px] font-bold uppercase tracking-[.18em] text-navy/60">Instructions</p>
-        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
-          <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/80">{assignment.description || assignment.content || "No instructions provided."}</p>
+        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm overflow-hidden">
+          <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-foreground/80">{assignment.description || assignment.content || "No instructions provided."}</p>
         </div>
       </div>
       {attachments.length > 0 && (

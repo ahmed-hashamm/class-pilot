@@ -14,4 +14,5 @@ export * from './PageHeader';
 export * from './SkeletonLoader';
 export * from './tabs';
 export * from './textarea';
+export * from './select';
 export * from './ConfirmModal';

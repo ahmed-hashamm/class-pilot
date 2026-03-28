@@ -33,7 +33,7 @@ export default function StreamView({
     },
   });
 
-  const isCodeHidden = settings?.showClassCode === false && !isTeacher;
+  const isCodeHidden = settings?.showClassCode === false;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full mx-auto py-4">

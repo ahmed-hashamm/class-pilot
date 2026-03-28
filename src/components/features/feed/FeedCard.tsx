@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight } from "lucide-react";
 import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
-import { deleteAnnouncement } from "@/actions/ClassActions";
+import { deleteAnnouncement, deleteAssignment, deleteMaterial } from "@/actions/ClassActions";
 import EditAnnouncementModal from "@/components/features/feed/EditAnnouncementModal";
 import { 
   FEED_TYPE_LABELS, 
@@ -22,11 +23,12 @@ interface FeedCardProps {
   children?: React.ReactNode;
 }
 
-export default function FeedCard({ item, classId, userId, isTeacher, children }: FeedCardProps) {
+const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const queryClient = useQueryClient();
 
   const isAssignment = item.type === "assignment";
   const isAnnouncement = item.type === "announcement";
@@ -44,10 +46,20 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      await deleteAnnouncement(item.id, classId);
+      if (item.type === "announcement") {
+        await deleteAnnouncement(item.id, classId);
+      } else if (item.type === "assignment") {
+        await deleteAssignment(item.id, classId);
+        await queryClient.invalidateQueries({ queryKey: ["classAssignments", classId] });
+      } else if (item.type === "material") {
+        await deleteMaterial(item.id, classId);
+        await queryClient.invalidateQueries({ queryKey: ["classMaterials", classId] });
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
       setShowDeleteConfirm(false);
     } catch {
-      alert("Failed to delete announcement");
+      alert(`Failed to delete ${item.type}`);
     } finally {
       setDeleting(false);
     }
@@ -76,22 +88,24 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
 
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h4 className="font-bold text-[14px] text-foreground leading-snug truncate">
+                <h4 className="font-bold text-[14px] text-foreground leading-snug break-words">
                   {item.title || item.question || (item.type === "material" ? "Class Material" : "Post")}
                 </h4>
                 <div className="flex items-center gap-1.5 shrink-0">
                   {isPinned && <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase bg-yellow/20 text-navy border border-yellow/40 rounded-full px-2 py-0.5"><Pin size={9} /> Pinned</span>}
                   <span className={`text-[10px] font-bold tracking-wide uppercase border rounded-full px-2.5 py-0.5 ${FEED_TYPE_PILLS[item.type]}`}>{FEED_TYPE_LABELS[item.type]}</span>
-                  {isTeacher && isAnnouncement && (
+                  {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material") && (
                     <div className="relative">
                       <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all cursor-pointer bg-transparent border-none"><MoreVertical size={14} /></button>
                       {menuOpen && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                           <div className="absolute right-0 top-8 z-50 bg-white border border-border rounded-xl shadow-lg overflow-hidden min-w-[140px]">
-                            <button onClick={() => { setMenuOpen(false); setEditOpen(true); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
-                              <Pencil size={13} className="text-navy" /> Edit
-                            </button>
+                            {item.type === "announcement" && (
+                              <button onClick={() => { setMenuOpen(false); setEditOpen(true); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
+                                <Pencil size={13} className="text-navy" /> Edit
+                              </button>
+                            )}
                             <button onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} disabled={deleting} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
                               <Trash2 size={13} /> Delete
                             </button>
@@ -140,3 +154,5 @@ export default function FeedCard({ item, classId, userId, isTeacher, children }:
     </>
   );
 }
+
+export default FeedCard;

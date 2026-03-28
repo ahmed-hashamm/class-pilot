@@ -35,7 +35,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 h-14 bg-navy text-primary-foreground mb-[1px]">
       <div className="w-full max-w-[1600px] mx-auto h-full flex items-center justify-between px-8 md:px-12 lg:px-16">
         {/* Logo */}
-        <Link href="/" className="flex items-center group">
+        <Link href="/" className="flex items-center group text-white decoration-0 no-underline">
           <div className="relative w-12 h-12">
             <Image
               src="/logo.png"
@@ -47,20 +47,6 @@ const Navbar = () => {
           </div>
           <p className="text-xl font-bold tracking-tight">Class <span className="text-navy-light">Pilot</span></p>
         </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {MARKETING_NAV_LINKS.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="flex items-center gap-1 cursor-pointer hover:text-accent transition-colors"
-            >
-              <span>{item.label}</span>
-              <ChevronDown size={16} />
-            </Link>
-          ))}
-        </nav>
 
         {/* Right Section */}
         <div className="flex items-center gap-4 relative">

@@ -53,6 +53,12 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
       // Handle INSERT/UPDATE by refetching the specific row to get joined relationships (users, etc.)
       try {
         const queryTable = itemType === 'poll' ? 'polls' : itemType === 'attendance' ? 'attendances' : table
+        
+        // Manual filter: if inserting/updating, check class_id
+        if (eventType !== 'DELETE' && newRec && newRec.class_id && newRec.class_id !== classId) {
+          return
+        }
+
         let query = supabase.from(queryTable as any).select('*')
 
         if (itemType === 'announcement' || itemType === 'assignment') {
@@ -95,12 +101,12 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
 
     const channel = supabase
       .channel(`stream_feed_${classId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements', filter: `class_id=eq.${classId}` }, handlePayload)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'assignments', filter: `class_id=eq.${classId}` }, handlePayload)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'materials', filter: `class_id=eq.${classId}` }, handlePayload)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'polls', filter: `class_id=eq.${classId}` }, handlePayload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, handlePayload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'assignments' }, handlePayload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'materials' }, handlePayload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'polls' }, handlePayload)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'poll_responses' }, handlePayload)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendances', filter: `class_id=eq.${classId}` }, handlePayload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendances' }, handlePayload)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_records' }, handlePayload)
       .subscribe()
 

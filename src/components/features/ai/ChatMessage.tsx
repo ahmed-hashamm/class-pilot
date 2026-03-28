@@ -15,7 +15,7 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
             : 'bg-secondary text-foreground border border-border rounded-bl-md'
           }`}
       >
-        <div className="whitespace-pre-wrap">{content}</div>
+        <div className="whitespace-pre-wrap break-words">{content}</div>
       </div>
     </div>
   )

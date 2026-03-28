@@ -4,6 +4,7 @@ import { useState } from "react";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
 import { useReveal } from "@/lib/hooks/useReveal";
 import { sendContactForm, ContactFormState } from "@/actions/ContactActions";
+import { Select } from "@/components/ui";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    CONSTANTS
@@ -187,14 +188,14 @@ export default function ContactPage() {
                                 {/* Type + Subject */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <Field label="Type">
-                                        <select
+                                        <Select
                                             value={type}
                                             onChange={(e) => setType(e.target.value)}
-                                            className={`${inputClass("type")} cursor-pointer`}>
+                                        >
                                             {MESSAGE_TYPES.map((t) => (
                                                 <option key={t} value={t}>{t}</option>
                                             ))}
-                                        </select>
+                                        </Select>
                                     </Field>
                                     <Field label="Subject">
                                         <input

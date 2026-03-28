@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Lock, Clock } from "lucide-react";
-import { submitPollResponse, closePoll } from "@/actions/ClassFeaturesActions";
+import { usePoll } from "@/lib/hooks";
+import { formatTime } from "@/lib/utils/time";
 import { ConfirmModal } from "@/components/ui";
 
 export default function PollBody({ 
@@ -20,44 +18,19 @@ export default function PollBody({
   isActive: boolean;
   remaining: number;
 }) {
-  const [closing, setClosing] = useState(false);
-  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
-  const router = useRouter();
-
-  const formatTime = (seconds: number) => {
-    if (seconds === Infinity) return "";
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const handleClose = async () => {
-    setClosing(true);
-    try {
-      const res = await closePoll(item.id);
-      if (!res.success) toast.error(res.error || "Failed to close poll");
-      else { 
-        toast.success("Poll closed successfully"); 
-        setShowCloseConfirm(false);
-        router.refresh(); 
-      }
-    } finally { setClosing(false); }
-  };
-
-  const handleVote = async (idx: number) => {
-    const res = await submitPollResponse(item.id, idx);
-    if (!res.success) toast.error(res.error || "Could not submit vote");
-    else { toast.success("Vote submitted successfully"); router.refresh(); }
-  };
+  const {
+    closing,
+    showCloseConfirm,
+    setShowCloseConfirm,
+    handleClose,
+    handleVote,
+    calculateResults
+  } = usePoll({ item, userId });
 
   return (
     <div className="pl-[48px] flex flex-col gap-2">
       {item.options.map((opt: string, idx: number) => {
-        const totalVotes = item.poll_responses?.length || 0;
-        const optionVotes = item.poll_responses?.filter((r: any) => r.selected_option_index === idx).length || 0;
-        const percent = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
-        const hasVoted = item.poll_responses?.some((r: any) => r.user_id === userId);
-        const isMyVote = item.poll_responses?.some((r: any) => r.user_id === userId && r.selected_option_index === idx);
+        const { percent, hasVoted, isMyVote } = calculateResults(idx);
 
         if (hasVoted || isTeacher || !isActive) {
           return (

@@ -22,9 +22,54 @@ import {
   removeGroupMemberSchema,
   deleteGroupSchema,
   getClassNameSchema,
+  deleteClassSchema,
+  updateClassSettingsSchema,
   ALLOWED_FILE_TYPES,
 } from "@/lib/validations/class"
 import { ClassService, Note } from "@/lib/services/class.service"
+
+// ... existing code ...
+
+/* ---------------- DELETE CLASS ---------------- */
+
+export async function deleteClass(classId: string) {
+  const parsed = deleteClassSchema.safeParse({ classId })
+  if (!parsed.success) return { data: null, error: "Invalid input" }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: "Unauthorized" }
+
+  try {
+    await ClassService.deleteClass(parsed.data.classId, user.id)
+    revalidatePath('/dashboard')
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to delete class" }
+  }
+}
+
+export async function updateClassSettings(payload: any) {
+  const parsed = updateClassSettingsSchema.safeParse(payload)
+  if (!parsed.success) return { data: null, error: "Invalid input" }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: "Unauthorized" }
+
+  try {
+    await ClassService.updateClassSettings({
+      ...parsed.data,
+      description: parsed.data.description ?? '',
+      userId: user.id
+    })
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    revalidatePath('/dashboard')
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to update settings" }
+  }
+}
 
 
 
@@ -168,6 +213,7 @@ export async function deleteAnnouncement(id: string, classId: string) {
 
   await ClassService.deleteAnnouncement(parsed.data.id, user.id)
   revalidatePath(`/classes/${parsed.data.classId}`)
+  revalidatePath('/dashboard')
 }
 
 /* ---------------- CREATE MATERIAL ---------------- */
@@ -265,14 +311,20 @@ export async function updateMaterial(formData: FormData) {
 
 export async function deleteMaterial(id: string, classId: string) {
   const parsed = deleteMaterialSchema.safeParse({ id, classId })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.deleteMaterial(parsed.data.id, parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
+  try {
+    await ClassService.deleteMaterial(parsed.data.id, user.id)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    revalidatePath('/dashboard')
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to delete material" }
+  }
 }
 
 /* ---------------- CREATE ASSIGNMENT ---------------- */
@@ -297,21 +349,25 @@ export async function createAssignment(formData: FormData) {
   const files = formData.getAll('files') as File[]
   const attachmentPaths = await ClassService.uploadFiles(files, parsed.data.classId, 'assignments')
 
-  const result = await ClassService.createAssignment({
-    title: parsed.data.title,
-    description: parsed.data.description ?? null,
-    dueDate: parsed.data.dueDate ?? null,
-    points: parsed.data.points,
-    classId: parsed.data.classId,
-    userId: user.id,
-    submissionType: parsed.data.submissionType,
-    rubricId: parsed.data.rubricId ?? null,
-    attachmentPaths,
-    isGroupProject: parsed.data.isGroupProject,
-  })
+  try {
+    const result = await ClassService.createAssignment({
+      title: parsed.data.title,
+      description: parsed.data.description ?? null,
+      dueDate: parsed.data.dueDate ?? null,
+      points: parsed.data.points,
+      classId: parsed.data.classId,
+      userId: user.id,
+      submissionType: parsed.data.submissionType,
+      rubricId: parsed.data.rubricId ?? null,
+      attachmentPaths,
+      isGroupProject: parsed.data.isGroupProject,
+    })
 
-  revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true, id: result.id }
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { id: result.id, success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to create assignment" }
+  }
 }
 
 /* ---------------- UPDATE ASSIGNMENT ---------------- */
@@ -319,7 +375,7 @@ export async function createAssignment(formData: FormData) {
 export async function updateAssignment(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
   const assignmentId = formData.get('assignmentId') as string
   const classId = formData.get('classId') as string
@@ -332,59 +388,70 @@ export async function updateAssignment(formData: FormData) {
   const isGroupProject = formData.get('isGroupProject') === 'true'
 
   const parsed = updateAssignmentSchema.safeParse({ assignmentId, classId, title, description, dueDate, points, submissionType, rubricId, isGroupProject })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  // Upload new files
-  const newFiles = formData.getAll('files') as File[]
-  const newPaths = await ClassService.uploadFiles(newFiles, parsed.data.classId, 'assignments')
+  try {
+    // Upload new files
+    const newFiles = formData.getAll('files') as File[]
+    const newPaths = await ClassService.uploadFiles(newFiles, parsed.data.classId, 'assignments')
 
-  // Merge with kept existing paths
-  let existingPaths: string[] = []
-  const existingAttachmentsRaw = formData.get('existingAttachments') as string
-  if (existingAttachmentsRaw) {
-    try {
-      const p = JSON.parse(existingAttachmentsRaw)
-      if (Array.isArray(p)) {
-        existingPaths = p.map((a: any) => {
-          if (typeof a === 'string') return a
-          return a?.url || a?.path || null
-        }).filter(Boolean) as string[]
+    // Merge with kept existing paths
+    let existingPaths: string[] = []
+    const existingAttachmentsRaw = formData.get('existingAttachments') as string
+    if (existingAttachmentsRaw) {
+      try {
+        const p = JSON.parse(existingAttachmentsRaw)
+        if (Array.isArray(p)) {
+          existingPaths = p.map((a: any) => {
+            if (typeof a === 'string') return a
+            return a?.url || a?.path || null
+          }).filter(Boolean) as string[]
+        }
+      } catch (e) {
+        // ignore
       }
-    } catch (e) {
-      // ignore
     }
+    const allPaths: string[] = [...existingPaths, ...newPaths]
+
+    const result = await ClassService.updateAssignment({
+      assignmentId: parsed.data.assignmentId,
+      classId: parsed.data.classId,
+      title: parsed.data.title,
+      description: parsed.data.description ?? null,
+      dueDate: parsed.data.dueDate ?? null,
+      points: parsed.data.points,
+      submissionType: parsed.data.submissionType,
+      rubricId: parsed.data.rubricId ?? null,
+      isGroupProject: parsed.data.isGroupProject,
+      allPaths,
+    })
+
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { id: result.id, success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to update assignment" }
   }
-  const allPaths: string[] = [...existingPaths, ...newPaths]
-
-  const result = await ClassService.updateAssignment({
-    assignmentId: parsed.data.assignmentId,
-    classId: parsed.data.classId,
-    title: parsed.data.title,
-    description: parsed.data.description ?? null,
-    dueDate: parsed.data.dueDate ?? null,
-    points: parsed.data.points,
-    submissionType: parsed.data.submissionType,
-    rubricId: parsed.data.rubricId ?? null,
-    isGroupProject: parsed.data.isGroupProject,
-    allPaths,
-  })
-
-  revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true, id: result.id }
 }
 
 /* ---------------- DELETE ASSIGNMENT ---------------- */
 
 export async function deleteAssignment(id: string, classId: string) {
   const parsed = deleteAssignmentSchema.safeParse({ id, classId })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.deleteAssignment(parsed.data.id, parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
+  try {
+    await ClassService.deleteAssignment(parsed.data.id, user.id)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    revalidatePath('/dashboard')
+    revalidatePath('/todo')
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to delete assignment" }
+  }
 }
 
 /* ---------------- SUBMIT ASSIGNMENT ---------------- */

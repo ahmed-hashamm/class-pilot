@@ -1,10 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { X, Pin, Loader2, AlertCircle, FileText, Paperclip, UploadCloud } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { updateAnnouncement } from '@/actions/ClassActions'
+import { useEditAnnouncement } from '@/lib/hooks'
 
 interface Props {
     announcement: {
@@ -24,52 +21,15 @@ const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3
   focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy transition`
 
 export default function EditAnnouncementModal({ announcement, onClose, onSuccess }: Props) {
-    const [title, setTitle] = useState(announcement.title)
-    const [content, setContent] = useState(announcement.content)
-    const [isPinned, setIsPinned] = useState(announcement.pinned)
-    const [newFiles, setNewFiles] = useState<File[]>([])
-    const queryClient = useQueryClient()
-
-    // Convert string array to objects for existing files UI
-    const [existingFiles, setExistingFiles] = useState<{ name: string; url: string }[]>(
-        (announcement.attachment_paths || []).map((path: string) => {
-            const fileName = path.split('/').pop() || 'File'
-            let cleanName = fileName.includes('-') ? fileName.split('-').slice(1).join('-') : fileName
-            return { name: cleanName, url: path }
-        })
-    )
-
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const handleSave = async () => {
-        if (!title.trim() && !content.trim()) return
-        setLoading(true); setError(null)
-
-        const formData = new FormData()
-        formData.append('id', announcement.id)
-        formData.append('classId', announcement.classId)
-        formData.append('title', title)
-        formData.append('content', content)
-        formData.append('pinned', String(isPinned))
-
-        // Handle files
-        newFiles.forEach((file: File) => formData.append('files', file))
-        formData.append('existingAttachments', JSON.stringify(existingFiles))
-
-        try {
-            await updateAnnouncement(formData)
-            queryClient.invalidateQueries({ queryKey: ['streamFeed', announcement.classId] })
-            toast.success('Announcement updated successfully')
-            onSuccess()
-            onClose()
-        } catch (err: any) {
-            toast.error(err.message || 'Failed to update')
-            setError(err.message || 'Failed to update')
-        } finally {
-            setLoading(false)
-        }
-    }
+    const {
+        title, setTitle,
+        content, setContent,
+        isPinned, setIsPinned,
+        existingFiles, removeExistingFile,
+        newFiles, setNewFiles, removeNewFile,
+        loading, error,
+        handleSave
+    } = useEditAnnouncement(announcement, onClose, onSuccess);
 
     return (
         <div className="fixed inset-0 bg-navy/40 backdrop-blur-sm flex items-center
@@ -160,7 +120,7 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                                             <Paperclip size={11} className="text-navy" />
                                             <span className="truncate max-w-[140px]">{file.name}</span>
                                             <button type="button"
-                                                onClick={() => setExistingFiles(existingFiles.filter((_: any, idx: number) => idx !== i))}
+                                                onClick={() => removeExistingFile(i)}
                                                 className="text-muted-foreground hover:text-red-500 transition
                                                     cursor-pointer bg-transparent border-none p-0 flex">
                                                 <X size={12} />
@@ -184,7 +144,7 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                                             <Paperclip size={11} className="text-navy-light" />
                                             <span className="truncate max-w-[140px]">{file.name}</span>
                                             <button type="button"
-                                                onClick={() => setNewFiles(newFiles.filter((_: any, idx: number) => idx !== i))}
+                                                onClick={() => removeNewFile(i)}
                                                 className="text-muted-foreground hover:text-red-500 transition
                                                     cursor-pointer bg-transparent border-none p-0 flex">
                                                 <X size={12} />

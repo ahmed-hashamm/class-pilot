@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { X, Paperclip, UploadCloud, Loader2, AlertCircle, FolderOpen } from 'lucide-react'
-import { updateMaterial } from '@/actions/ClassActions'
+import { useEditMaterial } from '@/lib/hooks'
 
 interface ExistingFile {
     name: string
@@ -27,54 +26,14 @@ const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3
   focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy transition`
 
 export default function EditMaterialModal({ material, onClose, onSuccess }: Props) {
-    const [title, setTitle] = useState(material.title)
-    const [description, setDescription] = useState(material.description || '')
-
-    // Map string URLs to object shapes for the UI 
-    const [existingFiles, setExistingFiles] = useState<ExistingFile[]>(() => {
-        const files = material.files || []
-        return files.map((f: any) => {
-            if (typeof f === 'string') {
-                const fileName = f.split('/').pop() || 'File'
-                const cleanName = fileName.includes('-') ? fileName.split('-').slice(1).join('-') : fileName
-                return { name: cleanName, url: f }
-            }
-            return f
-        })
-    })
-
-    const [newFiles, setNewFiles] = useState<File[]>([])
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const removeExistingFile = (index: number) =>
-        setExistingFiles(existingFiles.filter((_, i) => i !== index))
-
-    const removeNewFile = (index: number) =>
-        setNewFiles(newFiles.filter((_, i) => i !== index))
-
-    const handleSave = async () => {
-        if (!title.trim()) { setError('Title is required'); return }
-        setLoading(true); setError(null)
-
-        const formData = new FormData()
-        formData.append('materialId', material.id)
-        formData.append('classId', material.classId)
-        formData.append('title', title)
-        formData.append('description', description)
-        formData.append('existingFiles', JSON.stringify(existingFiles))
-        newFiles.forEach((f) => formData.append('files', f))
-
-        try {
-            await updateMaterial(formData)
-            onSuccess()
-            onClose()
-        } catch (err: any) {
-            setError(err.message || 'Failed to update')
-        } finally {
-            setLoading(false)
-        }
-    }
+    const {
+        title, setTitle,
+        description, setDescription,
+        existingFiles, removeExistingFile,
+        newFiles, setNewFiles, removeNewFile,
+        loading, error,
+        handleSave
+    } = useEditMaterial(material, onClose, onSuccess);
 
     return (
         <div className="fixed inset-0 bg-navy/40 backdrop-blur-sm flex items-center

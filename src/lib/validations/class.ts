@@ -105,3 +105,14 @@ export const deleteGroupSchema = z.object({
 export const getClassNameSchema = z.object({
   classId: z.string().min(1),
 })
+
+export const deleteClassSchema = z.object({
+  classId: z.string().min(1),
+})
+
+export const updateClassSettingsSchema = z.object({
+  classId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  settings: z.record(z.any()),
+})

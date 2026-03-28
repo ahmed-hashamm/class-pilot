@@ -40,7 +40,7 @@ export default function MaterialRow({
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-[15px] text-foreground truncate
+        <h3 className="font-bold text-[15px] text-foreground break-words
           group-hover:text-navy transition-colors mb-1">
           {material.title}
         </h3>
@@ -74,7 +74,7 @@ export default function MaterialRow({
         </div>
 
         {material.description && (
-          <p className="text-[13px] text-muted-foreground line-clamp-2 leading-relaxed mt-2">
+          <p className="text-[13px] text-muted-foreground line-clamp-2 leading-relaxed mt-2 break-words">
             {material.description}
           </p>
         )}

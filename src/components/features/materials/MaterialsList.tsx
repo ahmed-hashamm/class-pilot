@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Database, Plus, RefreshCw, X } from "lucide-react";
 import { getMaterialsByClass } from "@/lib/db_data_fetching/materials";
@@ -29,6 +29,7 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [materialToDelete, setMaterialToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: materials = [], isLoading, error, refetch } = useQuery({
     queryKey: ["classMaterials", classId],
@@ -45,6 +46,7 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
     try {
       await deleteMaterial(materialToDelete.id, classId);
       refetch();
+      await queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
       setMaterialToDelete(null);
       toast.success("Material deleted");
     } catch {
