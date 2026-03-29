@@ -279,15 +279,14 @@ const DashboardNavbar = () => {
     <nav className="border-b border-gray-200 bg-navy text-primary-foreground sticky top-0 z-50">
       <div className="w-full max-w-[1600px] mx-auto flex h-16 items-center justify-between px-8 md:px-12 lg:px-16">
 
-        {/* Left Section: Logo */}
         {/* Logo */}
-        <Link href="/" className="flex items-center  group">
-          <div className="relative w-14 h-14"> {/* Added a wrapper with specific dimensions */}
+        <Link href="/" className="flex items-center group shrink-0">
+          <div className="relative w-14 h-14">
             <Image
               src="/logo.png"
               alt="Class Pilot"
               fill
-              className="object-contain" // object-contain ensures the logo isn't cropped
+              className="object-contain"
               priority
             />
           </div>
@@ -295,7 +294,12 @@ const DashboardNavbar = () => {
         </Link>
 
         {/* Right Section: Actions & Profile */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-6">
+
+          {/* Class Switcher */}
+          <div className="hidden md:flex items-center transition-all">
+            {/* <ClassSwitcher /> */}
+          </div>
 
           {/* Quick Action: Create Class */}
           {/* <button

@@ -23,7 +23,7 @@ export default function ClassHero({
   classSettings,
 }: ClassHeroProps) {
   return (
-    <div className="relative bg-navy text-white w-full pt-10 pb-0 overflow-hidden">
+    <div className="relative z-40 bg-navy text-white w-full pt-10 pb-0">
       {/* Radial glow */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,_rgba(79,156,249,.18)_0%,_transparent_70%)]"

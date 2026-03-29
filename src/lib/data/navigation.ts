@@ -7,7 +7,6 @@ export interface NavLink {
 }
 
 export const DASHBOARD_NAV_LINKS: NavLink[] = [
-  { label: "Home", href: "/dashboard", icon: Home },
   { label: "Rubrics", href: "/rubrics", icon: FileText },
   { label: "To-do", href: "/todo", icon: ListTodo },
   { label: "Calendar", href: "/calendar", icon: Calendar },
