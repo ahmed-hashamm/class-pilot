@@ -52,9 +52,9 @@ export default function AssignmentDetailHeader({
         </div>
       </div>
 
-      <span className={`w-fit shrink-0 inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wider rounded-full px-4 py-1.5 border self-start ${status.classes}`}>
-        {isTeacher && status.icon && <status.icon size={13} />}
-        {(isGraded || isTurnedIn) && !isTeacher && <CheckCircle2 size={13} />} 
+      <span className={`w-fit shrink-0 inline-flex items-center gap-1.5 text-[9px] sm:text-[11px] font-black uppercase tracking-widest rounded-full px-3 sm:px-4 py-1.5 border self-start ${status.classes}`}>
+        {isTeacher && status.icon && <status.icon size={12} />}
+        {(isGraded || isTurnedIn) && !isTeacher && <CheckCircle2 size={12} />} 
         {status.label}
       </span>
     </div>

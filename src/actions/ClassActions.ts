@@ -276,8 +276,10 @@ export async function createMaterial(formData: FormData) {
     pinned: parsed.data.pinned,
   })
 
+  if (!result) return { success: false, error: 'Failed to create material' }
+
   revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true, materialId: result.materialId }
+  return { success: true, materialId: result.id }
 }
 
 /* ---------------- UPDATE MATERIAL ---------------- */
@@ -322,13 +324,14 @@ export async function updateMaterial(formData: FormData) {
   const fileTypes = allPaths.map((p) => p.split('.').pop()?.toLowerCase() ?? 'file')
 
   await ClassService.updateMaterial({
-    materialId: parsed.data.materialId,
+    id: parsed.data.materialId,
     classId: parsed.data.classId,
     title: parsed.data.title,
     description: parsed.data.description ?? null,
-    allPaths,
+    attachmentPaths: allPaths,
     fileTypes,
     pinned: parsed.data.pinned,
+    userId: user.id
   })
 
   revalidatePath(`/classes/${parsed.data.classId}`)
@@ -392,8 +395,10 @@ export async function createAssignment(formData: FormData) {
       pinned: parsed.data.pinned,
     })
 
+    if (!result) return { data: null, error: "Failed to create assignment" }
+
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { data: { id: result.id, success: true }, error: null }
+    return { data: { id: (result as any).id, success: true }, error: null }
   } catch (err: any) {
     return { data: null, error: err.message || "Failed to create assignment" }
   }
@@ -458,7 +463,7 @@ export async function updateAssignment(formData: FormData) {
     })
 
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { data: { id: result.id, success: true }, error: null }
+    return { data: { id: (result as any).id, success: true }, error: null }
   } catch (err: any) {
     return { data: null, error: err.message || "Failed to update assignment" }
   }
@@ -512,13 +517,13 @@ export async function submitAssignment({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== parsed.data.userId) throw new Error("Unauthorized")
 
-  console.log('[submitAssignment] START:', { 
-    assignmentId: parsed.data.assignmentId, 
-    userId: parsed.data.userId, 
-    classId, 
+  console.log('[submitAssignment] START:', {
+    assignmentId: parsed.data.assignmentId,
+    userId: parsed.data.userId,
+    classId,
     hasContent: !!parsed.data.content,
     isGroup: parsed.data.isGroupProject,
-    groupId: parsed.data.groupId 
+    groupId: parsed.data.groupId
   })
 
   try {
@@ -536,11 +541,11 @@ export async function submitAssignment({
     } else {
       console.log('[submitAssignment] Success! ID:', data.id)
     }
-    
+
     revalidatePath(`/classes/${classId}/assignments/${assignmentId}`)
     revalidatePath(`/classes/${classId}`)
     revalidatePath('/todo')
-    
+
     return data
   } catch (err: any) {
     console.error('[submitAssignment] FATAL ERROR:', err)
@@ -564,10 +569,10 @@ export async function saveGroup(
   if (!user) throw new Error('Unauthorized')
 
   await ClassService.saveGroup(
-    parsed.data.classId, 
-    parsed.data.title, 
-    parsed.data.groupId, 
-    parsed.data.studentIds, 
+    parsed.data.classId,
+    parsed.data.title,
+    parsed.data.groupId,
+    parsed.data.studentIds,
     user.id
   )
 

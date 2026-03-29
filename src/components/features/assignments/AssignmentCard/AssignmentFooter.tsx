@@ -12,20 +12,7 @@ export default function AssignmentFooter({ assignment }: AssignmentFooterProps) 
   const teacher = assignment.users;
 
   return (
-    <div className="flex items-center justify-between gap-4 mt-auto pt-3 border-t border-secondary/40">
-      <div className="flex items-center gap-4">
-        {/* Points */}
-        <div className="flex items-center gap-1.5 text-navy/60 font-black text-[11px] uppercase tracking-wider">
-          <Award size={14} className="text-yellow-500" />
-          {assignment.points ?? 100} PTS
-        </div>
-
-        {/* Submissions Count - Desktop only */}
-        <div className="hidden sm:flex items-center gap-1.5 text-muted-foreground/30 font-bold text-[11px] uppercase tracking-wider ml-1">
-          <FileText size={14} />
-          {assignment.submission_count} Submissions
-        </div>
-      </div>
+    <div className="flex items-center justify-between gap-4 mt-auto">
 
       <div className="hidden sm:flex items-center gap-3 ml-auto pr-1">
         {/* Teacher Avatar - Desktop only */}

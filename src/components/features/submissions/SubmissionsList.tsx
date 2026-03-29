@@ -162,45 +162,49 @@ export default function SubmissionsList({ submissions, assignment, classId }: Su
 
         return (
           <div key={submission.id}
-            className={`flex flex-col gap-4 px-6 py-5
+            className={`flex flex-col gap-4 px-4 sm:px-6 py-5
               hover:bg-secondary/20 transition-all group
               ${i < submissions.length - 1 ? 'border-b border-border' : ''}`}>
 
             {/* Top Row: Title, Badges, and Grading Info */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4 min-w-0">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 {!isGroup && (
                   <StudentAvatar
                     name={studentName}
                     src={getAvatarSrc(student?.avatar_url)}
                     initial={getInitial(studentName)}
+                    size="size-9 sm:size-10"
                   />
                 )}
                 {isGroup && (
-                  <div className="shrink-0 size-10 rounded-xl bg-navy flex items-center justify-center text-yellow border border-navy/20">
-                    <Users size={20} />
+                  <div className="shrink-0 size-9 sm:size-10 rounded-xl bg-navy flex items-center justify-center text-yellow border border-navy/20">
+                    <Users size={18} className="sm:size-5" />
                   </div>
                 )}
 
                 <div className="min-w-0 flex flex-col gap-0.5">
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-[16px] text-foreground truncate group-hover:text-navy transition-colors">
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-bold text-[14px] sm:text-[16px] text-foreground truncate group-hover:text-navy transition-colors">
                       {isGroup ? (groupName || "Unnamed Team") : studentName}
                     </p>
                     {isGroup && (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-navy/5 text-navy text-[10px] font-black uppercase tracking-wider border border-navy/10">
+                      <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-lg bg-navy/5 text-navy text-[9px] font-black uppercase tracking-wider border border-navy/10">
                         Team
                       </span>
                     )}
                   </div>
-                  <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <Calendar size={11} />
-                    Submitted: {submission.submitted_at ? format(new Date(submission.submitted_at), 'MMM d, h:mm a') : 'Not submitted'}
+                  <p className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-muted-foreground whitespace-nowrap overflow-hidden">
+                    <Calendar size={10} className="sm:size-3" />
+                    <span className="hidden sm:inline">Submitted: </span>
+                    <span className="truncate">
+                      {submission.submitted_at ? format(new Date(submission.submitted_at), 'MMM d, h:mm a') : 'Not submitted'}
+                    </span>
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 shrink-0">
+              <div className="flex items-center gap-3 sm:gap-6 shrink-0">
                 {/* Score */}
                 {submission.final_grade !== null && (
                   <div className="hidden sm:flex flex-col items-end">
@@ -213,10 +217,10 @@ export default function SubmissionsList({ submissions, assignment, classId }: Su
                 )}
 
                 {/* Status Badge */}
-                <div className={`px-3 py-1.5 rounded-xl border font-black text-[10px] uppercase tracking-widest flex items-center gap-1.5
+                <div className={`px-2 sm:px-3 py-1.5 rounded-xl border font-black text-[10px] uppercase tracking-widest flex items-center gap-1.5
                   ${isGraded ? 'bg-green-50 text-green-700 border-green-100' : 'bg-yellow/10 text-navy border-yellow/20'}`}>
                   {isGraded ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                  {isGraded ? 'Graded' : 'Pending'}
+                  <span className="hidden sm:inline">{isGraded ? 'Graded' : 'Pending'}</span>
                 </div>
 
                 {/* Main Action */}

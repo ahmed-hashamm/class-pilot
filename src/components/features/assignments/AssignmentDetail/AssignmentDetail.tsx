@@ -34,7 +34,7 @@ export default function AssignmentDetail({
   const isTurnedIn = !!submission;
 
   return (
-    <div className="max-w-5xl mx-auto p-6 flex flex-col gap-6 min-h-screen">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-10 min-h-screen">
       <div className="flex items-center justify-between shrink-0">
         <button 
           onClick={() => router.push(`/classes/${classId}?tab=${fromTab}`)} 
@@ -72,7 +72,8 @@ export default function AssignmentDetail({
       />
 
       <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0">
-        <div className="flex-1 flex flex-col gap-6 pr-2 min-w-0">
+        {/* Left Column: Header, Instructions, and Progress */}
+        <div className="flex-1 flex flex-col gap-8 min-w-0 w-full">
           <AssignmentDetailHeader 
             assignment={assignment} 
             isTeacher={isTeacher}
@@ -80,6 +81,19 @@ export default function AssignmentDetail({
             isGraded={isGraded} 
           />
           <AssignmentDetailInstructions assignment={assignment} />
+          
+          {/* Mobile Configuration Section */}
+          <div className="lg:hidden">
+            <ConfigurationSection 
+              isTeacher={isTeacher}
+              isTurnedIn={isTurnedIn}
+              isGraded={isGraded}
+              assignment={assignment}
+              submission={submission}
+              onShowForm={() => setShowSubmissionForm(true)}
+            />
+          </div>
+
           {isTeacher && (
             <TeacherProgress 
               submissions={submissions} 
@@ -87,21 +101,20 @@ export default function AssignmentDetail({
               classId={classId} 
             />
           )}
+
         </div>
 
-        <div className="w-full lg:w-80 shrink-0 flex flex-col gap-6 pt-1">
-          <div className="flex flex-col gap-6">
-            <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1 text-left">Configuration & Status</p>
-            {!isTeacher && (
-              <StudentStatus
-                isTurnedIn={isTurnedIn}
-                isGraded={isGraded}
-                onShowForm={() => setShowSubmissionForm(true)}
-              />
-            )}
-            <AssignmentDetailInfo assignment={assignment} submission={submission} />
-          </div>
-        </div>
+        {/* Right Sidebar: Configuration & Status (Desktop only) */}
+        <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-6">
+          <ConfigurationSection 
+            isTeacher={isTeacher}
+            isTurnedIn={isTurnedIn}
+            isGraded={isGraded}
+            assignment={assignment}
+            submission={submission}
+            onShowForm={() => setShowSubmissionForm(true)}
+          />
+        </aside>
       </div>
 
       {showSubmissionForm && (
@@ -117,6 +130,27 @@ export default function AssignmentDetail({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Configuration & Status Component ── */
+function ConfigurationSection({ 
+  isTeacher, isTurnedIn, isGraded, assignment, submission, onShowForm 
+}: { 
+  isTeacher: boolean; isTurnedIn: boolean; isGraded: boolean; assignment: Assignment; submission: any; onShowForm: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-6">
+      <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1 text-left">Configuration & Status</p>
+      {!isTeacher && (
+        <StudentStatus
+          isTurnedIn={isTurnedIn}
+          isGraded={isGraded}
+          onShowForm={onShowForm}
+        />
+      )}
+      <AssignmentDetailInfo assignment={assignment} submission={submission} />
     </div>
   );
 }

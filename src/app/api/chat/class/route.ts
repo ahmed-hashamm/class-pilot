@@ -3,6 +3,7 @@ import { retrieveContext } from '@/lib/chat/retrieve-context'
 import { buildPrompt } from '@/lib/chat/build-prompt'
 import { chatComplete } from '@/lib/chat/chat-complete'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,9 +22,8 @@ export async function POST(req: Request) {
   }
 
   // Build a search query that combines the current question with recent context
-  // This helps the vector search find relevant chunks for follow-up questions
   const recentContext = (history || [])
-    .slice(-4) // last 2 exchanges (user + assistant)
+    .slice(-4)
     .filter((m: any) => m.role === 'user')
     .map((m: any) => m.content)
     .join(' ')
@@ -36,10 +36,24 @@ export async function POST(req: Request) {
   const contextChunks = await retrieveContext(searchQuery, classId)
 
   // 2️⃣ Build prompt with conversation history
-  const prompt = buildPrompt(contextChunks, question, history || [])
+  const prompt = buildPrompt([contextChunks], question, history || [])
 
   // 3️⃣ Get AI answer
-  const answer = await chatComplete(prompt)
+  const { content: answer, usage } = await chatComplete(prompt)
+
+  // 4️⃣ Log usage (Background)
+  if (usage) {
+    const adminClient = createAdminClient()
+    adminClient.from('ai_usage_logs').insert({
+      user_id: user.id,
+      action_type: 'class_assistant',
+      model: 'gpt-4o-mini',
+      input_tokens: usage.prompt_tokens,
+      output_tokens: usage.completion_tokens,
+    }).then(({ error }) => {
+      if (error) console.error('Failed to log AI usage:', error)
+    })
+  }
 
   return NextResponse.json({ answer })
 }

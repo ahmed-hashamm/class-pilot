@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { Database } from '@/types/database.utf8'
+import { Database } from '@/types/database'
 import { redirect } from 'next/navigation'
 
 type RubricRow = Database['public']['Tables']['rubrics']['Row']
@@ -32,7 +32,7 @@ export async function getRubricsList() {
     .order('created_at', { ascending: false })
 
   const rubrics: Rubric[] = (rubricsData || []).map(r => ({
-    ...(r as RubricRow),
+    ...r,
     criteria: (r.criteria as unknown) as RubricCriterion[]
   }))
 

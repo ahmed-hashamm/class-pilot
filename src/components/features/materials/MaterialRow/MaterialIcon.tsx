@@ -10,7 +10,7 @@ export default function MaterialIcon({ fileInfo }: MaterialIconProps) {
   return (
     <div className={`shrink-0 size-12 rounded-xl flex items-center justify-center border border-transparent transition-all
       ${fileInfo.bg} ${fileInfo.color} group-hover:shadow-inner`}>
-      <Icon size={22} />
+      <Icon size={22} className="shrink-0" />
     </div>
   );
 }

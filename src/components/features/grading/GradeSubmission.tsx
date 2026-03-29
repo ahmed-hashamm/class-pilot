@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft, ClipboardList, Sparkles,
   PenLine, CheckCircle2, Loader2,
+  Layout,
 } from "lucide-react";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
@@ -62,42 +63,44 @@ export default function GradeSubmission({
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 flex flex-col gap-6 h-full max-h-screen overflow-hidden">
-      
+    <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6 h-full lg:max-h-screen lg:overflow-hidden">
+
       {/* Top bar */}
-      <div className="flex items-center justify-between shrink-0">
+      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b sm:border-none pb-4 sm:pb-0">
         <button
           onClick={() => router.back()}
           className="inline-flex items-center gap-1.5 text-[13px] font-semibold
-            text-muted-foreground hover:text-navy transition-colors
-            cursor-pointer bg-transparent border-none w-fit">
-          <ArrowLeft size={15} /> Back to Class
+            text-navy/60 hover:text-navy transition-colors w-fit"
+        >
+          <ArrowLeft size={16} />
+          Back to Class
         </button>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
           {submission.final_grade !== null && (
             <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
               uppercase tracking-wider rounded-full px-4 py-1.5 border
               bg-navy text-white border-navy">
-              <CheckCircle2 size={13} /> Grade: {submission.final_grade} / {assignment?.points}
+              <CheckCircle2 size={13} />
+              <span className="truncate">Grade: {submission.final_grade} / {assignment?.points}</span>
             </span>
           )}
           <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
             uppercase tracking-wider rounded-full px-4 py-1.5 border
-            bg-yellow/10 text-navy border-yellow/30">
-            <ClipboardList size={13} /> Grading View
+            bg-navy/5 text-navy border-navy/10">
+            <Layout size={13} /> Grading View
           </span>
         </div>
       </div>
 
       {/* Main Content Areas */}
-      <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0 overflow-hidden">
-        
+      <div className="w-full flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0 lg:overflow-hidden">
+
         {/* Left — Submission Content */}
-        <div className="flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2 min-w-0">
-          
+        <div className="w-full lg:flex-1 flex flex-col gap-6 lg:overflow-y-auto lg:custom-scrollbar lg:pr-2 min-w-0">
+
           {/* Simple Header */}
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
               <div className="shrink-0 size-12 rounded-2xl bg-navy flex items-center justify-center text-yellow shadow-sm font-black text-lg">
                 {student?.full_name?.charAt(0).toUpperCase()}
@@ -105,27 +108,29 @@ export default function GradeSubmission({
               <div className="flex-1 min-w-0">
                 <h1 className="font-black text-[24px] tracking-tight leading-tight text-foreground break-words">{student?.full_name}</h1>
                 <div className="flex flex-wrap items-center gap-3 mt-1 text-[13px] text-muted-foreground font-medium">
-                  <span className="flex items-center gap-1.5"><ClipboardList size={13} className="text-navy/60" />{assignment?.title}</span>
-                  <span className="text-border">·</span>
-                  <span>Submitted {submission.submitted_at ? format(new Date(submission.submitted_at), "MMM d, h:mm a") : "Recently"}</span>
+                  <span className="flex items-center gap-1.5 min-w-0"><ClipboardList size={13} className="text-navy/60 shrink-0" /><span className="truncate">{assignment?.title}</span></span>
+                  <span className="hidden sm:inline text-border">·</span>
+                  <span className="truncate">Submitted {submission.submitted_at ? format(new Date(submission.submitted_at), "MMM d, h:mm a") : "Recently"}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Response area */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2.5 w-full min-w-0 overflow-hidden">
             <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Response</p>
-            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
-              <p className="whitespace-pre-wrap break-words text-[14px] leading-relaxed text-foreground/80">{submission.content || "No text content."}</p>
+            <div className="bg-white border border-border rounded-2xl p-4 sm:p-6 shadow-sm w-full min-w-0 overflow-hidden">
+              <p className="whitespace-pre-wrap break-words text-[14px] leading-relaxed text-foreground/80 w-full overflow-hidden">
+                {submission.content || "No text content."}
+              </p>
             </div>
           </div>
 
           {/* Files */}
           {files.length > 0 && (
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-2.5 w-full min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Attachments</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col gap-2 w-full min-w-0">
                 {files.map((file, i: number) => (
                   <AttachmentButton key={i} path={file.url} type="assignment" label={file.name} />
                 ))}
@@ -136,7 +141,7 @@ export default function GradeSubmission({
 
         {/* Right — Sidebar */}
         <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar pt-1">
-          
+
           <div className="flex flex-col gap-6">
             <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Grading & Feedback</p>
 
@@ -241,7 +246,7 @@ function GradeCard({ label, icon, score, feedback, total, isActive, variant, onA
   const isNavyLight = variant === "navy-light"
 
   return (
-    <div className={`bg-white border-2 rounded-2xl p-6 transition-all shadow-sm
+    <div className={`bg-white border-2 rounded-2xl p-4 sm:p-6 transition-all shadow-sm
       ${isActive
         ? isNavyLight
           ? "border-navy-light/40 bg-navy-light/5 ring-4 ring-navy-light/5"
@@ -256,7 +261,7 @@ function GradeCard({ label, icon, score, feedback, total, isActive, variant, onA
           {icon} {label}
         </span>
         <div className="text-right">
-          <span className="font-black text-[32px] text-foreground leading-none">
+          <span className="font-black text-[24px] sm:text-[32px] text-foreground leading-none">
             {score}
           </span>
           <span className="text-[14px] font-bold text-muted-foreground ml-1">/{total}</span>

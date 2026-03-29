@@ -27,26 +27,47 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
     url = data?.publicUrl || '#'
   }
 
-  // Clean filename
-  const fullFileName = path.split('/').pop() || ''
-  const displayName =
-    label || (fullFileName.includes('-') ? fullFileName.split('-').slice(1).join('-') : fullFileName)
+  // Robust filename extraction
+  const getBaseName = (p: string) => {
+    try {
+      // If it's a URL, get the last part of the path
+      const urlObj = new URL(p);
+      return urlObj.pathname.split('/').pop() || p.split('/').pop() || '';
+    } catch {
+      // Fallback for paths
+      return p.split('/').pop() || '';
+    }
+  };
+
+  const fullFileName = getBaseName(path);
+  
+  // Only trim prefixes (the '-' logic) if it looks like a Supabase UUID prefix
+  // and we don't have an explicit label.
+  const displayName = label || (
+    fullFileName.includes('-') && /^[0-9a-f]{8}-/.test(fullFileName)
+      ? fullFileName.split('-').slice(1).join('-')
+      : fullFileName
+  );
 
   const innerContent = (
     <>
-      <div className="flex items-center gap-3 overflow-hidden">
-        <div className="rounded-lg bg-navy/8 border border-navy/15 p-2 text-navy flex items-center justify-center transition-colors group-hover:bg-navy group-hover:text-white">
+      <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
+        <div className="rounded-lg bg-navy/8 border border-navy/15 p-2 text-navy flex items-center justify-center transition-colors group-hover:bg-navy group-hover:text-white shrink-0">
           <FileIcon size={16} />
         </div>
-        <span className="truncate text-[13px] font-bold tracking-tight text-foreground transition-colors group-hover:text-navy pr-2">
-          {displayName}
-        </span>
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <span className="block truncate text-[13px] font-bold tracking-tight text-foreground transition-colors group-hover:text-navy pr-2">
+            {displayName}
+          </span>
+        </div>
       </div>
-      <div className="pr-2 opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0">
+      <div className="pr-2 opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 shrink-0">
         <ExternalLink size={14} className="text-navy" />
       </div>
     </>
   )
+
+  const commonClasses = "group flex w-full max-w-full items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5 min-w-0"
 
   if (asDiv) {
     return (
@@ -55,7 +76,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
           e.stopPropagation();
           if (url !== '#') window.open(url, '_blank');
         }}
-        className="group flex w-fit max-w-full items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5 cursor-pointer"
+        className={`${commonClasses} cursor-pointer`}
       >
         {innerContent}
       </div>
@@ -67,7 +88,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex w-fit max-w-full items-center gap-4 justify-between rounded-xl border border-border bg-white p-1.5 shadow-sm transition-all duration-200 hover:shadow hover:-translate-y-0.5"
+      className={commonClasses}
     >
       {innerContent}
     </a>

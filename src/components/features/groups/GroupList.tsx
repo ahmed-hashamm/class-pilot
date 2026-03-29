@@ -139,7 +139,7 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
           />
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {groups.map((group) => (
             <GroupCard
               key={group.id}

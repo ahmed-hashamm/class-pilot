@@ -2,7 +2,7 @@
 
 import { Material } from "@/lib/types/schema";
 import { getFileIcon } from "@/lib/utils/fileIcons";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, Clock, User } from "lucide-react";
 import { format } from "date-fns";
 import MaterialIcon from "./MaterialIcon";
 import MaterialActions from "./MaterialActions";
@@ -33,11 +33,11 @@ export default function MaterialRow({
   const fileInfo = getFileIcon(firstFilePath);
 
   return (
-    <div className="group relative flex items-start gap-4 p-6 bg-white border border-border rounded-2xl transition-all duration-300
+    <div className="group relative z-0 hover:z-10 focus-within:z-10 flex items-start gap-3.5 p-4 sm:p-5 bg-white border border-border rounded-2xl transition-all duration-300
       hover:shadow-xl hover:shadow-navy/5 hover:-translate-y-1 active:scale-[0.99]">
 
       {/* Visual Accent */}
-      <div className="absolute left-0 top-6 bottom-6 w-1 bg-navy/10 rounded-r-full group-hover:bg-navy transition-colors" />
+      <div className="absolute left-0 top-4 bottom-4 w-1 bg-navy/10 rounded-r-full group-hover:bg-navy transition-colors" />
 
       <MaterialIcon fileInfo={fileInfo} />
 
@@ -60,30 +60,33 @@ export default function MaterialRow({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0 mt-0.5">
+        <div className="flex flex-col mt-0.5">
           {/* Metadata Row */}
-          <div className="flex items-center text-[12px] text-muted-foreground font-semibold">
-            <div className="flex items-center gap-1.5">
-              <Clock size={12} className="opacity-40" />
+          <div className="flex items-center text-[12px] text-muted-foreground font-semibold h-5">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Clock size={12} className="opacity-40 shrink-0" />
               <span>{material.created_at ? format(new Date(material.created_at), "MMM d, yyyy") : "No date"}</span>
             </div>
 
-            <div className="flex flex-row items-center">
-              <span className="text-border font-extrabold hidden sm:inline ml-1.5">·</span>
-
-              {material.ai_synced && (
-                <div className="flex items-center text-emerald-600 ml-1.5 sm:ml-1.5" title="AI Synced">
-                  <CheckCircle2 size={12} className="opacity-80" />
+            {material.ai_synced && (
+              <>
+                <span className="text-border font-extrabold mx-1.5 shrink-0">·</span>
+                <div className="flex items-center text-emerald-600 shrink-0" title="AI Synced">
+                  <CheckCircle2 size={12} className="opacity-80 shrink-0" />
                 </div>
-              )}
+              </>
+            )}
 
-              <span className="sm:hidden text-border font-extrabold ml-1.5">·</span>
-              <div className="flex items-center gap-1.5 ml-1.5">
-                <span className="sm:hidden font-medium text-muted-foreground/70 truncate max-w-[150px]">
-                  {material.users?.full_name || "Teacher"}
-                </span>
-              </div>
-            </div>
+            <span className="hidden sm:inline text-border font-extrabold mx-1.5">·</span>
+            <span className="hidden sm:inline text-muted-foreground/70 truncate max-w-[150px]">
+              {material.users?.full_name || "Teacher"}
+            </span>
+          </div>
+
+          {/* Teacher Section - Mobile Only */}
+          <div className="sm:hidden flex items-center gap-1.5 text-muted-foreground/60 text-[11px] font-bold uppercase tracking-wide mt-1">
+            <User size={10} className="shrink-0 opacity-40" />
+            <span className="truncate max-w-[150px]">{material.users?.full_name || "Teacher"}</span>
           </div>
         </div>
 

@@ -14,5 +14,8 @@ export async function chatComplete(prompt: string) {
     temperature: 0.2,
   })
 
-  return response.choices[0].message.content
+  return {
+    content: response.choices[0].message.content,
+    usage: response.usage
+  }
 }
