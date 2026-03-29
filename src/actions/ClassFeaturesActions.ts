@@ -9,6 +9,8 @@ import {
   createPollSchema,
   submitPollResponseSchema,
   closePollSchema,
+  deleteAttendanceSchema,
+  deletePollSchema,
 } from '@/lib/validations/classFeatures'
 import { ClassFeaturesService } from '@/lib/services/classFeatures.service'
 
@@ -155,10 +157,46 @@ export async function closePoll(pollId: string) {
 
   try {
     const classId = await ClassFeaturesService.closePoll(parsed.data.pollId)
-    if (classId) revalidatePath(`/classes/${classId}`)
+    revalidatePath(`/classes/${classId}`)
     return { success: true }
   } catch (err: any) {
     console.error('Error closing poll:', err)
+    return { success: false, error: err.message }
+  }
+}
+
+export async function deleteAttendance(id: string, classId: string) {
+  const parsed = deleteAttendanceSchema.safeParse({ id, classId })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  try {
+    await ClassFeaturesService.deleteAttendance(parsed.data.id, user.id)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { success: true }
+  } catch (err: any) {
+    console.error('Error deleting attendance:', err)
+    return { success: false, error: err.message }
+  }
+}
+
+export async function deletePoll(id: string, classId: string) {
+  const parsed = deletePollSchema.safeParse({ id, classId })
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  try {
+    await ClassFeaturesService.deletePoll(parsed.data.id, user.id)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { success: true }
+  } catch (err: any) {
+    console.error('Error deleting poll:', err)
     return { success: false, error: err.message }
   }
 }

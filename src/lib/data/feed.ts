@@ -62,3 +62,11 @@ export const FEED_ITEM_THEMES: Record<string, FeedItemTheme> = {
     iconColor: "text-white"
   },
 };
+
+export const FEED_TYPE_MESSAGES: Record<string, string> = {
+  announcement: "This action cannot be undone. All students will lose access to this announcement.",
+  assignment: "This will permanently delete the assignment and all student submissions.",
+  material: "This will remove the material from the stream. Files will remain in storage.",
+  poll: "This will permanently close and delete this poll and all its responses.",
+  attendance: "This will delete the attendance session and all student records for this date.",
+};

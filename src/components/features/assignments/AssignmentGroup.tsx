@@ -1,12 +1,12 @@
 "use client";
 
-import AssignmentCard from "./AssignmentCard";
+import AssignmentCard from "./AssignmentCard/AssignmentCard";
+import { Assignment } from "@/lib/types/schema";
 
 interface AssignmentGroupProps {
   label: string;
-  assignments: any[];
+  assignments: Assignment[];
   classId: string;
-  getDisplayName: (path: string) => string;
   muted?: boolean;
 }
 
@@ -14,7 +14,6 @@ export default function AssignmentGroup({
   label,
   assignments,
   classId,
-  getDisplayName,
   muted = false,
 }: AssignmentGroupProps) {
   if (assignments.length === 0) return null;
@@ -40,7 +39,6 @@ export default function AssignmentGroup({
             key={assignment.id}
             assignment={assignment}
             classId={classId}
-            getDisplayName={getDisplayName}
             muted={muted}
           />
         ))}

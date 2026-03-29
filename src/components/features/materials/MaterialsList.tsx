@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { Database, Plus, RefreshCw, X } from "lucide-react";
 import { getMaterialsByClass } from "@/lib/db_data_fetching/materials";
 import { deleteMaterial } from "@/actions/ClassActions";
-import MaterialRow from "./MaterialRow";
+import MaterialRow from "./MaterialRow/MaterialRow";
+import { Material } from "@/lib/types/schema";
 import { 
   PageHeader, 
   EmptyState, 
@@ -25,9 +26,9 @@ interface MaterialsListProps {
 
 export default function MaterialsList({ classId, isTeacher, userId }: MaterialsListProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState<Material | null>(null);
   const [syncingId, setSyncingId] = useState<string | null>(null);
-  const [materialToDelete, setMaterialToDelete] = useState<any>(null);
+  const [materialToDelete, setMaterialToDelete] = useState<Material | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
 
@@ -36,7 +37,7 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
     queryFn: async () => {
       const { materials: data, error } = await getMaterialsByClass(classId);
       if (error) throw new Error("Failed to load materials.");
-      return (data || []) as any[];
+      return (data || []) as Material[];
     },
   });
 
@@ -192,7 +193,14 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
       )}
       {editing && (
         <EditMaterialModal
-          material={{ ...editing, classId, files: editing.attachment_paths || [] }}
+          material={{ 
+            ...editing, 
+            classId, 
+            files: (editing.attachment_paths || []).map((path: string) => ({
+              name: getDisplayName(path),
+              url: path
+            })) 
+          }}
           onClose={() => setEditing(null)}
           onSuccess={() => { setEditing(null); refetch(); }}
         />

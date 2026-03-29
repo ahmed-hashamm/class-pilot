@@ -121,3 +121,10 @@ export const updateClassSettingsSchema = z.object({
   description: z.string().optional(),
   settings: z.record(z.any()),
 })
+
+export const togglePinSchema = z.object({
+  id: z.string().min(1),
+  classId: z.string().min(1),
+  pinned: z.boolean(),
+  type: z.enum(['announcements', 'materials', 'assignments', 'polls', 'attendances']),
+})

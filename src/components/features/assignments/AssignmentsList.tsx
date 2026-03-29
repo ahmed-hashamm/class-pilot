@@ -12,6 +12,8 @@ import {
 import { ClipboardList, Plus, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
+import { Assignment } from "@/lib/types/schema";
+
 interface AssignmentsListProps {
   classId: string;
   isTeacher: boolean;
@@ -23,7 +25,7 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
     queryFn: async () => {
       const { assignments: data, error } = await getAssignmentsByClass(classId);
       if (error) throw new Error("Failed to load assignments.");
-      return (data || []) as any[];
+      return (data || []) as Assignment[];
     },
   });
 
@@ -106,13 +108,11 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
             label="Upcoming"
             assignments={upcoming}
             classId={classId}
-            getDisplayName={getDisplayName}
           />
           <AssignmentGroup
             label="Past"
             assignments={past}
             classId={classId}
-            getDisplayName={getDisplayName}
             muted
           />
         </div>

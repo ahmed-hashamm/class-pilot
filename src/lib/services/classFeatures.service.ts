@@ -133,5 +133,57 @@ export const ClassFeaturesService = {
 
     const { data: pl } = await supabase.from('polls').select('class_id').eq('id', pollId).maybeSingle()
     return (pl as Poll | null)?.class_id
+  },
+
+  async deleteAttendance(id: string, userId: string) {
+    const supabase = await createClient()
+    
+    // Authorization check
+    const { data: attendance } = await supabase
+      .from('attendances')
+      .select('created_by, class_id')
+      .eq('id', id)
+      .maybeSingle()
+    
+    if (!attendance) throw new Error('Attendance not found')
+    
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', attendance.class_id)
+      .maybeSingle()
+      
+    if (attendance.created_by !== userId && classData?.created_by !== userId) {
+      throw new Error('Unauthorized to delete this attendance')
+    }
+
+    const { error } = await supabase.from('attendances').delete().eq('id', id)
+    if (error) throw new Error(error.message)
+  },
+
+  async deletePoll(id: string, userId: string) {
+    const supabase = await createClient()
+    
+    // Authorization check
+    const { data: poll } = await supabase
+      .from('polls')
+      .select('created_by, class_id')
+      .eq('id', id)
+      .maybeSingle()
+    
+    if (!poll) throw new Error('Poll not found')
+    
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', poll.class_id)
+      .maybeSingle()
+      
+    if (poll.created_by !== userId && classData?.created_by !== userId) {
+      throw new Error('Unauthorized to delete this poll')
+    }
+
+    const { error } = await supabase.from('polls').delete().eq('id', id)
+    if (error) throw new Error(error.message)
   }
 }

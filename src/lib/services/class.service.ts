@@ -615,5 +615,52 @@ export const ClassService = {
       .eq('id', data.classId)
 
     if (error) throw error
+  },
+
+  async togglePin(data: {
+    type: 'announcements' | 'materials' | 'assignments' | 'polls' | 'attendances',
+    id: string,
+    pinned: boolean,
+    userId: string
+  }) {
+    const supabase = await createClient()
+
+    // 1. Get class_id and verify authorization
+    const { data: item } = await supabase
+      .from(data.type as any)
+      .select('class_id, created_by')
+      .eq('id', data.id)
+      .maybeSingle()
+
+    if (!item) throw new Error("Item not found")
+
+    const { data: member } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', item.class_id)
+      .eq('user_id', data.userId)
+      .maybeSingle()
+
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', item.class_id)
+      .maybeSingle()
+
+    const isAuthorized = 
+      item.created_by === data.userId || 
+      member?.role === 'teacher' || 
+      classData?.created_by === data.userId
+
+    if (!isAuthorized) {
+      throw new Error("You do not have permission to pin/unpin this item")
+    }
+
+    // 2. Update pinning status
+    const { error } = await (supabase.from(data.type as any) as any)
+      .update({ pinned: data.pinned } as any)
+      .eq('id', data.id)
+
+    if (error) throw new Error(error.message)
   }
 }

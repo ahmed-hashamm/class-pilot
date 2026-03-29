@@ -1,5 +1,5 @@
 import { getAssignmentDetail } from '@/lib/db_data_fetching/assignments'
-import AssignmentDetail from '@/components/features/assignments/AssignmentDetail'
+import AssignmentDetail from '@/components/features/assignments/AssignmentDetail/AssignmentDetail'
 export const dynamic = 'force-dynamic'
 
 export default async function AssignmentDetailPage({
@@ -16,10 +16,8 @@ export default async function AssignmentDetailPage({
       assignment={assignment}
       isTeacher={isTeacher}
       submission={submission}
-      submissions={submissions}
-      userId={user.id}
+      submissions={submissions || []}
       classId={id}
-      teacherName={teacherName}
     />
   )
 }

@@ -16,9 +16,9 @@ interface Message {
 }
 
 const SUGGESTED_QUESTIONS = [
-  'Summarize the key topics',
-  'What are the main concepts?',
-  'List important definitions',
+  'What are the latest announcements?',
+  'What are the latest updates?',
+  'What is the next deadline?',
 ]
 
 export default function ClassChat({ classId }: ClassChatProps) {

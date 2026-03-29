@@ -2,12 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { Search, X, Check, Plus, AlertCircle, Loader2, UserX } from "lucide-react";
-import Image from "next/image";
+import StudentAvatar from "./GroupCard/StudentAvatar";
+import { Group, BaseUser } from "@/lib/types/schema";
 
 interface GroupModalProps {
-  editingGroup: any;
-  groups: any[];
-  allMembers: any[];
+  editingGroup: Group | null;
+  groups: Group[];
+  allMembers: { user_id: string; role: string; users: BaseUser | null }[];
   onClose: () => void;
   onSave: (title: string, selectedIds: string[]) => void;
   submitting: boolean;
@@ -25,20 +26,15 @@ export default function GroupModal({
 }: GroupModalProps) {
   const [title, setTitle] = useState(editingGroup?.title || "");
   const [selectedIds, setSelectedIds] = useState<string[]>(
-    editingGroup?.project_members?.map((m: any) => m.user_id) || []
+    editingGroup?.project_members?.map((m: { user_id: string }) => m.user_id) || []
   );
   const [searchQuery, setSearchQuery] = useState("");
 
-  const getProfile = (profiles: any) => (Array.isArray(profiles) ? profiles[0] : profiles);
-  const getName = (profiles: any) => getProfile(profiles)?.full_name ?? "Unknown";
-
-  // Identify students who are already in other groups
   const alreadyAssignedIds = useMemo(() => {
     const ids = new Set<string>();
     groups.forEach(g => {
-      // If we're editing a group, don't flag its current members as "already assigned" for this edit
       if (!editingGroup || g.id !== editingGroup.id) {
-        g.project_members?.forEach((m: any) => {
+        g.project_members?.forEach((m: { user_id: string }) => {
           if (m.user_id) ids.add(m.user_id);
         });
       }
@@ -50,12 +46,12 @@ export default function GroupModal({
     return allMembers
       .filter((m) => m.role !== "teacher" && m.role !== "owner")
       .filter((m) =>
-        getName(m.profiles).toLowerCase().includes(searchQuery.toLowerCase())
+        (m.users?.full_name || "Unknown").toLowerCase().includes(searchQuery.toLowerCase())
       );
   }, [allMembers, searchQuery]);
 
   const handleToggle = (id: string, isAssignedElseWhere: boolean) => {
-    if (isAssignedElseWhere) return; // Prevent selection of students in other groups
+    if (isAssignedElseWhere) return;
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
@@ -65,7 +61,7 @@ export default function GroupModal({
     <div className="fixed inset-0 bg-navy/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
       <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border">
         <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-secondary/20">
-          <div>
+          <div className="text-left">
             <h3 className="font-black text-[18px] tracking-tight text-foreground">
               {editingGroup ? "Update Group" : "Create New Group"}
             </h3>
@@ -83,7 +79,7 @@ export default function GroupModal({
             </div>
           )}
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 text-left">
             <label className="text-[11px] font-black tracking-[.2em] uppercase text-navy/40 pl-1">Team Name</label>
             <input
               autoFocus
@@ -123,17 +119,16 @@ export default function GroupModal({
                 filteredMembers.map((s) => {
                   const isSelected = selectedIds.includes(s.user_id);
                   const isAssignedElsewhere = alreadyAssignedIds.has(s.user_id);
-                  const profile = getProfile(s.profiles);
-                  const name = profile?.full_name || "Unknown";
+                  const name = s.users?.full_name || "Unknown";
                   
                   return (
                     <button
                       key={s.user_id}
                       onClick={() => handleToggle(s.user_id, isAssignedElsewhere)}
                       disabled={isAssignedElsewhere}
-                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl border-2 text-[13px] font-bold transition-all group/item
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl border-2 text-[13px] font-bold transition-all group/item
                         ${isSelected 
-                          ? "bg-navy text-white border-navy shadow-md shadow-navy/10 scale-[0.99]" 
+                          ? "bg-navy text-white border-navy shadow-md shadow-navy/10" 
                           : isAssignedElsewhere
                             ? "bg-secondary/20 border-border/10 text-muted-foreground/40 cursor-not-allowed"
                             : "bg-white border-border/50 hover:bg-secondary/50 hover:border-border cursor-pointer"}`}
@@ -141,10 +136,8 @@ export default function GroupModal({
                       <div className="flex items-center gap-3">
                         <StudentAvatar 
                           name={name} 
-                          src={profile?.avatar_url} 
-                          initial={name.charAt(0).toUpperCase()} 
-                          isSelected={isSelected}
-                          isDisabled={isAssignedElsewhere}
+                          src={s.users?.avatar_url}
+                          className={`size-8 ${isSelected ? 'border-white/20' : ''}`}
                         />
                         <div className="flex flex-col items-start gap-0.5">
                           <span className={isSelected ? "text-white" : "text-foreground group-hover/item:text-navy"}>
@@ -184,31 +177,6 @@ export default function GroupModal({
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function StudentAvatar({ name, src, initial, isSelected, isDisabled }: { name: string; src?: string; initial: string; isSelected?: boolean; isDisabled?: boolean }) {
-  const [imgError, setImgError] = useState(false);
-  const avatarSrc = src?.startsWith('http') ? src : src ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${src}` : null;
-
-  return (
-    <div className={`shrink-0 size-8 rounded-xl overflow-hidden border flex items-center justify-center font-black text-[12px] relative transition-all
-      ${isSelected 
-        ? 'bg-white/10 border-white/20 text-white' 
-        : isDisabled
-          ? 'bg-secondary/10 border-border/10 grayscale opacity-40'
-          : 'bg-secondary text-navy border-border'}`}>
-      {avatarSrc && !imgError ? (
-        <Image 
-          src={avatarSrc} 
-          alt={name} 
-          className="object-cover" 
-          fill
-          sizes="32px"
-          onError={() => setImgError(true)} 
-        />
-      ) : initial}
     </div>
   );
 }

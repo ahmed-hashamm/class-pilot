@@ -1,0 +1,5 @@
+-- Add pinned column to class content tables
+ALTER TABLE assignments ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT false;
+ALTER TABLE materials ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT false;
+ALTER TABLE polls ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT false;
+ALTER TABLE attendances ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT false;

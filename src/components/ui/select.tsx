@@ -47,10 +47,11 @@ const Select = ({
     if (options) return options;
     const parsed: { label: string; value: string | number }[] = [];
     React.Children.forEach(children, (child) => {
-      if (React.isValidElement(child) && child.type === "option") {
+      if (React.isValidElement(child) && (child.type === "option" || (child.type as any).displayName === "Option")) {
+        const props = child.props as any;
         parsed.push({
-          label: child.props.children as string,
-          value: child.props.value,
+          label: props.children as string,
+          value: props.value,
         });
       }
     });

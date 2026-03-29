@@ -21,12 +21,35 @@ import {
   saveGroupSchema,
   removeGroupMemberSchema,
   deleteGroupSchema,
-  getClassNameSchema,
   deleteClassSchema,
   updateClassSettingsSchema,
+  getClassNameSchema,
+  togglePinSchema,
   ALLOWED_FILE_TYPES,
 } from "@/lib/validations/class"
 import { ClassService, Note } from "@/lib/services/class.service"
+
+/* ---------------- TOGGLE PIN ---------------- */
+
+export async function togglePinAction(payload: unknown) {
+  const parsed = togglePinSchema.safeParse(payload)
+  if (!parsed.success) return { data: null, error: "Invalid input" }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: "Unauthorized" }
+
+  try {
+    await ClassService.togglePin({
+      ...parsed.data,
+      userId: user.id
+    })
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to toggle pin" }
+  }
+}
 
 // ... existing code ...
 

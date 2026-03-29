@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const createAttendanceSchema = z.object({
   classId: z.string().min(1),
   date: z.string().min(1),
-  title: z.string().optional(),
+  title: z.string().min(1),
   deadline: z.string().optional(),
   pinned: z.boolean().default(false),
 })
@@ -29,4 +29,14 @@ export const submitPollResponseSchema = z.object({
 })
 export const closePollSchema = z.object({
   pollId: z.string().min(1),
+})
+
+export const deleteAttendanceSchema = z.object({
+  id: z.string().min(1),
+  classId: z.string().min(1),
+})
+
+export const deletePollSchema = z.object({
+  id: z.string().min(1),
+  classId: z.string().min(1),
 })

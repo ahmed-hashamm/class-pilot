@@ -3,16 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users } from "lucide-react";
+import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users, PinOff } from "lucide-react";
 import { format } from "date-fns";
 import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
-import { deleteAnnouncement, deleteAssignment, deleteMaterial } from "@/actions/ClassActions";
+import { deleteAnnouncement, deleteAssignment, deleteMaterial, togglePinAction } from "@/actions/ClassActions";
+import { deleteAttendance, deletePoll } from "@/actions/ClassFeaturesActions";
+import { toast } from "sonner";
 import EditAnnouncementModal from "@/components/features/feed/EditAnnouncementModal";
-import { 
-  FEED_TYPE_LABELS, 
-  FEED_TYPE_PILLS, 
-  FEED_ITEM_THEMES 
+import {
+  FEED_TYPE_LABELS,
+  FEED_TYPE_MESSAGES,
+  FEED_ITEM_THEMES
 } from "@/lib/data/feed";
 import { ConfirmModal } from "@/components/ui";
 
@@ -37,8 +39,6 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
 
   const theme = FEED_ITEM_THEMES[item.type] || FEED_ITEM_THEMES.announcement;
 
-  // Labels and pill styles are imported from @/lib/data/feed
-
   const getDisplayName = (path: string) => {
     const fileName = path.split("/").pop() || "File";
     return fileName.includes("-") ? fileName.split("-").slice(1).join("-") : fileName;
@@ -46,6 +46,7 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
 
   const handleDelete = async () => {
     setDeleting(true);
+    const label = FEED_TYPE_LABELS[item.type] || "item";
     try {
       if (item.type === "announcement") {
         await deleteAnnouncement(item.id, classId);
@@ -55,12 +56,17 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
       } else if (item.type === "material") {
         await deleteMaterial(item.id, classId);
         await queryClient.invalidateQueries({ queryKey: ["classMaterials", classId] });
+      } else if (item.type === "poll") {
+        await deletePoll(item.id, classId);
+      } else if (item.type === "attendance") {
+        await deleteAttendance(item.id, classId);
       }
 
       await queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
+      toast.success(`${label} deleted successfully`);
       setShowDeleteConfirm(false);
     } catch {
-      alert(`Failed to delete ${item.type}`);
+      toast.error(`Failed to delete ${label.toLowerCase()}`);
     } finally {
       setDeleting(false);
     }
@@ -72,15 +78,23 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="Delete announcement?"
-        message="This action cannot be undone. All students will lose access to this post."
+        title={`Delete ${FEED_TYPE_LABELS[item.type] || "item"}`}
+        message={FEED_TYPE_MESSAGES[item.type] || "This action cannot be undone."}
         confirmLabel="Delete"
         variant="danger"
         isLoading={deleting}
       />
-      <div className={`bg-white rounded-xl border transition-all duration-200
-        ${isPinned ? "border-navy/30 ring-1 ring-navy/10" : "border-border hover:border-border/80 hover:shadow-sm"}
+      <div className={`bg-white rounded-xl border transition-all duration-300 relative group
+        ${isPinned
+          ? "border-navy/50 shadow-md bg-navy/[0.02]"
+          : "border-border hover:border-border/80 hover:shadow-sm"}
         ${isAssignment ? "hover:shadow-md" : ""}`}>
+
+        {/* Pinned Accent Bar */}
+        {/* {isPinned && (
+          <div className="absolute left-0 top-6 bottom-6 w-1 bg-navy shadow-[0_0_10px_rgba(251,191,36,0.3)] z-10 rounded-r-full rounded-bl-xl" />
+        )} */}
+
         <div className="p-4 flex flex-col gap-3.5">
           <div className="flex items-start gap-4">
             <div className={`shrink-0 size-10 rounded-xl flex items-center justify-center shadow-sm ${theme.bgColor} ${theme.iconColor}`}>
@@ -88,57 +102,96 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <h4 className="font-bold text-[14px] text-foreground leading-snug break-words">
+              <div className="flex items-center justify-between gap-3 mb-1 w-full">
+                <h4 className="font-bold text-[14px] text-foreground leading-tight flex-1 break-all overflow-hidden">
                   {item.title || item.question || (item.type === "material" ? "Class Material" : "Post")}
                 </h4>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {isPinned && <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase bg-yellow/20 text-navy border border-yellow/40 rounded-full px-2 py-0.5"><Pin size={9} /> Pinned</span>}
-                  {item.is_group_project && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase bg-navy/5 text-navy border border-navy/10 rounded-full px-2 py-0.5">
-                      <Users size={9} /> Group
-                    </span>
-                  )}
-                  {isAssignment && item.due_date && (
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider bg-navy/5 text-navy border border-navy/10 rounded-full px-2.5 py-1 shadow-sm">
-                      <Clock size={10} className="text-navy/60" />
-                      Due: {format(new Date(item.due_date), "MMM d, h:mm a")}
-                    </span>
-                  )}
-                  <span className={`text-[10px] font-bold tracking-wide uppercase border rounded-full px-2.5 py-0.5 ${FEED_TYPE_PILLS[item.type]}`}>{FEED_TYPE_LABELS[item.type]}</span>
-                  {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material") && (
-                    <div className="relative">
-                      <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all cursor-pointer bg-transparent border-none"><MoreVertical size={14} /></button>
-                      {menuOpen && (
-                        <>
-                          <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                          <div className="absolute right-0 top-8 z-50 bg-white border border-border rounded-xl shadow-lg overflow-hidden min-w-[140px]">
-                            {item.type === "announcement" && (
-                              <button onClick={() => { setMenuOpen(false); setEditOpen(true); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
-                                <Pencil size={13} className="text-navy" /> Edit
-                              </button>
+                {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material" || item.type === "poll" || item.type === "attendance") && (
+                  <div className="shrink-0 relative">
+                    <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all cursor-pointer bg-transparent border-none"><MoreVertical size={14} /></button>
+                    {menuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                        <div className="absolute right-0 top-8 z-50 bg-white border border-border rounded-xl shadow-lg overflow-hidden min-w-[140px]">
+                          <button
+                            onClick={async () => {
+                              setMenuOpen(false);
+                              const res = await togglePinAction({
+                                id: item.id,
+                                classId,
+                                pinned: !isPinned,
+                                type: item.type === "announcement" ? "announcements" :
+                                  item.type === "assignment" ? "assignments" :
+                                    item.type === "material" ? "materials" :
+                                      item.type === "poll" ? "polls" : "attendances",
+                              });
+                              if (!res.error) {
+                                toast.success(isPinned ? "Item unpinned" : "Item pinned");
+                                await queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
+                              } else {
+                                toast.error(res.error);
+                              }
+                            }}
+                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left"
+                          >
+                            {isPinned ? (
+                              <><PinOff size={13} className="text-navy" /> Unpin</>
+                            ) : (
+                              <><Pin size={13} className="text-navy" /> Pin</>
                             )}
-                            <button onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} disabled={deleting} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
-                              <Trash2 size={13} /> Delete
+                          </button>
+
+                          {item.type === "announcement" && (
+                            <button onClick={() => { setMenuOpen(false); setEditOpen(true); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
+                              <Pencil size={13} className="text-navy" /> Edit
                             </button>
-                          </div>
-                        </>
-                      )}
+                          )}
+                          <button onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} disabled={deleting} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
+                            <Trash2 size={13} /> Delete
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-1 sm:gap-0 text-[11px] text-muted-foreground mt-0.5">
+                {/* Name and Date Row */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="font-medium truncate max-w-[120px]">{item.users?.full_name || "Teacher"}</span>
+                  <span className="text-border font-extrabold">·</span>
+                  <div className="flex items-center gap-1.5">
+                    <Clock size={11} className="shrink-0" />
+                    {item.created_at ? format(new Date(item.created_at), "MMM d") : "Recently"}
+                  </div>
+                </div>
+
+                {/* Badges Row (Inline on Desktop, Stacked on Mobile) */}
+                <div className="flex flex-row items-center gap-1.5 sm:gap-1.5 flex-wrap">
+                  <span className="text-border font-extrabold hidden sm:inline ml-1.5">·</span>
+
+                  {item.is_group_project && (
+                    <div className="flex items-center text-navy sm:ml-1.5" title="Group Project">
+                      <Users size={12} className="opacity-80" />
+                    </div>
+                  )}
+
+                  {isAssignment && item.due_date && (
+                    <div className="flex items-center gap-1.5 text-navy font-bold sm:ml-1.5" title={`Due: ${format(new Date(item.due_date), "MMM d, h:mm a")}`}>
+                      {item.is_group_project && <span className="text-border font-extrabold mr-1.5">·</span>}
+                      <Clock size={12} className="text-rose-500" />
+                      <span>{format(new Date(item.due_date), "MMM d, h:mm a")}</span>
                     </div>
                   )}
                 </div>
               </div>
-              <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
-                <span className="font-medium">{item.users?.full_name || "Teacher"}</span>
-                <span className="text-border">·</span>
-                <Clock size={11} />
-                {item.created_at ? format(new Date(item.created_at), "MMM d, h:mm a") : "Recently"}
-              </p>
             </div>
           </div>
 
           {(item.content || item.description) && !item.question && (
-            <p className="text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap break-words pl-[48px]">{item.content || item.description}</p>
+            <p className="text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap break-all overflow-hidden pl-[48px]">
+              {item.content || item.description}
+            </p>
           )}
 
           {children}

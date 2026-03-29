@@ -5,8 +5,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { getGroupsWithMembers, getAllClassMembers } from "@/lib/db_data_fetching/groups";
 import { saveGroup, deleteGroup, removeGroupMember } from "@/actions/ClassActions";
-import GroupCard from "./GroupCard";
+import GroupCard from "./GroupCard/GroupCard";
 import GroupModal from "./GroupModal";
+import { Group } from "@/lib/types/schema";
 import { 
   PageHeader, 
   EmptyState, 
@@ -25,17 +26,17 @@ interface GroupListProps {
 export default function GroupList({ classId, isTeacher }: GroupListProps) {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
-  const [editingGroup, setEditingGroup] = useState<any>(null);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-  const [groupToDelete, setGroupToDelete] = useState<any>(null);
+  const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
   const { data: groups = [], isLoading: loadingGroups, error: errorGroups, refetch: refetchGroups } = useQuery({
     queryKey: ["groups", classId],
     queryFn: async () => {
       const { groups: data, error } = await getGroupsWithMembers(classId);
       if (error) throw new Error(error);
-      return (data || []) as any[];
+      return (data || []) as Group[];
     },
   });
 

@@ -15,7 +15,7 @@ interface AttendanceInputProps {
 }
 
 export default function AttendanceInput({ classId, onSuccess }: AttendanceInputProps) {
-  const [topic, setTopic] = useState('')
+  const [title, setTitle] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [deadline, setDeadline] = useState('')
   const [isPinned, setIsPinned] = useState(false)
@@ -23,8 +23,8 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
   const router = useRouter()
 
   const handleCreate = async () => {
-    if (!date) {
-      toast.error('Date is required')
+    if (!title.trim() || !date) {
+      toast.error('Title and Date are required')
       return
     }
 
@@ -33,14 +33,14 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
       const result = await createAttendance(
         classId,
         date,
-        topic || undefined,
+        title,
         deadline ? new Date(deadline).toISOString() : undefined,
         isPinned
       )
 
       if (result.success) {
         toast.success('Attendance session created')
-        setTopic('')
+        setTitle('')
         setDeadline('')
         setIsPinned(false)
         if (onSuccess) onSuccess()
@@ -55,15 +55,17 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
     }
   }
 
+  const isFormValid = title.trim() && date
+
   return (
     <div className="space-y-6">
       <div className="grid gap-5">
-        <FormSection label="Session Topic (Optional)" description="e.g. Lecture 12: Introduction to React">
+        <FormSection label="Attendance Title" description="e.g. Lecture 12: Introduction to React">
           <div className="relative">
             <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/40" />
             <Input 
-              value={topic} 
-              onChange={(e) => setTopic(e.target.value)} 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
               placeholder="What is this session about?"
               className="pl-10 rounded-xl border-border bg-gray-50/50 py-6"
             />
@@ -101,12 +103,12 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
             pinned={isPinned} 
             onToggle={setIsPinned} 
           />
-          {(topic.trim() || deadline) && (
+          {(title.trim() || deadline) && (
             <FeatureButton
               label="Clear"
               variant="ghost"
               onClick={() => {
-                setTopic('')
+                setTitle('')
                 setDeadline('')
                 setIsPinned(false)
               }}
@@ -117,7 +119,7 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
           label="Create Session"
           icon={SendHorizontal}
           loading={loading}
-          disabled={!date}
+          disabled={!isFormValid || loading}
           onClick={handleCreate}
           className="min-w-[180px] py-6 shadow-md"
           size="lg"
