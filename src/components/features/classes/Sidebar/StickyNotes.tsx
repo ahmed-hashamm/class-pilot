@@ -3,7 +3,7 @@
 // import { useState, useTransition, useEffect } from 'react'
 // import { Button } from '@/components/ui/button'
 // import { X } from 'lucide-react'
-// import SidebarCard from './Sidebar'
+// import SidebarCard from './SidebarCard'
 // import {
 //   getStickyNotes,
 //   addStickyNote,
@@ -96,7 +96,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { X, Plus, StickyNote, Loader2 } from 'lucide-react'
-import SidebarCard from './Sidebar'
+import SidebarCard from './SidebarCard'
 import {
   getStickyNotes,
   addStickyNote,

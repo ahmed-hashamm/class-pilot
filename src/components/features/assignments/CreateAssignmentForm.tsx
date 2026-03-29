@@ -4,7 +4,6 @@ import { FeatureButton } from "@/components/ui";
 import { AssignmentBasics, AssignmentAttachments } from "./AssignmentFormComponents";
 import { AssignmentConfig } from "./AssignmentFormConfig";
 import { useAssignmentForm } from "@/lib/hooks";
-import { PinToggle } from "../feed/PinToggle";
 
 export default function CreateAssignmentForm({ classId, userId, rubrics, initialData }: any) {
   const {
@@ -27,22 +26,22 @@ export default function CreateAssignmentForm({ classId, userId, rubrics, initial
   return (
     <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8 items-start w-full">
       <div className="flex-1 flex flex-col gap-5 w-full">
-        <AssignmentBasics 
+        <AssignmentBasics
           title={title} setTitle={setTitle}
           description={description} setDescription={setDescription}
         />
-        <AssignmentAttachments 
-          newFiles={newFiles} 
-          existingFiles={existingFiles} 
-          setNewFiles={setNewFiles} 
-          setExistingFiles={setExistingFiles} 
+        <AssignmentAttachments
+          newFiles={newFiles}
+          existingFiles={existingFiles}
+          setNewFiles={setNewFiles}
+          setExistingFiles={setExistingFiles}
         />
       </div>
       <div className="w-full lg:w-64 shrink-0 flex flex-col gap-4">
-        <AssignmentConfig 
-          isGroupProject={isGroupProject} 
-          setIsGroupProject={setIsGroupProject} 
-          rubrics={rubrics} 
+        <AssignmentConfig
+          isGroupProject={isGroupProject}
+          setIsGroupProject={setIsGroupProject}
+          rubrics={rubrics}
           initialData={initialData}
           pinned={isPinned}
           onToggle={setIsPinned}
@@ -53,7 +52,7 @@ export default function CreateAssignmentForm({ classId, userId, rubrics, initial
           submissionType={submissionType} setSubmissionType={setSubmissionType}
           rubricId={rubricId} setRubricId={setRubricId}
         />
-        
+
         <FeatureButton
           type="submit"
           loading={loading}

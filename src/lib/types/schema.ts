@@ -1,4 +1,4 @@
-import { Database } from '@/types/database.utf8'
+import { Database } from '@/types/database'
 
 export type BaseUser = {
   full_name: string | null

@@ -1,6 +1,6 @@
 "use client";
 
-import SidebarCard from "./Sidebar";
+import SidebarCard from "./SidebarCard";
 
 interface DueSoonCardProps {
   assignments: { id: string; title: string; due_date: string | null }[];

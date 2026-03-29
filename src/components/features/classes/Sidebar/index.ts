@@ -1,5 +1,5 @@
-export { default as Sidebar } from './Sidebar';
-export * from './Sidebar';
+export { default as Sidebar } from './SidebarCard';
+export * from './SidebarCard';
 export { default as StickyNotes } from './StickyNotes';
 export * from './StickyNotes';
 export { default as ClassCodeCard } from './ClassCodeCard';

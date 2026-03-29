@@ -43,7 +43,7 @@ export const ClassFeaturesService = {
         class_id: data.classId,
         title: data.title as any,
         date: data.date,
-      })
+      } as any)
       .select()
       .maybeSingle()
 
@@ -69,7 +69,7 @@ export const ClassFeaturesService = {
       .maybeSingle()
 
     if (!record || (record as any).closed_at) throw new Error("Attendance is closed or not found")
-    
+
     const { data, error } = await supabase.from('attendance_records').upsert({
       attendance_id: attendanceId,
       user_id: userId,

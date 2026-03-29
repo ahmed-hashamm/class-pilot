@@ -159,9 +159,9 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
 
                     {/* Pin toggle */}
                     <div className="pt-2">
-                        <PinToggle 
-                            pinned={isPinned} 
-                            onToggle={setIsPinned} 
+                        <PinToggle
+                            pinned={isPinned}
+                            onToggle={setIsPinned}
                         />
                     </div>
                 </div>
