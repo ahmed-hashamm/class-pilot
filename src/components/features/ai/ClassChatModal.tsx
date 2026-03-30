@@ -45,13 +45,13 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
             />
 
             {/* Modal */}
-            <motion.div 
+            <motion.div
               variants={MODAL_VARIANTS}
               initial="initial"
               animate="animate"
               exit="exit"
               transition={SPRING_TRANSITION}
-              className="relative w-full sm:max-w-lg h-[75vh]
+              className="relative w-full sm:max-w-lg h-[85vh]
                 bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl
                 flex flex-col overflow-hidden"
             >

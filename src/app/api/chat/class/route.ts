@@ -9,23 +9,10 @@ import { getStreamFeed } from '@/lib/db_data_fetching/stream'
 
 export const dynamic = 'force-dynamic'
 
-// Enrich short/vague questions into better vector search queries
-const ENRICH_PROMPT = (q: string) => `
-You are a search query optimizer for a classroom AI assistant.
-Transform the user's question into a concise vector search query.
-
-Rules:
-- If the question is a follow-up (pronouns like "they", "it", "their", or vague references 
-  like "the members", "the deadline"), resolve what it refers to using the context above 
-  and include the full reference in the search query.
-- Preserve exact document or file names if mentioned.
-- Focus on the core information being requested.
-- Return ONLY the search query, nothing else.
-
-Examples:
-Context: what is the project title in the Internship Final Report
-Question: who are the members?
-Output: Internship Final Report project members team
+const ENRICH_PROMPT = (q: string) => `Refine for vector search.
+- Resolve vague references (it, they, the members) via context.
+- Keep exact file names.
+- Return ONLY the query.
 
 ${q}
 `

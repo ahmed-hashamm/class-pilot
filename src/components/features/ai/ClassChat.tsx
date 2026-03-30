@@ -103,7 +103,7 @@ export default function ClassChat({ classId }: ClassChatProps) {
     <div className="flex h-full flex-col bg-background">
 
       {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-3 bg-white">
+      <div className="flex  items-center justify-between border-b px-4 py-2.5 bg-white">
         <div className="flex items-center gap-2.5">
           <div className="size-8 rounded-lg bg-navy flex items-center justify-center shadow-sm shrink-0">
             <Sparkles className="size-3.5 text-yellow" />
@@ -122,7 +122,7 @@ export default function ClassChat({ classId }: ClassChatProps) {
           onClick={handleClearChat}
           disabled={messages.length === 0 || clearing}
           title="Clear chat history"
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-semibold
             text-muted-foreground/30 hover:text-red-500 
             transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none
             active:scale-95 mr-7"
@@ -135,7 +135,7 @@ export default function ClassChat({ classId }: ClassChatProps) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
+      <div className="flex-1  overflow-y-auto px-4 py-4 custom-scrollbar">
         {initializing ? (
           <div className="flex h-full flex-col items-center justify-center gap-3">
             <div className="flex gap-1.5 items-center">
@@ -163,7 +163,7 @@ export default function ClassChat({ classId }: ClassChatProps) {
                 Ask about deadlines, materials, polls, or anything in {className}.
               </p>
             </div>
-            <div className="flex flex-col gap-1.5 w-full max-w-[260px]">
+            {/* <div className="flex flex-col gap-1.5 w-full max-w-[260px]">
               {SUGGESTED_QUESTIONS.slice(0, 3).map((q) => (
                 <button
                   key={q}
@@ -176,12 +176,12 @@ export default function ClassChat({ classId }: ClassChatProps) {
                 >
                   {q}
                 </button>
-              ))}
-            </div>
+              ))} 
+          </div>*/}
           </div>
 
         ) : (
-          <div className="space-y-1 pb-2">
+          <div className="space-y-1.5 pb-2">
             {messages.map((msg, i) => (
               <ChatMessage key={i} role={msg.role} content={msg.content} />
             ))}
@@ -217,24 +217,24 @@ export default function ClassChat({ classId }: ClassChatProps) {
       </div>
 
       {/* Input area */}
-      <div className="px-4 pb-4 pt-3 bg-white border-t border-border/60">
-        {messages.length > 0 && (
-          <div className="flex gap-1.5 overflow-x-auto pb-2.5 no-scrollbar">
-            {SUGGESTED_QUESTIONS.map((q) => (
-              <button
-                key={q}
-                onClick={() => sendMessage(q)}
-                disabled={loading || clearing}
-                className="whitespace-nowrap text-[10px] font-bold text-navy/40 bg-navy/[0.04]
+      <div className="px-4 pb-3.5 pt-2 bg-white border-t border-border/60">
+
+        <div className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
+          {SUGGESTED_QUESTIONS.map((q) => (
+            <button
+              key={q}
+              onClick={() => sendMessage(q)}
+              disabled={loading || clearing}
+              className="whitespace-nowrap text-[10px] font-bold text-navy/40 bg-navy/[0.04]
                   border border-navy/[0.08] rounded-lg px-2.5 py-1.5
                   hover:bg-navy/[0.08] hover:text-navy/60 hover:border-navy/15
                   transition-all duration-150 disabled:opacity-40 active:scale-95"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        )}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+
 
         <form
           onSubmit={(e) => { e.preventDefault(); sendMessage() }}
@@ -272,6 +272,6 @@ export default function ClassChat({ classId }: ClassChatProps) {
           30% { transform: translateY(-3px); opacity: 0.7; }
         }
       ` }} />
-    </div>
+    </div >
   )
 }
