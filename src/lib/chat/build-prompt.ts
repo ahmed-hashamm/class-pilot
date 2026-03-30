@@ -1,69 +1,4 @@
-// /**
-//  * Builds a RAG-enhanced system prompt for the class AI assistant.
-//  * Includes conversation history for context-aware follow-up questions.
-//  */
-// export function buildPrompt(
-//   context: string,
-//   question: string,
-//   history: { role: string; content: string }[] = [],
-//   liveData?: string,
-//   availableMaterials?: string
-// ): string {
-//   // Build conversation history string
-//   const historyStr = history.length > 0
-//     ? '\nCONVERSATION HISTORY:\n' +
-//       history.slice(-6).map((m) =>
-//         `${m.role === 'user' ? 'Student' : 'Assistant'}: ${m.content}`
-//       ).join('\n') + '\n'
-//     : ''
-
-//   // Strictly split live data into sections
-//   const liveLines = liveData?.split('\n') || []
-//   const upcomingItems = liveLines.filter(line => line.includes('(Upcoming)') || line.includes('[Ann]') || line.includes('[Poll]') || line.includes('[Att]')).join('\n')
-//   const pastItems = liveLines.filter(line => line.includes('(Past)')).join('\n')
-
-//   const formattedLiveData = `
-// [UPCOMING ACTIVITIES & UPDATES]
-// ${upcomingItems || '(No active updates found)'}
-
-// [RECENT HISTORY / COMPLETED]
-// ${pastItems || '(No recent history items)'}
-// `
-
-//   return `
-// You are Class Pilot AI, a helpful university classroom assistant.
-// TODAY'S DATE: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-
-// Your job is to answer student questions based on the class data provided below.
-// Be clear, concise, and professional.
-
-// Rules:
-// - **Authority on Status & Availability**: 
-//   - For temporal updates (deadlines, live polls), use [UPCOMING ACTIVITIES & UPDATES].
-//   - For permanent class files, use [SYNCED CLASS MATERIALS].
-//   - If a section is empty, say: "There are currently no active [feature] for this class."
-// - **STRICT DEADLINE FILTER**: For "next", "upcoming", or "current" deadlines, ONLY use items from [UPCOMING ACTIVITIES & UPDATES]. DO NOT use history for these questions.
-// - **Material Reference**: Materials are indexed by their **Title** (listed in SYNCED CLASS MATERIALS). If a user refers to a material by its title, or says "the file named...", find the matching Title in the index and use its content from the CONTEXT section to answer.
-// - **Answer Sourcing**: If you can't find an answer in LIVE CLASS DATA, SYNCED CLASS MATERIALS, or CONTEXT FROM MATERIALS, say:
-//   "I couldn't find this in the class materials. Try asking your teacher directly!"
-// - Never make up information.
-// - Format: Plain text only, NO markdown (**), hashtags (#), or dashes (-) for lists. Use spaces and newlines.
-
-// LIVE CLASS DATA:
-// ${formattedLiveData}
-
-// SYNCED CLASS MATERIALS:
-// ${availableMaterials || '(No synced materials found)'}
-
-// CONTEXT FROM MATERIALS:
-// ${context || '(No relevant materials found)'}
-
-// ${historyStr}
-
-// CURRENT QUESTION:
-// ${question}
-// `
-// }
+// {working }//
 interface Message {
   role: string
   content: string
@@ -102,57 +37,112 @@ export function buildPrompt(
       .join('\n')
     : ''
 
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  const currentDateTime = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
   })
 
-  return `You are Class Pilot AI, a helpful university classroom assistant.
-TODAY: ${today}
+  return `You are Class Pilot AI, a helpful, professional university classroom assistant.
+CURRENT DATE & TIME: ${currentDateTime}
 
-Answer student questions using ONLY the data provided below. Never make up information.
+Your goal is to provide clear, well-formatted, and helpful answers using ONLY the data sections below.
 
 ━━━━━━━━━━━━━━━━━━━━━━━
 SECTION 1 — UPCOMING DEADLINES
-Use this for: "what's due", "next deadline", "upcoming assignments"
 ${upcomingDeadlines || '(No upcoming deadlines)'}
 
 SECTION 2 — ACTIVE POLLS
-Use this for: any question about current polls or voting
 ${polls || '(No active polls)'}
 
 SECTION 3 — ACTIVE ATTENDANCE
-Use this for: any question about current attendance sessions
 ${attendance || '(No active attendance session)'}
 
 SECTION 4 — RECENT ANNOUNCEMENTS
-Use this for: latest updates, news, or messages from the teacher
 ${announcements || '(No recent announcements)'}
 
 SECTION 5 — PAST ASSIGNMENTS
-Use this for: questions about completed or past work
 ${pastAssignments || '(No past assignments)'}
 
-━━━━━━━━━━━━━━━━━━━━━━━
 SECTION 6 — SYNCED MATERIALS INDEX
-These are the uploaded files available for questions:
 ${availableMaterials || '(No materials synced)'}
 
 SECTION 7 — CONTENT FROM MATERIALS
-Use this to answer questions about specific files, documents, or uploaded content:
 ${chunks || '(No relevant content found)'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━
 ${historyStr ? `CONVERSATION HISTORY:\n${historyStr}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n` : ''}
-STUDENT QUESTION: ${question}
 
-━━━━━━━━━━━━━━━━━━━━━━━
-RULES:
-1. For deadline/assignment questions → use SECTION 1 or SECTION 5 only.
-2. For poll questions → use SECTION 2 only.
-3. For attendance questions → use SECTION 3 only.
-4. For announcements/updates → use SECTION 4 only.
-5. For material/document questions → use SECTIONS 6 and 7.
-6. If no answer is found in any section → say: "I couldn't find this in the class data. Ask your teacher directly."
-7. Format: plain text only. No markdown, no asterisks, no hashtags. Use newlines for spacing.
+RULES FOR YOUR RESPONSE:
+1. NEVER include internal tags like [Ann], [Asgn], [Poll], or [Att] in your response. These are for your reference only.
+2. Use Markdown for clarity: 
+   - Use **bold** for deadlines, dates, titles, and important terms.
+   - Use bulleted lists for multiple items (e.g., announcements or assignments).
+   - Use ### headers if you need to separate different topics.
+3. Be helpful and professional. If a deadline is missing, say "No upcoming deadlines found."
+4. If you don't know the answer from the data provided, say: "I couldn't find this in the class data. Ask your teacher directly."
+6. Keep your responses concise and direct. Use the minimum amount of tokens necessary while still being helpful.
+7. Avoid wordy conclusions. End with a very short follow-up like "Any other questions?" or "How else can I help?".
+
+
+
+STUDENT QUESTION: ${question}
 `
 }
+
+// interface Message {
+//   role: string
+//   content: string
+// }
+
+// export function buildPrompt(
+//   chunks: string,
+//   question: string,
+//   history: Message[] = [],
+//   liveData?: string,
+//   availableMaterials?: string
+// ): string {
+//   const lines = liveData?.split('\n').filter(Boolean) || []
+
+//   const upcoming    = lines.filter(l => l.includes('[Asgn]') && l.includes('(Upcoming)')).join('\n')
+//   const past        = lines.filter(l => l.includes('[Asgn]') && l.includes('(Past)')).join('\n')
+//   const announcements = lines.filter(l => l.includes('[Ann]')).join('\n')
+//   const polls       = lines.filter(l => l.includes('[Poll]')).join('\n')
+//   const attendance  = lines.filter(l => l.includes('[Att]')).join('\n')
+
+//   // Only render sections that have actual data — skip empty ones entirely
+//   const sections: string[] = []
+
+//   if (upcoming)       sections.push(`[UPCOMING ASSIGNMENTS]\n${upcoming}`)
+//   if (polls)          sections.push(`[ACTIVE POLLS]\n${polls}`)
+//   if (attendance)     sections.push(`[ACTIVE ATTENDANCE]\n${attendance}`)
+//   if (announcements)  sections.push(`[ANNOUNCEMENTS]\n${announcements}`)
+//   if (past)           sections.push(`[PAST ASSIGNMENTS]\n${past}`)
+//   if (availableMaterials) sections.push(`[SYNCED MATERIALS]\n${availableMaterials}`)
+//   if (chunks)         sections.push(`[MATERIAL CONTENT]\n${chunks}`)
+
+//   const historyStr = history.length > 0
+//     ? '[CONVERSATION HISTORY]\n' +
+//       history.slice(-4).map(m =>
+//         `${m.role === 'user' ? 'Student' : 'AI'}: ${m.content}`
+//       ).join('\n')
+//     : ''
+
+//   const today = new Date().toLocaleDateString('en-US', {
+//     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+//   })
+
+//   return `You are Class Pilot AI, a university classroom assistant. TODAY: ${today}
+// Answer using ONLY the data below. Never make up information.
+
+// Rules:
+// - Deadlines/assignments → use UPCOMING or PAST ASSIGNMENTS
+// - Polls → use ACTIVE POLLS
+// - Attendance → use ACTIVE ATTENDANCE
+// - Announcements/updates → use ANNOUNCEMENTS
+// - Document/file questions → use SYNCED MATERIALS + MATERIAL CONTENT
+// - If not found → say: "I couldn't find this in the class data. Ask your teacher directly."
+// - Plain text only. No markdown, asterisks, or hashtags.
+
+// ${sections.join('\n\n')}
+
+// ${historyStr ? historyStr + '\n\n' : ''}[QUESTION] ${question}`
+// }

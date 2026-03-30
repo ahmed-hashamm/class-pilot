@@ -21,6 +21,9 @@ export default function AssignmentDateBox({ dueDate, muted }: AssignmentDateBoxP
           <span className={`text-[10px] font-bold text-muted-foreground/40 mt-1`}>
             {format(dueDate, "EEE")}
           </span>
+          <span className={`text-[9px] font-black leading-none mt-2 px-1.5 py-1 rounded-md ${muted ? "bg-muted-foreground/10 text-muted-foreground/40" : "bg-navy/5 text-navy/40"}`}>
+            {format(dueDate, "h:mm a")}
+          </span>
         </>
       ) : (
         <Calendar size={20} className="text-muted-foreground/20" />

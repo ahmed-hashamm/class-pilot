@@ -65,6 +65,7 @@
 //     }
 // }
 
+//{working}//
 import { createClient } from '@/lib/supabase/server'
 import { embedText } from '@/lib/ingestion/embed-text'
 
@@ -95,7 +96,9 @@ export async function retrieveContext(question: string, classId: string, matchCo
 
     const getFriendlyFilename = (path: string) => {
         try {
-            return decodeURIComponent(path).split('/').pop() || 'Unknown File'
+            const rawName = decodeURIComponent(path).split('/').pop() || 'Unknown File'
+            // Strip leading timestamp (e.g., "174242132142-") added during upload
+            return rawName.replace(/^\d+-/, '')
         } catch {
             return 'File'
         }
@@ -117,3 +120,5 @@ export async function retrieveContext(question: string, classId: string, matchCo
 
     return { chunks: chunkText, availableMaterials }
 }
+
+
