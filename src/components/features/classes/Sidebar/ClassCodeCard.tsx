@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Lock, Copy, CheckCheck, Eye, EyeOff } from "lucide-react";
-import SidebarCard from "./Sidebar";
+import SidebarCard from "./SidebarCard";
 
 interface ClassCodeCardProps {
   classCode: string;
