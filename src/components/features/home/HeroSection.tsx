@@ -3,7 +3,7 @@ import ActionButton from "./ActionButton";
 
 const HeroSection = () => {
   return (
-    <section className="bg-navy text-primary-foreground relative overflow-hidden">
+    <section className="bg-navy h-full text-primary-foreground relative overflow-hidden">
       {/* Background decoration: clean wavy line */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <svg
@@ -20,8 +20,8 @@ const HeroSection = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-[1600px] mx-auto p-8 md:p-12 lg:p-16">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div className="w-full max-w-[1600px] mx-auto p-8 py-16 md:p-12 lg:p-16">
+        <div className="grid lg:grid-cols-2 gap-20 sm:gap-16 items-center">
           {/* Text Content */}
           <div className="relative z-10 max-w-2xl">
             <h1 className="text-4xl lg:text-5xl font-extrabold leading-[1.1] mb-8 tracking-tight">

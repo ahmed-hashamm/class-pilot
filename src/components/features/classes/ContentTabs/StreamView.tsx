@@ -6,6 +6,7 @@ import Feed from "@/components/features/feed/Feed";
 import StickyNotes from "@/components/features/classes/sidebar/StickyNotes";
 import ClassCodeCard from "@/components/features/classes/sidebar/ClassCodeCard";
 import DueSoonCard from "@/components/features/classes/sidebar/DueSoonCard";
+import StreamSidebarMobile from "@/components/features/classes/sidebar/StreamSidebarMobile";
 
 interface StreamViewProps {
   classId: string;
@@ -36,9 +37,18 @@ export default function StreamView({
   const isCodeHidden = settings?.showClassCode === false;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full mx-auto py-4">
-      {/* Sidebar */}
-      <div className="lg:col-span-3 flex flex-col gap-4">
+    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 w-full mx-auto pt-0 lg:pt-4 pb-4">
+      {/* Mobile-Only Toggleable Sidebar */}
+      <StreamSidebarMobile
+        classId={classId}
+        classCode={classCode}
+        isTeacher={isTeacher}
+        isCodeHidden={isCodeHidden}
+        assignments={assignments}
+      />
+
+      {/* Desktop Sidebar (lg and above) */}
+      <div className="hidden lg:col-span-3 lg:flex lg:flex-col gap-6">
         <ClassCodeCard
           classCode={classCode}
           isTeacher={isTeacher}
@@ -48,8 +58,8 @@ export default function StreamView({
         <StickyNotes classId={classId} />
       </div>
 
-      {/* Feed */}
-      <div className="lg:col-span-9">
+      {/* Main Feed */}
+      <div className="flex-1 lg:col-span-9">
         <Feed classId={classId} isTeacher={isTeacher} userId={userId} />
       </div>
     </div>
