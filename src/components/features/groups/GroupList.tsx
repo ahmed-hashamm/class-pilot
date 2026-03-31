@@ -102,7 +102,12 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
   };
 
   if (loadingGroups || loadingMembers) {
-    return <div className="py-6"><SkeletonLoader variant="list" count={3} /></div>;
+    return (
+      <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
+        <SkeletonLoader variant="header" />
+        <SkeletonLoader variant="card" count={4} />
+      </div>
+    );
   }
 
   if (errorGroups) {

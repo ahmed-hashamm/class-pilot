@@ -19,22 +19,22 @@ export default function ClassPageSkeleton() {
         <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 relative pb-8">
           <div className="w-full">
             {/* Role badge skeleton */}
-            <div className="h-5 w-20 rounded-full bg-white/10 animate-pulse mb-4 border border-white/10" />
+            <div className="h-5 w-20 rounded-full bg-white/20 animate-pulse mb-4 border border-white/15" />
             
             {/* Class name skeleton (Dynamic width) */}
-            <div className="h-9 w-1/3 min-w-[200px] bg-white/10 rounded-xl animate-pulse mb-3" />
+            <div className="h-9 w-1/3 min-w-[200px] bg-white/20 rounded-xl animate-pulse mb-3" />
             
             {/* Description skeleton */}
             <div className="space-y-2.5 mb-8">
-              <div className="h-3.5 w-1/2 max-w-[400px] bg-white/5 rounded-md animate-pulse" />
-              <div className="h-3.5 w-1/3 max-w-[300px] bg-white/5 rounded-md animate-pulse" />
+              <div className="h-3.5 w-1/2 max-w-[400px] bg-white/10 rounded-md animate-pulse" />
+              <div className="h-3.5 w-1/3 max-w-[300px] bg-white/10 rounded-md animate-pulse" />
             </div>
 
             {/* Tabs skeleton - Matching ClassTabs spacing */}
-            <div className="flex gap-8 border-b border-white/5">
+            <div className="flex gap-8 border-b border-white/10">
               {['Stream', 'Assignments', 'People', 'Materials'].map((tab) => (
                 <div key={tab} className="pb-4 border-b-2 border-transparent">
-                  <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
+                  <div className="h-4 w-16 bg-white/20 rounded animate-pulse" />
                 </div>
               ))}
             </div>
@@ -48,11 +48,11 @@ export default function ClassPageSkeleton() {
           {/* Sidebar Skeleton (lg:col-span-3) */}
           <div className="lg:col-span-3 flex flex-col gap-6">
             {/* Class Code Card skeleton */}
-            <div className="h-32 bg-white border border-border/60 rounded-2xl animate-pulse shadow-sm" />
+            <div className="h-32 bg-white border border-border/80 rounded-2xl animate-pulse shadow-sm" />
             {/* Due Soon Card skeleton */}
-            <div className="h-56 bg-white border border-border/60 rounded-2xl animate-pulse shadow-sm" />
+            <div className="h-56 bg-white border border-border/80 rounded-2xl animate-pulse shadow-sm" />
             {/* Sticky Notes skeleton */}
-            <div className="h-44 bg-white border border-border/60 rounded-2xl animate-pulse shadow-sm" />
+            <div className="h-44 bg-white border border-border/80 rounded-2xl animate-pulse shadow-sm" />
           </div>
 
           {/* Feed Skeleton (lg:col-span-9) */}

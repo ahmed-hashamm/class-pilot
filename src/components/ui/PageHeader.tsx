@@ -21,14 +21,14 @@ export function PageHeader({
   secondaryAction
 }: PageHeaderProps) {
   return (
-    <motion.div 
+    <motion.div
       variants={FADE_IN}
       initial="initial"
       animate="animate"
       className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="flex items-center gap-3">
-        <div className="size-10 rounded-xl bg-navy flex items-center justify-center shadow-sm">
+        <div className="size-10  shrink-0 rounded-xl bg-navy flex items-center justify-center shadow-sm">
           <Icon size={17} className="text-yellow" />
         </div>
         <div>

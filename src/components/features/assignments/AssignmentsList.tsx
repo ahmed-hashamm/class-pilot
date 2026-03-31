@@ -45,14 +45,9 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 py-6">
-        <PageHeader 
-          icon={ClipboardList} 
-          title="Assignments" 
-          description="Coursework and evaluative materials"
-          action={HeaderAction}
-        />
-        <SkeletonLoader variant="list" />
+      <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
+        <SkeletonLoader variant="header" />
+        <SkeletonLoader variant="list" count={4} />
       </div>
     );
   }

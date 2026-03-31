@@ -161,7 +161,7 @@ export default function ClassTabs({
                     : "bg-white/10 border border-white/15 text-white/75 hover:bg-white/18 hover:text-white"
                   }`}
               >
-                <Icon size={14} className={isActive ? "text-navy" : "text-white/60"} />
+                <Icon size={14} className={`shrink-0 ${isActive ? "text-navy" : "text-white/60"}`} />
                 {tab.label}
               </button>
             );

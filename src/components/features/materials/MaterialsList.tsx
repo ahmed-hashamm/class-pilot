@@ -95,14 +95,9 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 py-6">
-        <PageHeader 
-          icon={Database} 
-          title="Class Materials" 
-          description="Shared documents and resources"
-          action={HeaderAction}
-        />
-        <SkeletonLoader variant="list" />
+      <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
+        <SkeletonLoader variant="header" />
+        <SkeletonLoader variant="list" count={5} />
       </div>
     );
   }
