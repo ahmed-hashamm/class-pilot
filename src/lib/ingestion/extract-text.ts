@@ -1,9 +1,35 @@
 import { createClient } from '@/lib/supabase/server'
 
-/**
- * Extracts text content from all attachments of a material record.
- * Supports PDF and DOCX file types.
- */
+export interface FileAttachment {
+  path: string
+  type: string
+}
+
+export async function extractTextFromBuffer(buffer: Buffer, fileType: string): Promise<string> {
+  const type = fileType.toLowerCase()
+
+  switch (type) {
+    case 'pdf':
+      return await extractPdf(buffer)
+
+    case 'docx':
+    case 'doc':
+      return await extractDocx(buffer)
+
+    case 'ppt':
+    case 'pptx':
+      return await extractPptx(buffer)
+
+    case 'txt':
+    case 'md':
+      return buffer.toString('utf-8')
+
+    default:
+      console.warn(`[extract-text] Unsupported file type: ${type}`)
+      return ''
+  }
+}
+
 export async function extractTextFromMaterial(material: {
   id: string
   class_id: string
@@ -11,59 +37,58 @@ export async function extractTextFromMaterial(material: {
   file_types?: string[]
 }): Promise<string> {
   const supabase = await createClient()
-  let fullText = ''
-
   const paths = material.attachment_paths ?? []
   const types = material.file_types ?? []
 
-  for (let i = 0; i < paths.length; i++) {
-    const path = paths[i]
-    const type = (types[i] ?? '').toLowerCase()
+  if (paths.length === 0) {
+    return ''
+  }
 
+  const attachments: FileAttachment[] = paths.map((path, i) => ({
+    path,
+    type: types[i] ?? '',
+  }))
+
+  return await extractTextFromFiles(supabase, attachments, 'materials')
+}
+
+export async function extractTextFromSubmission(
+  supabase: ReturnType<typeof createClient> extends Promise<infer T> ? T : never,
+  attachments: FileAttachment[]
+): Promise<string> {
+  return await extractTextFromFiles(supabase, attachments, 'assignments')
+}
+
+async function extractTextFromFiles(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  attachments: FileAttachment[],
+  bucket: string
+): Promise<string> {
+  if (attachments.length === 0) {
+    return ''
+  }
+
+  const downloadPromises = attachments.map(async (attachment) => {
     const { data, error } = await supabase.storage
-      .from('materials')
-      .download(path)
+      .from(bucket)
+      .download(attachment.path)
 
     if (error || !data) {
-      console.error(`[extract-text] Failed to download ${path}:`, error)
-      continue
+      console.error(`[extract-text] Failed to download ${attachment.path}:`, error)
+      return ''
     }
 
     const buffer = Buffer.from(await data.arrayBuffer())
+    return extractTextFromBuffer(buffer, attachment.type)
+  })
 
-    switch (type) {
-      case 'pdf':
-        fullText += await extractPdf(buffer)
-        break
-
-      case 'docx':
-      case 'doc':
-        fullText += await extractDocx(buffer)
-        break
-
-      case 'ppt':
-      case 'pptx':
-        fullText += await extractPptx(buffer)
-        break
-
-      case 'txt':
-      case 'md':
-        fullText += buffer.toString('utf-8')
-        break
-
-      default:
-        console.warn(`[extract-text] Unsupported file type: ${type}`)
-    }
-  }
-
-  return fullText.trim()
+  const texts = await Promise.all(downloadPromises)
+  return texts.filter(Boolean).join('\n\n').trim()
 }
 
-/* ── PDF extraction using pdf-parse ─────────────────────────────────────── */
 async function extractPdf(buffer: Buffer): Promise<string> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse')
+    const pdfParse = (await import('pdf-parse')) as any
     const result = await pdfParse(buffer)
     return result.text + '\n'
   } catch (err) {
@@ -72,7 +97,6 @@ async function extractPdf(buffer: Buffer): Promise<string> {
   }
 }
 
-/* ── DOCX extraction using mammoth ──────────────────────────────────────── */
 async function extractDocx(buffer: Buffer): Promise<string> {
   try {
     const mammoth = await import('mammoth')
@@ -84,7 +108,6 @@ async function extractDocx(buffer: Buffer): Promise<string> {
   }
 }
 
-/* ── PPTX extraction using JSZip (parses XML slides inside the ZIP) ───── */
 async function extractPptx(buffer: Buffer): Promise<string> {
   try {
     const JSZip = (await import('jszip')).default
@@ -92,7 +115,6 @@ async function extractPptx(buffer: Buffer): Promise<string> {
 
     const slideTexts: string[] = []
 
-    // PPTX slides are stored as ppt/slides/slide1.xml, slide2.xml, etc.
     const slideFiles = Object.keys(zip.files)
       .filter((name) => /^ppt\/slides\/slide\d+\.xml$/i.test(name))
       .sort((a, b) => {
@@ -104,7 +126,6 @@ async function extractPptx(buffer: Buffer): Promise<string> {
     for (const slidePath of slideFiles) {
       const xml = await zip.files[slidePath].async('text')
 
-      // Extract all text content from <a:t> tags (PowerPoint text runs)
       const textMatches = xml.match(/<a:t[^>]*>([^<]*)<\/a:t>/g)
       if (textMatches) {
         const slideText = textMatches

@@ -120,16 +120,22 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, ArrowRight, CheckCircle2, Clock, Users } from 'lucide-react'
+import { Calendar, ArrowRight, CheckCircle2, Clock, Users, FileText, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 interface SubmissionsListProps {
   submissions: any[]
   assignment: any
   classId: string
+  gradingIds?: string[]
 }
 
-export default function SubmissionsList({ submissions, assignment, classId }: SubmissionsListProps) {
+export default function SubmissionsList({ 
+  submissions, 
+  assignment, 
+  classId,
+  gradingIds = [] 
+}: SubmissionsListProps) {
   const supabase = createClient()
 
   const getInitial = (name?: string) => name?.charAt(0).toUpperCase() || '?'
@@ -154,7 +160,9 @@ export default function SubmissionsList({ submissions, assignment, classId }: Su
       {submissions.map((submission: any, i: number) => {
         const student     = submission.users
         const studentName = student?.full_name || student?.email || 'Unknown Student'
-        const isGraded    = submission.status === 'graded'
+        const isGraded    = submission.status === 'graded' || !!submission.final_grade
+        const isDraft     = (typeof submission.ai_grade === 'number' && submission.ai_grade !== null) && submission.final_grade === null
+        const isGrading   = gradingIds.includes(submission.id)
         const isGroup     = !!assignment.is_group_project
         const groupData   = submission.group_projects
         const groupName   = groupData?.title
@@ -193,20 +201,43 @@ export default function SubmissionsList({ submissions, assignment, classId }: Su
                         Team
                       </span>
                     )}
+                    {isDraft && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-yellow/20 text-navy text-[9px] font-black uppercase tracking-wider border border-yellow/30">
+                        <FileText size={10} />
+                        Draft
+                      </span>
+                    )}
                   </div>
-                  <p className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-muted-foreground whitespace-nowrap overflow-hidden">
-                    <Calendar size={10} className="sm:size-3" />
-                    <span className="hidden sm:inline">Submitted: </span>
-                    <span className="truncate">
-                      {submission.submitted_at ? format(new Date(submission.submitted_at), 'MMM d, h:mm a') : 'Not submitted'}
-                    </span>
-                  </p>
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-muted-foreground whitespace-nowrap overflow-hidden mt-0.5">
+                    {isGrading ? (
+                      <span className="text-blue-600 font-black animate-pulse flex items-center gap-1">
+                        <div className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" />
+                        AI Grading...
+                      </span>
+                    ) : (
+                      <>
+                        <Calendar size={10} className="sm:size-3" />
+                        <span className="hidden sm:inline">Submitted: </span>
+                        <span className="truncate">
+                          {submission.submitted_at ? (
+                            (() => {
+                              try {
+                                return format(new Date(submission.submitted_at), 'MMM d, h:mm a')
+                              } catch (e) {
+                                return 'Invalid Date'
+                              }
+                            })()
+                          ) : 'Not submitted'}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 sm:gap-6 shrink-0">
                 {/* Score */}
-                {submission.final_grade !== null && (
+                {submission.final_grade !== null ? (
                   <div className="hidden sm:flex flex-col items-end">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Score</p>
                     <p className="font-black text-[17px] text-foreground leading-none">
@@ -214,13 +245,34 @@ export default function SubmissionsList({ submissions, assignment, classId }: Su
                       <span className="text-[12px] text-muted-foreground font-bold ml-0.5">/{assignment.points}</span>
                     </p>
                   </div>
+                ) : isDraft && (
+                  <div className="hidden sm:flex flex-col items-end">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-600 mb-0.5 flex items-center gap-1">
+                      <Sparkles size={10} /> AI Draft
+                    </p>
+                    <p className="font-black text-[17px] text-yellow-700 leading-none">
+                      {submission.ai_grade}
+                      <span className="text-[12px] text-yellow-600/60 font-bold ml-0.5">/{assignment.points}</span>
+                    </p>
+                  </div>
+                )}
+
+                {/* AI Grade Preview (when draft) */}
+                {isDraft && submission.ai_grade !== null && (
+                  <div className="hidden sm:flex flex-col items-end">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-navy/50 mb-0.5">AI Draft</p>
+                    <p className="font-black text-[14px] text-navy/60 leading-none">
+                      {submission.ai_grade}
+                      <span className="text-[11px] text-muted-foreground font-bold ml-0.5">/{assignment.points}</span>
+                    </p>
+                  </div>
                 )}
 
                 {/* Status Badge */}
                 <div className={`px-2 sm:px-3 py-1.5 rounded-xl border font-black text-[10px] uppercase tracking-widest flex items-center gap-1.5
-                  ${isGraded ? 'bg-green-50 text-green-700 border-green-100' : 'bg-yellow/10 text-navy border-yellow/20'}`}>
-                  {isGraded ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                  <span className="hidden sm:inline">{isGraded ? 'Graded' : 'Pending'}</span>
+                  ${isGraded ? 'bg-green-50 text-green-700 border-green-100' : isDraft ? 'bg-yellow/20 text-navy border-yellow/30' : 'bg-yellow/10 text-navy border-yellow/20'}`}>
+                  {isGraded ? <CheckCircle2 size={12} /> : isDraft ? <FileText size={12} /> : <Clock size={12} />}
+                  <span className="hidden sm:inline">{isGraded ? 'Graded' : isDraft ? 'Draft' : 'Pending'}</span>
                 </div>
 
                 {/* Main Action */}
@@ -228,7 +280,9 @@ export default function SubmissionsList({ submissions, assignment, classId }: Su
                   <button className={`size-10 rounded-xl flex items-center justify-center border-2 transition-all cursor-pointer group/btn shadow-sm
                     ${isGraded
                       ? 'bg-white text-navy border-border hover:border-navy/40 hover:bg-secondary/50'
-                      : 'bg-navy text-white border-navy hover:bg-navy/90 hover:shadow-md active:scale-95'
+                      : isDraft
+                        ? 'bg-navy-light text-white border-navy-light hover:bg-navy-light/90 hover:shadow-md'
+                        : 'bg-navy text-white border-navy hover:bg-navy/90 hover:shadow-md active:scale-95'
                     }`}>
                     <ArrowRight size={18} className="group-hover/btn:translate-x-0.5 transition-transform" />
                   </button>

@@ -294,8 +294,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Trash2, Plus, Calculator, Info, AlertCircle, Loader2 } from 'lucide-react'
+import { Trash2, Plus, Calculator, Info, AlertCircle, Loader2, Sparkles, Wand2 } from 'lucide-react'
+import { generateAIGradingCriteria, saveRubricAction } from '@/actions/ClassFeaturesActions'
+import { toast } from 'sonner'
+
 
 interface Criterion {
   id: string
@@ -320,16 +322,60 @@ const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3
 const labelClass = `text-[11px] font-bold tracking-[.18em] uppercase text-navy`
 
 export default function RubricForm({ userId, initialData }: RubricFormProps) {
-  const supabase  = createClient()
   const router    = useRouter()
+
   const isEditing = !!initialData
 
   const [loading,  setLoading]  = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [error,    setError]    = useState<string | null>(null)
   const [name,     setName]     = useState(initialData?.name || '')
+  const [aiTitle,  setAiTitle]  = useState('')
+  const [aiDescription, setAiDescription] = useState('')
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false)
+  
   const [criteria, setCriteria] = useState<Criterion[]>(
     initialData?.criteria || [{ id: crypto.randomUUID(), name: '', description: '', points: 10 }]
   )
+
+  const handleGenerateAI = async () => {
+    if (!aiTitle || !aiDescription) {
+      toast.error('Please provide assignment details')
+      return
+    }
+
+    setIsGenerating(true)
+    setError(null)
+    
+    try {
+      const { data, error: aiError } = await generateAIGradingCriteria({
+        title: aiTitle,
+        description: aiDescription,
+      })
+
+      if (aiError) throw new Error(aiError)
+      if (!data) throw new Error('No data received')
+
+      // Map AI criteria to the form format
+      const formattedCriteria = data.map((c: any) => ({
+        id: crypto.randomUUID(),
+        name: c.name,
+        description: c.description,
+        points: c.points,
+      }))
+
+      setCriteria(formattedCriteria)
+      if (!name) setName(aiTitle) // Use title as name if name is empty
+      setIsAiPanelOpen(false)
+      toast.success('Rubric generated successfully!')
+    } catch (err: any) {
+      setError(err.message || 'Failed to generate rubric')
+      toast.error('AI generation failed')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
 
   const totalPoints = criteria.reduce((sum, c) => sum + c.points, 0)
 
@@ -347,33 +393,106 @@ export default function RubricForm({ userId, initialData }: RubricFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true); setError(null)
+    if (loading || isGenerating) return
 
-    const payload = { name, criteria, total_points: totalPoints, created_by: userId }
+    setLoading(true)
+    setError(null)
+
+    const payload = { 
+      id: initialData?.id,
+      name: name.trim() || aiTitle || 'Untitled Rubric', 
+      criteria, 
+      total_points: totalPoints, 
+      created_by: userId 
+    }
 
     try {
-      let result
-      if (isEditing && initialData) {
-        result = await (supabase as any)
-          .from('rubrics').update(payload).eq('id', initialData.id).select().maybeSingle()
-      } else {
-        result = await supabase
-          .from('rubrics').insert(payload as any).select().maybeSingle()
+      const { data, error: saveError } = await saveRubricAction(payload)
+      
+      if (saveError) throw new Error(saveError)
+      if (!data) throw new Error('Failed to save rubric')
+
+      toast.success(isEditing ? 'Rubric updated!' : 'Rubric created!')
+      
+      const newId = (data as any).id
+      if (newId) {
+        router.push(`/rubrics/${newId}`)
+        router.refresh()
       }
-
-      if (result.error) throw result.error
-
-      const newId = (result.data as any).id
-      if (newId) { router.push(`/rubrics/${newId}`); router.refresh() }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred')
+      const msg = err.message || 'An unexpected error occurred'
+      setError(msg)
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
+
   }
+
+
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 pb-32">
+      
+      {/* AI Generator Panel */}
+      <div className={`bg-navy/5 border ${isAiPanelOpen ? 'border-navy/20 shadow-lg' : 'border-dashed border-navy/20'} rounded-2xl overflow-hidden transition-all`}>
+        <button
+          type="button"
+          onClick={() => setIsAiPanelOpen(!isAiPanelOpen)}
+          className="w-full flex items-center justify-between p-4 bg-white hover:bg-navy/5 transition group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-navy/10 flex items-center justify-center text-navy">
+              <Sparkles size={18} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-black text-[14px] text-foreground">AI Rubric Generator</h3>
+              <p className="text-[11px] text-muted-foreground">Generate criteria automatically from your assignment details</p>
+            </div>
+          </div>
+          <div className={`px-4 py-2 rounded-xl text-[12px] font-bold transition-all ${isAiPanelOpen ? 'bg-navy text-white' : 'bg-navy/10 text-navy group-hover:bg-navy group-hover:text-white'}`}>
+            {isAiPanelOpen ? 'Close' : 'Try it'}
+          </div>
+        </button>
+
+        {isAiPanelOpen && (
+          <div className="p-6 flex flex-col gap-5 bg-white border-t border-border">
+            <div className="flex flex-col gap-2">
+              <label className={labelClass}>Assignment context title</label>
+              <input
+                value={aiTitle}
+                onChange={(e) => setAiTitle(e.target.value)}
+                placeholder="e.g. Victorian Poetry Analysis Essay"
+                className={inputClass}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className={labelClass}>Assignment instructions/description</label>
+              <textarea
+                value={aiDescription}
+                onChange={(e) => setAiDescription(e.target.value)}
+                placeholder="Paste your assignment instructions here. Include what you want students to focus on..."
+                rows={4}
+                className={`${inputClass} resize-none`}
+              />
+            </div>
+            <div className="flex items-center justify-end pt-2">
+              <button
+                type="button"
+                onClick={handleGenerateAI}
+                disabled={isGenerating || !aiTitle || !aiDescription}
+                className="inline-flex items-center gap-2 bg-navy text-white font-black text-[13px] px-6 py-3 rounded-xl hover:bg-navy/90 transition shadow-md disabled:opacity-50"
+              >
+                {isGenerating ? (
+                  <><Loader2 size={16} className="animate-spin" /> Generating...</>
+                ) : (
+                  <><Wand2 size={16} /> Generate Grading Criteria</>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Rubric name */}
       <div className="bg-white border border-border rounded-2xl p-6 flex flex-col gap-2">
@@ -527,13 +646,14 @@ export default function RubricForm({ userId, initialData }: RubricFormProps) {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isGenerating}
               className="flex-1 sm:flex-none inline-flex items-center justify-center
                 gap-2 bg-navy text-white font-bold text-[14px] px-6 py-2.5
                 rounded-xl hover:bg-navy/90 transition disabled:opacity-60
                 cursor-pointer border-none">
               {loading
                 ? <><Loader2 size={14} className="animate-spin" />Saving…</>
+                : isGenerating ? <><Loader2 size={14} className="animate-spin" />Processing AI…</>
                 : isEditing ? 'Update rubric' : 'Create rubric'
               }
             </button>

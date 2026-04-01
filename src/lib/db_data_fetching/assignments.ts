@@ -70,7 +70,7 @@ export async function getAssignmentDetail(classId: string, assignmentId: string)
   if (isTeacher) {
     const { data: submissionsData } = await supabase
       .from('submissions')
-      .select('id, assignment_id, user_id, final_grade, status, teacher_feedback, group_id, submitted_at, users(full_name, email, avatar_url), group_projects(title, project_members(users(full_name, avatar_url)))')
+      .select('id, assignment_id, user_id, ai_grade, ai_feedback, final_grade, status, teacher_feedback, group_id, submitted_at, users(full_name, email, avatar_url), group_projects(title, project_members(users(full_name, avatar_url)))')
       .eq('assignment_id', assignmentId)
       .order('submitted_at', { ascending: false })
     submissions = submissionsData

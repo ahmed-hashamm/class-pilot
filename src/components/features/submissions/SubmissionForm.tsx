@@ -330,7 +330,7 @@ export default function SubmissionForm({ assignment, classId, onClose, onSuccess
         const { error: uploadError } = await supabase.storage.from('assignments').upload(filePath, file)
         if (uploadError) throw uploadError
         const { data: { publicUrl } } = supabase.storage.from('assignments').getPublicUrl(filePath)
-        uploadedFiles.push({ name: file.name, url: publicUrl })
+        uploadedFiles.push({ name: file.name, url: publicUrl, path: filePath })
       }
 
       await submitAssignment({

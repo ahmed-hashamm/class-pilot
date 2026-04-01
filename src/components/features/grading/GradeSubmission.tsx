@@ -1,66 +1,89 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft, ClipboardList, Sparkles,
   PenLine, CheckCircle2, Loader2,
-  Layout,
-} from "lucide-react";
-import { format } from "date-fns";
-import { createClient } from "@/lib/supabase/client";
-import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
-import AIGradingButton from "./AIGradingButton";
-import ManualGradingForm from "./ManualGradingForm";
+  Layout, FileText,
+} from "lucide-react"
+import { format } from "date-fns"
+import { createClient } from "@/lib/supabase/client"
+import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton"
+import AIGradingButton from "./AIGradingButton"
+import ManualGradingForm from "./ManualGradingForm"
+import { publishAIGrade } from "@/actions/ClassFeaturesActions"
 
 export interface GradingSubmissionProps {
-  id: string;
-  assignment_id: string;
-  content: string | null;
-  files: { name: string; url: string }[] | null;
-  final_grade: number | null;
-  ai_grade: number | null;
-  manual_grade: number | null;
-  ai_feedback: string | null;
-  teacher_feedback: string | null;
-  status: string;
-  submitted_at: string | null;
-  users: { full_name: string; avatar_url: string | null } | null;
-  assignments: { title: string; points: number; rubrics?: Record<string, unknown> } | null;
+  id: string
+  assignment_id: string
+  content: string | null
+  files: { name: string; url: string }[] | null
+  final_grade: number | null
+  ai_grade: number | null
+  manual_grade: number | null
+  ai_feedback: string | null
+  teacher_feedback: string | null
+  status: string
+  submitted_at: string | null
+  users: { full_name: string; avatar_url: string | null } | null
+  assignments: { title: string; points: number; rubrics?: Record<string, unknown> } | null
 }
 
 export default function GradeSubmission({
   submission, classId,
 }: {
-  submission: GradingSubmissionProps;
-  classId: string;
+  submission: GradingSubmissionProps
+  classId: string
 }) {
-  const [gradingMode, setGradingMode] = useState<"ai" | "manual" | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const router = useRouter();
-  const supabase = createClient();
+  const [gradingMode, setGradingMode] = useState<"ai" | "manual" | null>(null)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [isAiProcessing, setIsAiProcessing] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [viewMode, setViewMode] = useState<"single" | "side-by-side">("side-by-side")
+  const router = useRouter()
+  const supabase = createClient()
 
-  const assignment = submission.assignments;
-  const student = submission.users;
-  const files = submission.files || [];
+  const assignment = submission.assignments
+  const student = submission.users
+  const files = submission.files || []
+
+  const hasAI = submission.ai_grade !== null
+  const hasManual = submission.manual_grade !== null
+  const isDraft = hasAI && submission.final_grade === null
 
   const handleSetFinalGrade = async (type: "ai" | "manual") => {
-    setIsUpdating(true);
-    const score = type === "ai" ? submission.ai_grade : submission.manual_grade;
+    setIsUpdating(true)
+    const score = type === "ai" ? submission.ai_grade : submission.manual_grade
     try {
       const { error } = await (supabase as any)
         .from("submissions")
         .update({ final_grade: score, updated_at: new Date().toISOString() })
-        .eq("id", submission.id);
-      if (error) throw error;
-      router.refresh();
+        .eq("id", submission.id)
+      if (error) throw error
+      router.refresh()
     } catch (err) {
-      console.error("Update failed:", err);
+      console.error("Update failed:", err)
     } finally {
-      setIsUpdating(false);
+      setIsUpdating(false)
     }
-  };
+  }
+
+  const handlePublishAIGrade = async () => {
+    setIsPublishing(true)
+    try {
+      const result = await publishAIGrade(submission.id)
+      if (result.success) {
+        router.refresh()
+      } else {
+        console.error("Failed to publish AI grade:", result.error)
+      }
+    } catch (err) {
+      console.error("Error publishing AI grade:", err)
+    } finally {
+      setIsPublishing(false)
+    }
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6 h-full lg:max-h-screen lg:overflow-hidden">
@@ -77,6 +100,14 @@ export default function GradeSubmission({
         </button>
 
         <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+          {isDraft && (
+            <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
+              uppercase tracking-wider rounded-full px-4 py-1.5 border
+              bg-yellow text-navy border-yellow/30 animate-pulse">
+              <FileText size={13} />
+              <span className="truncate">Draft</span>
+            </span>
+          )}
           {submission.final_grade !== null && (
             <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
               uppercase tracking-wider rounded-full px-4 py-1.5 border
@@ -92,6 +123,33 @@ export default function GradeSubmission({
           </span>
         </div>
       </div>
+
+      {/* View Mode Toggle */}
+      {hasAI && hasManual && (
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">View:</span>
+          <button
+            onClick={() => setViewMode("side-by-side")}
+            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+              viewMode === "side-by-side"
+                ? "bg-navy text-white"
+                : "bg-secondary text-muted-foreground hover:bg-navy/10"
+            }`}
+          >
+            Side by Side
+          </button>
+          <button
+            onClick={() => setViewMode("single")}
+            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+              viewMode === "single"
+                ? "bg-navy text-white"
+                : "bg-secondary text-muted-foreground hover:bg-navy/10"
+            }`}
+          >
+            Single
+          </button>
+        </div>
+      )}
 
       {/* Main Content Areas */}
       <div className="w-full flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0 lg:overflow-hidden">
@@ -145,8 +203,47 @@ export default function GradeSubmission({
           <div className="flex flex-col gap-6">
             <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Grading & Feedback</p>
 
+            {/* Side-by-side view for AI and Manual grades */}
+            {viewMode === "side-by-side" && hasAI && hasManual && (
+              <div className="grid grid-cols-2 gap-3">
+                <GradeCardMini
+                  label="AI"
+                  score={submission.ai_grade!}
+                  isActive={submission.final_grade === submission.ai_grade}
+                  onApply={() => handleSetFinalGrade("ai")}
+                  disabled={isUpdating}
+                />
+                <GradeCardMini
+                  label="Manual"
+                  score={submission.manual_grade!}
+                  isActive={submission.final_grade === submission.manual_grade}
+                  onApply={() => handleSetFinalGrade("manual")}
+                  disabled={isUpdating}
+                />
+              </div>
+            )}
+
+            {/* Draft publish button */}
+            {isDraft && (
+              <button
+                onClick={handlePublishAIGrade}
+                disabled={isPublishing || isUpdating}
+                className="w-full inline-flex items-center justify-center gap-2 font-black
+                  text-[14px] py-3 rounded-xl transition-all cursor-pointer border-none
+                  bg-yellow text-navy hover:bg-yellow/90 shadow-md hover:-translate-y-0.5
+                  disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isPublishing ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <CheckCircle2 size={16} />
+                )}
+                Approve AI Grade
+              </button>
+            )}
+
             {/* Assessment results */}
-            {(submission.ai_grade !== null || submission.manual_grade !== null) && (
+            {viewMode !== "side-by-side" && (submission.ai_grade !== null || submission.manual_grade !== null) && (
               <div className="flex flex-col gap-3">
                 {submission.ai_grade !== null && (
                   <GradeCard
@@ -227,19 +324,50 @@ export default function GradeSubmission({
         </aside>
       </div>
     </div>
-  );
+  )
+}
+
+interface GradeCardMiniProps {
+  label: string
+  score: number
+  total?: number
+  isActive: boolean
+  onApply: () => void
+  disabled: boolean
+}
+
+function GradeCardMini({ label, score, total, isActive, onApply, disabled }: GradeCardMiniProps) {
+  return (
+    <button
+      onClick={onApply}
+      disabled={disabled || isActive}
+      className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all cursor-pointer
+        ${isActive
+          ? "border-navy bg-navy/5"
+          : "border-border hover:border-navy/30"
+        } disabled:cursor-not-allowed`}
+    >
+      <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? "text-navy" : "text-muted-foreground"}`}>
+        {label}
+      </span>
+      <span className="font-black text-[20px] text-foreground leading-none mt-1">
+        {score}
+      </span>
+      <span className="text-[10px] text-muted-foreground">/{total}</span>
+    </button>
+  )
 }
 
 interface GradeCardProps {
-  label: string;
-  icon: React.ReactNode;
-  score: number;
-  feedback: string | null;
-  total?: number;
-  isActive: boolean;
-  variant: "navy-light" | "yellow";
-  onApply: () => void;
-  disabled: boolean;
+  label: string
+  icon: React.ReactNode
+  score: number
+  feedback: string | null
+  total?: number
+  isActive: boolean
+  variant: "navy-light" | "yellow"
+  onApply: () => void
+  disabled: boolean
 }
 
 function GradeCard({ label, icon, score, feedback, total, isActive, variant, onApply, disabled }: GradeCardProps) {
@@ -271,7 +399,7 @@ function GradeCard({ label, icon, score, feedback, total, isActive, variant, onA
       {feedback && (
         <div className="bg-secondary/50 rounded-xl p-4 mb-5 border border-border/50">
           <p className="text-[13px] text-foreground/70 italic leading-relaxed line-clamp-4">
-            "{feedback}"
+            &ldquo;{feedback}&rdquo;
           </p>
         </div>
       )}
@@ -293,11 +421,11 @@ function GradeCard({ label, icon, score, feedback, total, isActive, variant, onA
 }
 
 interface MethodButtonProps {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  variant: "navy-light" | "yellow";
-  onClick: () => void;
+  icon: React.ReactNode
+  title: string
+  subtitle: string
+  variant: "navy-light" | "yellow"
+  onClick: () => void
 }
 
 function MethodButton({ icon, title, subtitle, variant, onClick }: MethodButtonProps) {

@@ -204,4 +204,44 @@ export const ClassFeaturesService = {
     if (error) throw error
     return data as any[]
   },
+
+  async saveRubric(data: {
+    id?: string
+    name: string
+    criteria: any // Json
+    total_points: number
+    created_by: string
+  }) {
+    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    
+    if (data.id) {
+      const { data: rubric, error } = await supabase
+        .from('rubrics')
+        .update({
+          name: data.name,
+          criteria: data.criteria,
+          total_points: data.total_points,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', data.id)
+        .select()
+        .maybeSingle()
+      if (error) throw error
+      return rubric
+    } else {
+      const { data: rubric, error } = await supabase
+        .from('rubrics')
+        .insert({
+          name: data.name,
+          criteria: data.criteria,
+          total_points: data.total_points,
+          created_by: data.created_by
+        })
+        .select()
+        .maybeSingle()
+      if (error) throw error
+      return rubric
+    }
+  },
 }
+
