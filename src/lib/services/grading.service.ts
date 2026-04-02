@@ -126,5 +126,91 @@ export const GradingService = {
     }
 
     return gradingResult
+  },
+
+  /**
+   * Finalizes the grade for a submission.
+   */
+  async updateFinalGrade(submissionId: string, teacherId: string, score: number) {
+    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+
+    // 1. Fetch submission to get class_id
+    const { data: submission, error: subError } = await (supabase as any)
+      .from('submissions')
+      .select('*, assignments(class_id)')
+      .eq('id', submissionId)
+      .maybeSingle()
+
+    if (subError || !submission) throw new Error('Submission not found')
+
+    // 2. Auth check
+    const { data: member } = await (supabase as any)
+      .from('class_members')
+      .select('role')
+      .eq('class_id', submission.assignments?.class_id)
+      .eq('user_id', teacherId)
+      .maybeSingle()
+
+    if (!member || member.role !== 'teacher') {
+      throw new Error('Forbidden: Teacher access required')
+    }
+
+    // 3. Update grade
+    const { error: updateError } = await (supabase as any)
+      .from('submissions')
+      .update({ 
+        final_grade: score, 
+        status: 'graded',
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', submissionId)
+
+    if (updateError) throw updateError
+
+    return { success: true }
+  },
+
+  /**
+   * Updates the manual grade and feedback for a submission.
+   */
+  async updateManualGrade(submissionId: string, teacherId: string, score: number, feedback: string) {
+    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+
+    // 1. Fetch submission to get class_id
+    const { data: submission, error: subError } = await (supabase as any)
+      .from('submissions')
+      .select('*, assignments(class_id)')
+      .eq('id', submissionId)
+      .maybeSingle()
+
+    if (subError || !submission) throw new Error('Submission not found')
+
+    // 2. Auth check
+    const { data: member } = await (supabase as any)
+      .from('class_members')
+      .select('role')
+      .eq('class_id', submission.assignments?.class_id)
+      .eq('user_id', teacherId)
+      .maybeSingle()
+
+    if (!member || member.role !== 'teacher') {
+      throw new Error('Forbidden: Teacher access required')
+    }
+
+    // 3. Update grade
+    const { error: updateError } = await (supabase as any)
+      .from('submissions')
+      .update({ 
+        manual_grade: score, 
+        final_grade: score, 
+        teacher_feedback: feedback,
+        status: 'graded',
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', submissionId)
+
+    if (updateError) throw updateError
+
+    return { success: true }
   }
 }

@@ -60,4 +60,15 @@ export const saveRubricSchema = z.object({
   created_by: z.string().min(1),
 })
 
+export const setFinalGradeSchema = z.object({
+  submissionId: z.string().min(1),
+  score: z.number().min(0),
+})
+
+export const updateManualGradeSchema = z.object({
+  submissionId: z.string().min(1),
+  score: z.number().min(0),
+  feedback: z.string().min(1, 'Feedback is required'),
+})
+
 

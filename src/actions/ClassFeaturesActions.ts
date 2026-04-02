@@ -13,6 +13,8 @@ import {
   deletePollSchema,
   generateRubricSchema,
   saveRubricSchema,
+  setFinalGradeSchema,
+  updateManualGradeSchema,
 } from '@/lib/validations/classFeatures'
 import { ClassFeaturesService } from '@/lib/services/classFeatures.service'
 import { GradingService } from '@/lib/services/grading.service'
@@ -352,5 +354,76 @@ export async function gradeAssignmentSubmissionAction(assignmentId: string, subm
   } catch (err: any) {
     console.error('[gradeAssignmentSubmissionAction] Error:', err)
     return { data: null, error: err.message || 'Failed to grade submission' }
+  }
+}
+
+export async function setFinalGradeAction(payload: unknown) {
+  const parsed = setFinalGradeSchema.safeParse(payload)
+  if (!parsed.success) {
+    return { data: null, error: parsed.error.errors[0]?.message || 'Invalid input' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: 'Unauthorized' }
+
+  try {
+    const result = await GradingService.updateFinalGrade(
+      parsed.data.submissionId,
+      user.id,
+      parsed.data.score
+    )
+    
+    // Fetch submission to get class_id for revalidation
+    const { data: sub } = await (supabase as any)
+      .from('submissions')
+      .select('assignments(class_id)')
+      .eq('id', parsed.data.submissionId)
+      .maybeSingle()
+
+    if (sub?.assignments?.class_id) {
+      revalidatePath(`/classes/${sub.assignments.class_id}`)
+    }
+
+    return { data: result, error: null }
+  } catch (err: any) {
+    console.error('[setFinalGradeAction] Error:', err)
+    return { data: null, error: err.message || 'Failed to update final grade' }
+  }
+}
+
+export async function updateManualGradeAction(payload: unknown) {
+  const parsed = updateManualGradeSchema.safeParse(payload)
+  if (!parsed.success) {
+    return { data: null, error: parsed.error.errors[0]?.message || 'Invalid input' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: 'Unauthorized' }
+
+  try {
+    const result = await GradingService.updateManualGrade(
+      parsed.data.submissionId,
+      user.id,
+      parsed.data.score,
+      parsed.data.feedback
+    )
+    
+    // Refresh to update UI
+    const { data: sub } = await (supabase as any)
+      .from('submissions')
+      .select('assignments(class_id)')
+      .eq('id', parsed.data.submissionId)
+      .maybeSingle()
+
+    if (sub?.assignments?.class_id) {
+      revalidatePath(`/classes/${sub.assignments.class_id}`)
+    }
+
+    return { data: result, error: null }
+  } catch (err: any) {
+    console.error('[updateManualGradeAction] Error:', err)
+    return { data: null, error: err.message || 'Failed to update manual grade' }
   }
 }

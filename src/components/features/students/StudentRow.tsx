@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { StudentAvatar } from "./StudentAvatar";
 import { Mail } from "lucide-react";
 
 interface StudentRowProps {
@@ -10,36 +9,20 @@ interface StudentRowProps {
 }
 
 export default function StudentRow({ member, role }: StudentRowProps) {
-  const [imgError, setImgError] = useState(false);
   const name = member.users?.full_name || member.users?.email || "Unknown";
   const email = member.users?.email;
   const avatar = member.users?.avatar_url;
-
-  const getInitial = (name: string) => name?.charAt(0).toUpperCase() || "?";
 
   return (
     <div className="flex items-center justify-between gap-4 px-6 py-3.5
       hover:bg-secondary/40 transition-colors group">
       <div className="flex items-center gap-3.5 min-w-0">
         {/* Avatar */}
-        <div className={`shrink-0 size-10 rounded-xl overflow-hidden border flex
-          items-center justify-center font-black text-[15px] relative
-          ${role === "teacher"
-            ? "bg-navy text-yellow border-navy/20"
-            : "bg-secondary text-navy border-border"
-          }`}>
-          {avatar && !imgError ? (
-            <Image
-              src={avatar}
-              alt={name}
-              className="object-cover"
-              fill
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            getInitial(name)
-          )}
-        </div>
+        <StudentAvatar 
+          name={name}
+          src={avatar}
+          role={role}
+        />
 
         {/* Name + email */}
         <div className="min-w-0">
