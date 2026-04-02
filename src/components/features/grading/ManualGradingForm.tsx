@@ -29,8 +29,8 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
   const supabase = createClient()
 
   const [scores, setScores] = useState<Record<string, number>>({})
-  const [overallGrade, setOverallGrade] = useState<string>(submission.final_grade?.toString() ?? submission.ai_grade?.toString() ?? '')
-  const [feedback, setFeedback] = useState<string>(submission.teacher_feedback || '')
+  const [overallGrade, setOverallGrade] = useState<string>('')
+  const [feedback, setFeedback] = useState<string>('')
   const [loading, setLoading] = useState(false)
 
   const criteria: RubricCriterion[] = (rubric?.criteria as RubricCriterion[]) || []
@@ -97,7 +97,13 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
                         text-[14px] font-black text-center text-navy
                         focus:outline-none focus:ring-4 focus:ring-navy/5 focus:border-navy transition-all"
                       onChange={(e) => {
-                        const val = parseFloat(e.target.value) || 0
+                        const rawVal = parseFloat(e.target.value) || 0
+                        const val = Math.min(Math.max(0, rawVal), c.points)
+                        
+                        // Force update the input value in case they typed more than max
+                        if (rawVal > c.points) e.target.value = c.points.toString()
+                        if (rawVal < 0) e.target.value = "0"
+
                         const newScores = { ...scores, [c.id]: val }
                         setScores(newScores)
                         const total = (Object.values(newScores) as number[]).reduce((s, v) => s + v, 0)
@@ -154,11 +160,11 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
       <div className="flex flex-col gap-3 pt-2">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !overallGrade || !feedback.trim()}
           className="w-full inline-flex items-center justify-center gap-2
             bg-navy text-white font-black text-[14px] py-3.5 rounded-xl
             hover:bg-navy/90 transition shadow-md hover:-translate-y-0.5
-            disabled:opacity-60 disabled:translate-y-0 cursor-pointer border-none">
+            disabled:opacity-60 disabled:translate-y-0 disabled:cursor-not-allowed cursor-pointer border-none">
           {loading
             ? <><Loader2 size={16} className="animate-spin" /> Saving Grade…</>
             : <><CheckCheck size={16} /> Confirm Evaluation</>

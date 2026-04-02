@@ -210,10 +210,11 @@ export default function GradeSubmission({
 
             {/* Side-by-side view for AI and Manual grades */}
             {viewMode === "side-by-side" && hasAI && hasManual && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-2.5">
                 <GradeCardMini
                   label="AI"
                   score={submission.ai_grade!}
+                  total={assignment?.points}
                   isActive={submission.final_grade === submission.ai_grade}
                   onApply={() => handleSetFinalGrade("ai")}
                   disabled={isUpdating}
@@ -221,6 +222,7 @@ export default function GradeSubmission({
                 <GradeCardMini
                   label="Manual"
                   score={submission.manual_grade!}
+                  total={assignment?.points}
                   isActive={submission.final_grade === submission.manual_grade}
                   onApply={() => handleSetFinalGrade("manual")}
                   disabled={isUpdating}
@@ -342,23 +344,43 @@ interface GradeCardMiniProps {
 }
 
 function GradeCardMini({ label, score, total, isActive, onApply, disabled }: GradeCardMiniProps) {
+  const isAI = label === "AI"
   return (
     <button
       onClick={onApply}
       disabled={disabled || isActive}
-      className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all cursor-pointer
+      className={`group w-full flex items-center justify-between p-3.5 rounded-2xl border-2 transition-all cursor-pointer bg-white
         ${isActive
-          ? "border-navy bg-navy/5"
-          : "border-border hover:border-navy/30"
-        } disabled:cursor-not-allowed`}
+          ? "border-navy ring-4 ring-navy/5 bg-navy/[0.02]"
+          : "border-border hover:border-navy/30 hover:bg-navy/[0.01]"
+        } disabled:cursor-not-allowed shadow-sm`}
     >
-      <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? "text-navy" : "text-muted-foreground"}`}>
-        {label}
-      </span>
-      <span className="font-black text-[20px] text-foreground leading-none mt-1">
-        {score}
-      </span>
-      <span className="text-[10px] text-muted-foreground">/{total}</span>
+      <div className="flex items-center gap-3">
+        <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm
+          ${isAI ? "bg-navy-light text-white" : "bg-yellow text-navy"}`}>
+          {isAI ? <Sparkles size={14} /> : <PenLine size={14} />}
+        </div>
+        <div className="text-left">
+          <p className={`text-[11px] font-black uppercase tracking-[.15em] leading-none mb-1
+            ${isActive ? "text-navy" : "text-muted-foreground"}`}>
+            {isAI ? "AI Evaluation" : "Manual Review"}
+          </p>
+          <div className="flex items-center gap-1.5">
+             {isActive && <div className="size-1.5 rounded-full bg-navy animate-pulse" />}
+             <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight">
+               {isActive ? "Currently Applied" : `Select this ${label}`}
+             </p>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-baseline gap-1 bg-secondary/30 px-3 py-1.5 rounded-xl border border-border/40">
+        <span className="font-black text-[18px] text-navy leading-none">
+          {score}
+        </span>
+        <span className="text-[11px] font-bold text-navy/40 uppercase tracking-tighter">
+          /{total || "—"}
+        </span>
+      </div>
     </button>
   )
 }
