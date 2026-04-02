@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 
 export type BulkGradingStatus = 'idle' | 'processing' | 'completed' | 'error'
 
@@ -29,6 +30,7 @@ export default function BulkGradingHeader({
 }: BulkGradingHeaderProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const pendingCount = gradingStates.filter((s) => s.status === 'pending').length
   const gradingCount = gradingStates.filter((s) => s.status === 'grading').length
@@ -40,6 +42,7 @@ export default function BulkGradingHeader({
   const total = gradingStates.length
 
   const handleStartGrading = async () => {
+    setShowConfirm(false)
     setIsProcessing(true)
     setIsExpanded(true)
     try {
@@ -67,13 +70,25 @@ export default function BulkGradingHeader({
           </div>
         </div>
         <button
-          onClick={handleStartGrading}
-          disabled={submissionCount === 0}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-navy-light text-white font-bold text-[13px] transition-all hover:bg-navy-light/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          onClick={() => setShowConfirm(true)}
+          disabled={submissionCount === 0 || isProcessing}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-navy-light text-white font-bold text-[13px] transition-all hover:bg-navy-light/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border-none cursor-pointer"
         >
-          <Sparkles size={16} />
+          {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
           Grade All with AI
         </button>
+
+        <ConfirmModal
+          isOpen={showConfirm}
+          onClose={() => setShowConfirm(false)}
+          onConfirm={handleStartGrading}
+          title="Start Bulk AI Grading?"
+          message={`This will analyze ${submissionCount} submission${submissionCount !== 1 ? 's' : ''} using your rubric. This may take a minute depending on the volume.`}
+          confirmLabel="Start Grading"
+          cancelLabel="Cancel"
+          variant="info"
+          isLoading={isProcessing}
+        />
       </div>
     )
   }

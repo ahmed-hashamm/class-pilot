@@ -8,6 +8,7 @@ import { SubmissionsList } from "@/components/features/submissions";
 import { Assignment } from "@/lib/types/schema";
 import { gradeAssignmentSubmissionAction } from "@/actions/ClassFeaturesActions";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface TeacherProgressProps {
   submissions: any[];
@@ -19,6 +20,7 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
   const router = useRouter();
   const [gradingIds, setGradingIds] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const pendingSubmissions = submissions?.filter(s => s.status !== 'graded' && s.final_grade === null) || [];
 
@@ -28,10 +30,7 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
       return;
     }
 
-    if (!confirm(`Are you sure you want to AI-grade ${pendingSubmissions.length} submissions? This may take a minute.`)) {
-      return;
-    }
-
+    setIsConfirmOpen(false);
     setIsProcessing(true);
     let successCount = 0;
     let failCount = 0;
@@ -85,7 +84,7 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
         </div>
 
         <Button
-          onClick={handleGradeAll}
+          onClick={() => setIsConfirmOpen(true)}
           disabled={isProcessing || pendingSubmissions.length === 0}
           variant="outline"
           size="sm"
@@ -113,6 +112,18 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
           gradingIds={gradingIds}
         />
       </div>
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleGradeAll}
+        title="Batch AI Grading"
+        message={`Are you sure you want to AI-grade ${pendingSubmissions.length} submissions? This will process each submission through the AI rubric, which may take a minute.`}
+        confirmLabel="Start Grading"
+        cancelLabel="Not Now"
+        variant="info"
+        isLoading={isProcessing}
+      />
     </div>
   );
 }
