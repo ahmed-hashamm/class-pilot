@@ -26,6 +26,7 @@ export interface GradingSubmissionProps {
   teacher_feedback: string | null
   status: string
   submitted_at: string | null
+  created_at: string | null
   users: { full_name: string; avatar_url: string | null } | null
   assignments: { title: string; points: number; rubrics?: Record<string, unknown> } | null
 }
@@ -86,7 +87,7 @@ export default function GradeSubmission({
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6 h-full lg:max-h-screen lg:overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6 min-h-screen">
 
       {/* Top bar */}
       <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b sm:border-none pb-4 sm:pb-0">
@@ -152,10 +153,10 @@ export default function GradeSubmission({
       )}
 
       {/* Main Content Areas */}
-      <div className="w-full flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0 lg:overflow-hidden">
+      <div className="w-full flex flex-col lg:flex-row gap-8 items-start flex-1">
 
         {/* Left — Submission Content */}
-        <div className="w-full lg:flex-1 flex flex-col gap-6 lg:overflow-y-auto lg:custom-scrollbar lg:pr-2 min-w-0">
+        <div className="w-full lg:flex-1 flex flex-col gap-6 min-w-0">
 
           {/* Simple Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -168,7 +169,11 @@ export default function GradeSubmission({
                 <div className="flex flex-wrap items-center gap-3 mt-1 text-[13px] text-muted-foreground font-medium">
                   <span className="flex items-center gap-1.5 min-w-0"><ClipboardList size={13} className="text-navy/60 shrink-0" /><span className="truncate">{assignment?.title}</span></span>
                   <span className="hidden sm:inline text-border">·</span>
-                  <span className="truncate">Submitted {submission.submitted_at ? format(new Date(submission.submitted_at), "MMM d, h:mm a") : "Recently"}</span>
+                  <span className="truncate">
+                    Submitted {submission.submitted_at || submission.created_at
+                      ? format(new Date(submission.submitted_at || submission.created_at || ""), "MMM d, h:mm a") 
+                      : "Recently"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -198,7 +203,7 @@ export default function GradeSubmission({
         </div>
 
         {/* Right — Sidebar */}
-        <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-6 h-full overflow-y-auto custom-scrollbar pt-1">
+        <aside className="w-full lg:w-80 shrink-0 flex flex-col gap-6 pb-20">
 
           <div className="flex flex-col gap-6">
             <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Grading & Feedback</p>

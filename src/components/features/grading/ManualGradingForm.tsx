@@ -71,7 +71,7 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6 pb-8">
 
       {/* Rubric criteria */}
       {criteria.length > 0 && (
@@ -80,32 +80,34 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
             Rubric Criteria
           </p>
           <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
-            {criteria.map((c, i) => (
-              <div key={c.id}
-                className={`flex items-center gap-4 px-5 py-4
-                   hover:bg-navy/[0.02] transition-colors
-                  ${i < criteria.length - 1 ? 'border-b border-border/60' : ''}`}>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-black text-foreground">{c.name}</p>
-                  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">Max {c.points} pts</p>
+            <div className="max-h-[300px] overflow-y-auto custom-scrollbar pr-0.5">
+              {criteria.map((c, i) => (
+                <div key={c.id}
+                  className={`flex items-center gap-4 px-5 py-4
+                     hover:bg-navy/[0.02] transition-colors
+                    ${i < criteria.length - 1 ? 'border-b border-border/60' : ''}`}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-black text-foreground">{c.name}</p>
+                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">Max {c.points} pts</p>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="number" step="0.1" max={c.points} placeholder="0"
+                      className="w-20 bg-secondary/50 border border-border rounded-xl px-3 py-2.5
+                        text-[14px] font-black text-center text-navy
+                        focus:outline-none focus:ring-4 focus:ring-navy/5 focus:border-navy transition-all"
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0
+                        const newScores = { ...scores, [c.id]: val }
+                        setScores(newScores)
+                        const total = (Object.values(newScores) as number[]).reduce((s, v) => s + v, 0)
+                        setOverallGrade(total.toString())
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <input
-                    type="number" step="0.1" max={c.points} placeholder="0"
-                    className="w-20 bg-secondary/50 border border-border rounded-xl px-3 py-2.5
-                      text-[14px] font-black text-center text-navy
-                      focus:outline-none focus:ring-4 focus:ring-navy/5 focus:border-navy transition-all"
-                    onChange={(e) => {
-                      const val = parseFloat(e.target.value) || 0
-                      const newScores = { ...scores, [c.id]: val }
-                      setScores(newScores)
-                      const total = (Object.values(newScores) as number[]).reduce((s, v) => s + v, 0)
-                      setOverallGrade(total.toString())
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
