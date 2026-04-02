@@ -41,7 +41,6 @@ export default function GradeSubmission({
   const [isUpdating, setIsUpdating] = useState(false)
   const [isAiProcessing, setIsAiProcessing] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
-  const [viewMode, setViewMode] = useState<"single" | "side-by-side">("side-by-side")
   const router = useRouter()
   const supabase = createClient()
 
@@ -90,17 +89,18 @@ export default function GradeSubmission({
     <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 flex flex-col gap-6 min-h-screen">
 
       {/* Top bar */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b sm:border-none pb-4 sm:pb-0">
+      <div className="w-full flex items-center justify-between gap-4 py-2 sm:py-0 border-b sm:border-none">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-[13px] font-semibold
-            text-navy/60 hover:text-navy transition-colors w-fit"
+          className="inline-flex items-center gap-1.5 text-[13px] font-semibold shrink-0
+            text-navy/60 hover:text-navy transition-colors"
         >
           <ArrowLeft size={16} />
-          Back to Class
+          <span className="hidden xs:inline">Back to Class</span>
+          <span className="xs:hidden">Back</span>
         </button>
 
-        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
           {isDraft && (
             <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-black
               uppercase tracking-wider rounded-full px-4 py-1.5 border
@@ -125,32 +125,6 @@ export default function GradeSubmission({
         </div>
       </div>
 
-      {/* View Mode Toggle */}
-      {hasAI && hasManual && (
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">View:</span>
-          <button
-            onClick={() => setViewMode("side-by-side")}
-            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-              viewMode === "side-by-side"
-                ? "bg-navy text-white"
-                : "bg-secondary text-muted-foreground hover:bg-navy/10"
-            }`}
-          >
-            Side by Side
-          </button>
-          <button
-            onClick={() => setViewMode("single")}
-            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-              viewMode === "single"
-                ? "bg-navy text-white"
-                : "bg-secondary text-muted-foreground hover:bg-navy/10"
-            }`}
-          >
-            Single
-          </button>
-        </div>
-      )}
 
       {/* Main Content Areas */}
       <div className="w-full flex flex-col lg:flex-row gap-8 items-start flex-1">
@@ -171,7 +145,7 @@ export default function GradeSubmission({
                   <span className="hidden sm:inline text-border">·</span>
                   <span className="truncate">
                     Submitted {submission.submitted_at || submission.created_at
-                      ? format(new Date(submission.submitted_at || submission.created_at || ""), "MMM d, h:mm a") 
+                      ? format(new Date(submission.submitted_at || submission.created_at || ""), "MMM d, h:mm a")
                       : "Recently"}
                   </span>
                 </div>
@@ -208,25 +182,31 @@ export default function GradeSubmission({
           <div className="flex flex-col gap-6">
             <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1">Grading & Feedback</p>
 
-            {/* Side-by-side view for AI and Manual grades */}
-            {viewMode === "side-by-side" && hasAI && hasManual && (
+            {/* Unified Grading List */}
+            {(hasAI || hasManual) && (
               <div className="flex flex-col gap-2.5">
-                <GradeCardMini
-                  label="AI"
-                  score={submission.ai_grade!}
-                  total={assignment?.points}
-                  isActive={submission.final_grade === submission.ai_grade}
-                  onApply={() => handleSetFinalGrade("ai")}
-                  disabled={isUpdating}
-                />
-                <GradeCardMini
-                  label="Manual"
-                  score={submission.manual_grade!}
-                  total={assignment?.points}
-                  isActive={submission.final_grade === submission.manual_grade}
-                  onApply={() => handleSetFinalGrade("manual")}
-                  disabled={isUpdating}
-                />
+                {hasAI && (
+                  <GradeCardMini
+                    label="AI"
+                    score={submission.ai_grade!}
+                    feedback={submission.ai_feedback}
+                    total={assignment?.points}
+                    isActive={submission.final_grade === submission.ai_grade}
+                    onApply={() => handleSetFinalGrade("ai")}
+                    disabled={isUpdating}
+                  />
+                )}
+                {hasManual && (
+                  <GradeCardMini
+                    label="Manual"
+                    score={submission.manual_grade!}
+                    feedback={submission.teacher_feedback}
+                    total={assignment?.points}
+                    isActive={submission.final_grade === submission.manual_grade}
+                    onApply={() => handleSetFinalGrade("manual")}
+                    disabled={isUpdating}
+                  />
+                )}
               </div>
             )}
 
@@ -249,43 +229,11 @@ export default function GradeSubmission({
               </button>
             )}
 
-            {/* Assessment results */}
-            {viewMode !== "side-by-side" && (submission.ai_grade !== null || submission.manual_grade !== null) && (
-              <div className="flex flex-col gap-3">
-                {submission.ai_grade !== null && (
-                  <GradeCard
-                    label="AI suggested"
-                    icon={<Sparkles size={12} />}
-                    score={submission.ai_grade}
-                    feedback={submission.ai_feedback}
-                    total={assignment?.points}
-                    isActive={submission.final_grade === submission.ai_grade}
-                    variant="navy-light"
-                    onApply={() => handleSetFinalGrade("ai")}
-                    disabled={isUpdating}
-                  />
-                )}
-
-                {submission.manual_grade !== null && (
-                  <GradeCard
-                    label="Manual grade"
-                    icon={<PenLine size={12} />}
-                    score={submission.manual_grade}
-                    feedback={submission.teacher_feedback}
-                    total={assignment?.points}
-                    isActive={submission.final_grade === submission.manual_grade}
-                    variant="yellow"
-                    onApply={() => handleSetFinalGrade("manual")}
-                    disabled={isUpdating}
-                  />
-                )}
-              </div>
-            )}
-
             {/* Grading panel */}
             <div className="flex flex-col gap-3">
               {!gradingMode ? (
                 <>
+                  <p className="text-[10px] font-bold uppercase tracking-[.2em] text-navy/40 pl-1 mt-2">Select Method</p>
                   <MethodButton
                     icon={<Sparkles size={18} />}
                     title="AI Evaluation"
@@ -337,115 +285,87 @@ export default function GradeSubmission({
 interface GradeCardMiniProps {
   label: string
   score: number
+  feedback?: string | null
   total?: number
   isActive: boolean
   onApply: () => void
   disabled: boolean
 }
 
-function GradeCardMini({ label, score, total, isActive, onApply, disabled }: GradeCardMiniProps) {
+function GradeCardMini({ label, score, feedback, total, isActive, onApply, disabled }: GradeCardMiniProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
   const isAI = label === "AI"
-  return (
-    <button
-      onClick={onApply}
-      disabled={disabled || isActive}
-      className={`group w-full flex items-center justify-between p-3.5 rounded-2xl border-2 transition-all cursor-pointer bg-white
-        ${isActive
-          ? "border-navy ring-4 ring-navy/5 bg-navy/[0.02]"
-          : "border-border hover:border-navy/30 hover:bg-navy/[0.01]"
-        } disabled:cursor-not-allowed shadow-sm`}
-    >
-      <div className="flex items-center gap-3">
-        <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm
-          ${isAI ? "bg-navy-light text-white" : "bg-yellow text-navy"}`}>
-          {isAI ? <Sparkles size={14} /> : <PenLine size={14} />}
-        </div>
-        <div className="text-left">
-          <p className={`text-[11px] font-black uppercase tracking-[.15em] leading-none mb-1
-            ${isActive ? "text-navy" : "text-muted-foreground"}`}>
-            {isAI ? "AI Evaluation" : "Manual Review"}
-          </p>
-          <div className="flex items-center gap-1.5">
-             {isActive && <div className="size-1.5 rounded-full bg-navy animate-pulse" />}
-             <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight">
-               {isActive ? "Currently Applied" : `Select this ${label}`}
-             </p>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-baseline gap-1 bg-secondary/30 px-3 py-1.5 rounded-xl border border-border/40">
-        <span className="font-black text-[18px] text-navy leading-none">
-          {score}
-        </span>
-        <span className="text-[11px] font-bold text-navy/40 uppercase tracking-tighter">
-          /{total || "—"}
-        </span>
-      </div>
-    </button>
-  )
-}
-
-interface GradeCardProps {
-  label: string
-  icon: React.ReactNode
-  score: number
-  feedback: string | null
-  total?: number
-  isActive: boolean
-  variant: "navy-light" | "yellow"
-  onApply: () => void
-  disabled: boolean
-}
-
-function GradeCard({ label, icon, score, feedback, total, isActive, variant, onApply, disabled }: GradeCardProps) {
-  const isNavyLight = variant === "navy-light"
 
   return (
-    <div className={`bg-white border-2 rounded-2xl p-4 sm:p-6 transition-all shadow-sm
+    <div className={`flex flex-col rounded-2xl border-2 transition-all bg-white shadow-sm overflow-hidden
       ${isActive
-        ? isNavyLight
-          ? "border-navy-light/40 bg-navy-light/5 ring-4 ring-navy-light/5"
-          : "border-yellow/50 bg-yellow/5 ring-4 ring-yellow/5"
-        : "border-border hover:border-navy/20"
+        ? "border-navy ring-4 ring-navy/5 bg-navy/[0.02]"
+        : "border-border hover:border-navy/30"
       }`}>
 
-      <div className="flex items-center justify-between mb-4">
-        <span className={`inline-flex items-center gap-2 text-[12px] font-black
-          tracking-widest uppercase rounded-xl px-4 py-1.5
-          ${isNavyLight ? "bg-navy-light text-white" : "bg-yellow text-navy"}`}>
-          {icon} {label}
-        </span>
-        <div className="text-right">
-          <span className="font-black text-[24px] sm:text-[32px] text-foreground leading-none">
-            {score}
-          </span>
-          <span className="text-[14px] font-bold text-muted-foreground ml-1">/{total}</span>
+      {/* Main Row */}
+      <div className="flex items-center justify-between p-3.5 gap-3">
+        <button
+          onClick={onApply}
+          disabled={disabled || isActive}
+          className="flex flex-1 items-center gap-3 text-left bg-transparent border-none p-0 cursor-pointer disabled:cursor-default"
+        >
+          <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm
+            ${isAI ? "bg-navy-light text-white" : "bg-yellow text-navy"}`}>
+            {isAI ? <Sparkles size={14} /> : <PenLine size={14} />}
+          </div>
+          <div>
+            <p className={`text-[11px] font-black uppercase tracking-[.15em] leading-none mb-1
+              ${isActive ? "text-navy" : "text-muted-foreground"}`}>
+              {isAI ? "AI Evaluation" : "Manual Review"}
+            </p>
+            <div className="flex items-center gap-1.5">
+              {isActive && <div className="size-1.5 rounded-full bg-navy animate-pulse" />}
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight">
+                {isActive ? "Currently Applied" : `Select this ${label}`}
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-baseline gap-0.5 p-1.5">
+            <span className="font-black text-[16px] text-navy leading-none">
+              {score}
+            </span>
+            <span className="text-[10px] font-bold text-navy/40 tracking-tighter">
+              /{total || "—"}
+            </span>
+          </div>
+
+          {feedback && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+              className="size-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-navy/5 transition-colors cursor-pointer bg-white"
+            >
+              <Layout size={14} className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+            </button>
+          )}
         </div>
       </div>
 
-      {feedback && (
-        <div className="bg-secondary/50 rounded-xl p-4 mb-5 border border-border/50">
-          <p className="text-[13px] text-foreground/70 italic leading-relaxed line-clamp-4">
-            &ldquo;{feedback}&rdquo;
-          </p>
+      {/* Collapsible Feedback */}
+      {isExpanded && feedback && (
+        <div className="px-3.5 pb-4 pt-1 animate-in slide-in-from-top-2 duration-300">
+          <div className="bg-secondary/40 rounded-xl p-3 border border-border/40">
+            <p className="text-[12px] text-foreground/70 italic leading-relaxed">
+              &ldquo;{feedback}&rdquo;
+            </p>
+          </div>
         </div>
       )}
-
-      <button
-        onClick={onApply}
-        disabled={disabled || isActive}
-        className={`w-full inline-flex items-center justify-center font-black
-          text-[14px] py-3 rounded-xl transition-all cursor-pointer border-none
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${isNavyLight
-            ? "bg-navy-light text-white hover:bg-navy-light/90 shadow-md hover:-translate-y-0.5"
-            : "bg-navy text-white hover:bg-navy/90 shadow-md hover:-translate-y-0.5"
-          }`}>
-        {isActive ? <><CheckCircle2 size={16} className="mr-2" /> Applied</> : "Use this grade"}
-      </button>
     </div>
   )
 }
+
 
 interface MethodButtonProps {
   icon: React.ReactNode
