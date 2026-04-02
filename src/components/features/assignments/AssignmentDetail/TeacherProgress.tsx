@@ -105,7 +105,7 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
         </Button>
       </div>
 
-      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden min-h-[200px]">
+      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
         <SubmissionsList 
           submissions={submissions} 
           assignment={assignment} 

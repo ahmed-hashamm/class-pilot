@@ -257,7 +257,8 @@ export const ClassService = {
       group_id: data.groupId,
       content: data.content,
       files: data.files,
-      status: 'submitted'
+      status: 'submitted',
+      submitted_at: new Date().toISOString()
     } as any).select().maybeSingle()
     if (error) throw error
     return inserted

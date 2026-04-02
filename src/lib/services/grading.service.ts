@@ -117,7 +117,6 @@ export const GradingService = {
       .update({
         ai_grade: gradingResult.total_score,
         ai_feedback: gradingResult.overall_feedback,
-        status: 'pending' // Keep as pending but with ai_grade it counts as a draft
       })
       .eq('id', submissionId)
 
