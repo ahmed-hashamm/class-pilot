@@ -18,6 +18,7 @@ import {
 } from '@/lib/validations/classFeatures'
 import { ClassFeaturesService } from '@/lib/services/classFeatures.service'
 import { GradingService } from '@/lib/services/grading.service'
+import { redisSafe } from '@/lib/redis'
 import { generateRubricFromAssignment } from '@/lib/ai/grading'
 
 
@@ -83,6 +84,7 @@ export async function createAttendance(classId: string, date: string, title?: st
       userId: user.id,
       pinned: parsed.data.pinned
     })
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { success: true, data: result }
   } catch (err: any) {
@@ -106,7 +108,10 @@ export async function markAttendancePresent(attendanceId: string) {
 
   try {
     const result = await ClassFeaturesService.markAttendancePresent(parsed.data.attendanceId, user.id)
-    if (result.classId) revalidatePath(`/classes/${result.classId}`)
+    if (result.classId) {
+      await redisSafe.invalidateFeedCache(result.classId)
+      revalidatePath(`/classes/${result.classId}`)
+    }
     return { success: true, data: result.data }
   } catch (err: any) {
     console.error('Error marking attendance:', err)
@@ -129,7 +134,10 @@ export async function closeAttendance(attendanceId: string) {
 
   try {
     const classId = await ClassFeaturesService.closeAttendance(parsed.data.attendanceId)
-    if (classId) revalidatePath(`/classes/${classId}`)
+    if (classId) {
+      await redisSafe.invalidateFeedCache(classId)
+      revalidatePath(`/classes/${classId}`)
+    }
     return { success: true }
   } catch (err: any) {
     console.error('Error closing attendance:', err)
@@ -159,6 +167,7 @@ export async function createPoll(classId: string, question: string, options: str
       userId: user.id,
       pinned: parsed.data.pinned
     })
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { success: true, data: result }
   } catch (err: any) {
@@ -182,7 +191,10 @@ export async function submitPollResponse(pollId: string, selectedOptionIndex: nu
 
   try {
     const result = await ClassFeaturesService.submitPollResponse(parsed.data.pollId, parsed.data.selectedOptionIndex, user.id)
-    if (result.classId) revalidatePath(`/classes/${result.classId}`)
+    if (result.classId) {
+      await redisSafe.invalidateFeedCache(result.classId)
+      revalidatePath(`/classes/${result.classId}`)
+    }
     return { success: true, data: result.data }
   } catch (err: any) {
     console.error('Error submitting poll response:', err)
@@ -205,6 +217,7 @@ export async function closePoll(pollId: string) {
 
   try {
     const classId = await ClassFeaturesService.closePoll(parsed.data.pollId)
+    await redisSafe.invalidateFeedCache(classId)
     revalidatePath(`/classes/${classId}`)
     return { success: true }
   } catch (err: any) {
@@ -223,6 +236,7 @@ export async function deleteAttendance(id: string, classId: string) {
 
   try {
     await ClassFeaturesService.deleteAttendance(parsed.data.id, user.id)
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { success: true }
   } catch (err: any) {
@@ -241,6 +255,7 @@ export async function deletePoll(id: string, classId: string) {
 
   try {
     await ClassFeaturesService.deletePoll(parsed.data.id, user.id)
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { success: true }
   } catch (err: any) {

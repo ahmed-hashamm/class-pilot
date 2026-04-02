@@ -26,6 +26,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // --- REDIS INTEGRATION: AI Assistant Rate Limiting ---
+  const { checkRateLimit } = await import('@/lib/utils/rate-limit')
+  const { success, current, limit } = await checkRateLimit(user.id, 'AI_ASSISTANT')
+  
+  if (!success) {
+    return NextResponse.json({ 
+      answer: `⚠️ Rate limit exceeded: ${current}/${limit} messages per hour. Please wait a while before asking more questions.` 
+    }, { status: 429 })
+  }
+
   const { question, classId, history } = await req.json()
 
   if (!question || !classId) {

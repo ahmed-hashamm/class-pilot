@@ -160,6 +160,13 @@ export const ClassFeaturesService = {
   },
 
   async getPollResults(pollId: string) {
+    const { redisSafe } = await import('@/lib/redis')
+    const cacheKey = `poll:results:${pollId}`
+    
+    // 1. Check cache first (10s window)
+    const cached = await redisSafe.get<Record<number, number>>(cacheKey)
+    if (cached) return cached
+
     const supabase = (await createClient() as unknown) as SupabaseClient<Database>
     const { data: votes, error } = await supabase.from("poll_responses")
       .select("selected_option_index")
@@ -170,6 +177,10 @@ export const ClassFeaturesService = {
     votes?.forEach((v: any) => {
       counts[v.selected_option_index] = (counts[v.selected_option_index] || 0) + 1
     })
+
+    // 2. Store in cache for 10 seconds
+    await redisSafe.set(cacheKey, counts, { ex: 10 })
+
     return counts
   },
 

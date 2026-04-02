@@ -28,6 +28,16 @@ export type StreamItem =
 
 
 export async function getStreamFeed(classId: string): Promise<StreamItem[]> {
+  const { redisSafe } = await import('@/lib/redis')
+  const cacheKey = `feed:class:${classId}`
+
+  // 1. Check cache first
+  const cached = await redisSafe.get<StreamItem[]>(cacheKey)
+  if (cached) {
+    console.log(`[Redis Cache Hit] Serving feed for class ${classId}`)
+    return cached
+  }
+
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -89,6 +99,9 @@ export async function getStreamFeed(classId: string): Promise<StreamItem[]> {
     
     return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
   })
+
+  // 2. Cache the result for 1 hour
+  await redisSafe.set(cacheKey, combined, { ex: 3600 })
 
   return combined
 }

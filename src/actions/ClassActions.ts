@@ -28,6 +28,7 @@ import {
   ALLOWED_FILE_TYPES,
 } from "@/lib/validations/class"
 import { ClassService, Note } from "@/lib/services/class.service"
+import { redisSafe } from "@/lib/redis"
 
 /* ---------------- TOGGLE PIN ---------------- */
 
@@ -44,6 +45,7 @@ export async function togglePinAction(payload: unknown) {
       ...parsed.data,
       userId: user.id
     })
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { data: { success: true }, error: null }
   } catch (err: any) {
@@ -168,6 +170,7 @@ export async function createAnnouncement(formData: FormData) {
     deadline: parsed.data.deadline,
   })
 
+  await redisSafe.invalidateFeedCache(parsed.data.classId)
   revalidatePath(`/classes/${parsed.data.classId}`)
   return { success: true }
 }
@@ -220,6 +223,7 @@ export async function updateAnnouncement(formData: FormData) {
     pinned: parsed.data.pinned,
   })
 
+  await redisSafe.invalidateFeedCache(parsed.data.classId)
   revalidatePath(`/classes/${parsed.data.classId}`)
   return { success: true }
 }
@@ -235,6 +239,7 @@ export async function deleteAnnouncement(id: string, classId: string) {
   if (!user) throw new Error("Unauthorized")
 
   await ClassService.deleteAnnouncement(parsed.data.id, user.id)
+  await redisSafe.invalidateFeedCache(parsed.data.classId)
   revalidatePath(`/classes/${parsed.data.classId}`)
   revalidatePath('/dashboard')
 }
@@ -278,6 +283,7 @@ export async function createMaterial(formData: FormData) {
 
   if (!result) return { success: false, error: 'Failed to create material' }
 
+  await redisSafe.invalidateFeedCache(parsed.data.classId)
   revalidatePath(`/classes/${parsed.data.classId}`)
   return { success: true, materialId: result.id }
 }
@@ -334,6 +340,7 @@ export async function updateMaterial(formData: FormData) {
     userId: user.id
   })
 
+  await redisSafe.invalidateFeedCache(parsed.data.classId)
   revalidatePath(`/classes/${parsed.data.classId}`)
 }
 
@@ -349,6 +356,7 @@ export async function deleteMaterial(id: string, classId: string) {
 
   try {
     await ClassService.deleteMaterial(parsed.data.id, user.id)
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     revalidatePath('/dashboard')
     return { data: { success: true }, error: null }
@@ -397,6 +405,7 @@ export async function createAssignment(formData: FormData) {
 
     if (!result) return { data: null, error: "Failed to create assignment" }
 
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { data: { id: (result as any).id, success: true }, error: null }
   } catch (err: any) {
@@ -462,6 +471,7 @@ export async function updateAssignment(formData: FormData) {
       pinned: parsed.data.pinned,
     })
 
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { data: { id: (result as any).id, success: true }, error: null }
   } catch (err: any) {
@@ -481,6 +491,7 @@ export async function deleteAssignment(id: string, classId: string) {
 
   try {
     await ClassService.deleteAssignment(parsed.data.id, user.id)
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     revalidatePath('/dashboard')
     revalidatePath('/todo')

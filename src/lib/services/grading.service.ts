@@ -52,6 +52,23 @@ export const GradingService = {
       throw new Error('Forbidden: Teacher access required')
     }
 
+    // --- REDIS INTEGRATION: Rate Limiting ---
+    const { checkRateLimit } = await import('@/lib/utils/rate-limit')
+    const { success, current, limit } = await checkRateLimit(teacherId, 'AI_GRADING')
+    if (!success) {
+      throw new Error(`Rate limit exceeded: ${current}/${limit} assessments per hour.`)
+    }
+
+    // --- REDIS INTEGRATION: Caching ---
+    const { redisSafe } = await import('@/lib/redis')
+    const cacheKey = `grading:${submissionId}:${assignmentId}`
+    const cachedResult = await redisSafe.get<any>(cacheKey)
+
+    if (cachedResult) {
+      console.log(`[Redis Cache Hit] Returning cached grade for submission ${submissionId}`)
+      return cachedResult
+    }
+
     // 3. Extract text from content and files
     let extractedText = ''
     const files = (submission.files as any[]) || []
@@ -62,9 +79,6 @@ export const GradingService = {
           let path = f.path;
           
           if (!path && f.url && typeof f.url === 'string') {
-            // Attempt to extract the relative path from the public URL
-            // Format is usually: .../storage/v1/object/public/[bucket]/[path]
-            // or .../storage/v1/object/[bucket]/[path]
             const bucketSegment = '/assignments/';
             const bucketIndex = f.url.indexOf(bucketSegment);
             if (bucketIndex !== -1) {
@@ -110,6 +124,9 @@ export const GradingService = {
       submissionId,
       assignmentId
     )
+
+    // --- REDIS INTEGRATION: Store result in cache (24h TTL) ---
+    await redisSafe.set(cacheKey, gradingResult, { ex: 86400 })
 
     // 5. Persist to DB as a draft
     const { error: updateError } = await (supabase as any)
