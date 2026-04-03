@@ -3,7 +3,7 @@
 import { Lock, Check, Clock } from "lucide-react";
 import { useAttendance } from "@/lib/hooks";
 import { formatTime } from "@/lib/utils/time";
-import { ConfirmModal } from "@/components/ui";
+import { ConfirmModal } from "@/components/common";
 
 export default function AttendanceBody({ 
   item, 

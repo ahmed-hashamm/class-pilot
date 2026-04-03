@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getClassMembers } from "@/lib/db_data_fetching/members";
 import StudentRow from "./StudentRow";
 import { MemberSectionHeader } from "./StudentListComponents";
-import { EmptyState, SkeletonLoader } from "@/components/ui";
+import { EmptyState, SkeletonLoader } from "../../common";
 import { Users, RefreshCw } from "lucide-react";
 
 interface StudentListProps {

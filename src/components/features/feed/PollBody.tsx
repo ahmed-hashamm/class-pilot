@@ -3,7 +3,7 @@
 import { Lock, Clock } from "lucide-react";
 import { usePoll } from "@/lib/hooks";
 import { formatTime } from "@/lib/utils/time";
-import { ConfirmModal } from "@/components/ui";
+import { ConfirmModal } from "@/components/common";
 
 export default function PollBody({ 
   item, 

@@ -85,12 +85,15 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
               updated = [formattedRow, ...prev]
             }
 
-            // Re-sort to match server-side sorting (pinned first, then date)
+            // Robust sorting: pinned items always first, then by date descending
             return [...updated].sort((a, b) => {
-              const aPinned = a.pinned ? 1 : 0
-              const bPinned = b.pinned ? 1 : 0
+              const aPinned = a.pinned === true ? 1 : 0
+              const bPinned = b.pinned === true ? 1 : 0
               if (aPinned !== bPinned) return bPinned - aPinned
-              return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+              
+              const aTime = a.created_at ? new Date(a.created_at).getTime() : 0
+              const bTime = b.created_at ? new Date(b.created_at).getTime() : 0
+              return bTime - aTime
             })
           })
         }
