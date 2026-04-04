@@ -6,6 +6,7 @@ import { Calendar, ArrowRight, Users, FileText } from "lucide-react"
 import { StudentAvatar } from "@/components/features/students/StudentAvatar"
 import { SubmissionStatusBadge } from "./SubmissionStatusBadge"
 import { GroupMembersList } from "./GroupMembersList"
+import { Button } from "@/components/ui/button"
 
 interface SubmissionItemProps {
   submission: any
@@ -88,10 +89,12 @@ export function SubmissionItem({
           <SubmissionStatusBadge isGraded={isGraded} isDraft={isDraft} />
 
           <Link href={`/classes/${classId}/assignments/${assignment.id}/submissions/${submission.id}`}>
-            <button className={`size-10 rounded-xl flex items-center justify-center border-2 transition-all cursor-pointer group/btn shadow-sm
-              ${isGraded ? "bg-white text-navy border-border hover:border-navy/40" : "bg-navy text-white border-navy hover:bg-navy/90"}`}>
+            <Button 
+              variant={isGraded ? "outline" : "primary"}
+              className={`size-10 p-0 rounded-xl group/btn ${isGraded ? "border-border bg-white" : ""}`}
+            >
               <ArrowRight size={18} className="group-hover/btn:translate-x-0.5 transition-transform" />
-            </button>
+            </Button>
           </Link>
         </div>
       </div>

@@ -1,20 +1,19 @@
-"use client";
-
+import { Button } from "@/components/ui/button";
 import { Lock, Check, Clock } from "lucide-react";
 import { useAttendance } from "@/lib/hooks";
 import { formatTime } from "@/lib/utils/time";
-import { ConfirmModal } from "@/components/common";
+import { FeatureButton, ConfirmModal } from "@/components/ui";
 
-export default function AttendanceBody({ 
-  item, 
-  userId, 
-  isTeacher, 
+export default function AttendanceBody({
+  item,
+  userId,
+  isTeacher,
   isActive,
-  remaining 
-}: { 
-  item: any; 
-  userId: string; 
-  isTeacher: boolean; 
+  remaining
+}: {
+  item: any;
+  userId: string;
+  isTeacher: boolean;
   isActive: boolean;
   remaining: number;
 }) {
@@ -54,9 +53,15 @@ export default function AttendanceBody({
           )}
         </div>
         {isActive && (
-          <button onClick={() => setShowCloseConfirm(true)} disabled={loading} className="self-end text-xs font-semibold text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowCloseConfirm(true)}
+            disabled={loading}
+            className="self-end h-auto p-0 flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-transparent"
+          >
             <Lock size={12} /> {loading ? "Closing…" : "Close Session"}
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -74,22 +79,20 @@ export default function AttendanceBody({
 
   return (
     <div className="pl-[48px]">
-      <button
+      <FeatureButton
         onClick={handleMark}
-        disabled={loading || !isActive}
-        className="w-full bg-navy text-white font-bold text-[13px] py-2.5 rounded-xl hover:bg-navy/90 transition disabled:opacity-50 cursor-pointer border-none flex items-center justify-center gap-2"
+        loading={loading}
+        disabled={!isActive}
+        label={isActive ? (alreadyPresent ? "Marked Present" : "I'm Present") : "Session Closed"}
+        icon={isActive && alreadyPresent ? Check : undefined}
+        className="w-full py-2.5"
       >
-        {loading ? "Marking…" : isActive ? (
-          <>
-            I'm Present 
-            {remaining !== Infinity && (
-              <span className="opacity-60 text-[11px] font-medium border-l border-white/20 pl-2 ml-1 flex items-center gap-1">
-                <Clock size={11} /> {formatTime(remaining)}
-              </span>
-            )}
-          </>
-        ) : "Session Closed"}
-      </button>
+        {isActive && remaining !== Infinity && (
+          <span className="opacity-60 text-[11px] font-medium border-l border-white/20 pl-2 ml-1 flex items-center gap-1">
+            <Clock size={11} /> {formatTime(remaining)}
+          </span>
+        )}
+      </FeatureButton>
     </div>
   );
 }

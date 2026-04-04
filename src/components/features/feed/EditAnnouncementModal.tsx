@@ -3,6 +3,8 @@
 import { X, Pin, Loader2, AlertCircle, FileText, Paperclip, UploadCloud } from 'lucide-react'
 import { useEditAnnouncement } from '@/lib/hooks'
 import { PinToggle } from './PinToggle'
+import { FeatureButton } from '@/components/ui/FeatureButton'
+import { Button } from '@/components/ui/button'
 
 interface Props {
     announcement: {
@@ -45,12 +47,9 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                         </div>
                         <h3 className="font-black text-[17px] tracking-tight">Edit announcement</h3>
                     </div>
-                    <button onClick={onClose}
-                        className="p-1.5 text-muted-foreground hover:text-foreground
-              hover:bg-secondary rounded-lg transition cursor-pointer
-              bg-transparent border-none">
+                    <Button variant="ghost" size="sm" onClick={onClose} className="p-1.5 h-auto w-auto">
                         <X size={16} />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="p-6 flex flex-col gap-4">
@@ -120,12 +119,13 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                                             border border-border rounded-lg px-3 py-1.5 text-[12px] font-medium">
                                             <Paperclip size={11} className="text-navy" />
                                             <span className="truncate max-w-[140px]">{file.name}</span>
-                                            <button type="button"
+                                            <Button type="button"
+                                                variant="ghost"
+                                                size="sm"
                                                 onClick={() => removeExistingFile(i)}
-                                                className="text-muted-foreground hover:text-red-500 transition
-                                                    cursor-pointer bg-transparent border-none p-0 flex">
+                                                className="text-muted-foreground hover:text-red-500 hover:bg-red-50 p-1 h-auto w-auto ml-1">
                                                 <X size={12} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
@@ -144,12 +144,13 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
                                             border border-border rounded-lg px-3 py-1.5 text-[12px] font-medium">
                                             <Paperclip size={11} className="text-navy-light" />
                                             <span className="truncate max-w-[140px]">{file.name}</span>
-                                            <button type="button"
+                                            <Button type="button"
+                                                variant="ghost"
+                                                size="sm"
                                                 onClick={() => removeNewFile(i)}
-                                                className="text-muted-foreground hover:text-red-500 transition
-                                                    cursor-pointer bg-transparent border-none p-0 flex">
+                                                className="text-muted-foreground hover:text-red-500 hover:bg-red-50 p-1 h-auto w-auto ml-1">
                                                 <X size={12} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
@@ -168,23 +169,20 @@ export default function EditAnnouncementModal({ announcement, onClose, onSuccess
 
                 {/* Footer */}
                 <div className="flex flex-col-reverse sm:flex-row gap-3 px-6 pb-6">
-                    <button onClick={onClose}
-                        className="w-full sm:flex-1 py-3 text-[14px] font-semibold text-muted-foreground
-              hover:text-foreground hover:bg-secondary rounded-xl transition
-              cursor-pointer bg-transparent border-none">
+                    <Button onClick={onClose}
+                        variant="ghost"
+                        className="w-full sm:flex-1 py-3"
+                    >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <FeatureButton
                         onClick={handleSave}
                         disabled={loading}
-                        className="w-full sm:flex-1 inline-flex items-center justify-center gap-2
-              bg-navy text-white font-semibold text-[14px] py-3 rounded-xl
-              hover:bg-navy/90 transition disabled:opacity-60 cursor-pointer border-none">
-                        {loading
-                            ? <><Loader2 size={14} className="animate-spin" />Saving…</>
-                            : 'Save changes'
-                        }
-                    </button>
+                        loading={loading}
+                        loadingLabel="Saving…"
+                        label="Save changes"
+                        className="w-full sm:flex-1 py-3"
+                    />
                 </div>
             </div>
         </div>

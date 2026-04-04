@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Users } from "lucide-react";
 import { Group } from "@/lib/types/schema";
 
@@ -25,18 +26,22 @@ export default function GroupHeader({ group, isTeacher, onEdit, onDelete }: Grou
 
       {isTeacher && (
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => onEdit(group)}
-            className="inline-flex items-center gap-2 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-navy bg-white border border-border rounded-xl hover:bg-navy hover:text-white transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
+            className="px-4 py-2 text-[11px] font-black uppercase tracking-widest shrink-0"
           >
             <Pencil size={12} className="shrink-0" /> Edit
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
             onClick={() => onDelete(group)}
-            className="inline-flex items-center justify-center size-9 text-red-500 bg-white border border-border rounded-xl hover:bg-red-50 hover:border-red-200 transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
+            className="size-9 p-0 shrink-0 border-transparent bg-white text-red-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
           >
             <Trash2 size={14} className="shrink-0" />
-          </button>
+          </Button>
         </div>
       )}
     </div>

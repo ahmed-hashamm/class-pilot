@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SubmissionForm } from "@/components/features/submissions";
 import { ConfirmModal } from "@/components/ui";
 import { useAssignmentDetail } from "@/lib/hooks";
@@ -33,29 +34,41 @@ export default function AssignmentDetail({
   const isGraded = submission?.status === "graded";
   const isTurnedIn = !!submission;
 
+  // Compute whether the deadline has passed
+  const isPastDeadline = (() => {
+    if (!assignment.due_date) return false;
+    return new Date() > new Date(assignment.due_date);
+  })();
+
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-10 min-h-screen">
       <div className="flex items-center justify-between shrink-0">
-        <button 
-          onClick={() => router.push(`/classes/${classId}?tab=${fromTab}`)} 
-          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-navy transition-colors cursor-pointer bg-transparent border-none w-fit"
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push(`/classes/${classId}?tab=${fromTab}`)}
+          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-navy transition-colors bg-transparent border-none w-fit p-0 h-auto"
         >
           <ArrowLeft size={15} /> Back to Class
-        </button>
+        </Button>
         {isTeacher && (
           <div className="flex items-center gap-2">
-            <button 
-              onClick={() => router.push(`/classes/${classId}/assignments/${assignment.id}/edit?from=${fromTab}`)} 
-              className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-secondary text-foreground hover:bg-navy hover:text-white border border-border rounded-xl px-3 py-2 transition-all cursor-pointer"
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push(`/classes/${classId}/assignments/${assignment.id}/edit?from=${fromTab}`)}
+              className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-secondary text-foreground hover:bg-navy hover:text-white border border-border rounded-xl px-3 py-2 transition-all h-auto"
             >
               <Pencil size={11} /> Edit
-            </button>
-            <button 
-              onClick={() => setShowDeleteConfirm(true)} 
-              className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 rounded-xl px-3 py-2 transition-all cursor-pointer"
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 rounded-xl px-3 py-2 transition-all h-auto"
             >
               <Trash2 size={11} /> Delete
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -74,20 +87,21 @@ export default function AssignmentDetail({
       <div className="flex flex-col lg:flex-row gap-8 items-start flex-1 min-h-0">
         {/* Left Column: Header, Instructions, and Progress */}
         <div className="flex-1 flex flex-col gap-8 min-w-0 w-full">
-          <AssignmentDetailHeader 
-            assignment={assignment} 
+          <AssignmentDetailHeader
+            assignment={assignment}
             isTeacher={isTeacher}
-            isTurnedIn={isTurnedIn} 
-            isGraded={isGraded} 
+            isTurnedIn={isTurnedIn}
+            isGraded={isGraded}
           />
           <AssignmentDetailInstructions assignment={assignment} />
-          
+
           {/* Mobile Configuration Section */}
           <div className="lg:hidden">
-            <ConfigurationSection 
+            <ConfigurationSection
               isTeacher={isTeacher}
               isTurnedIn={isTurnedIn}
               isGraded={isGraded}
+              isPastDeadline={isPastDeadline}
               assignment={assignment}
               submission={submission}
               onShowForm={() => setShowSubmissionForm(true)}
@@ -95,10 +109,10 @@ export default function AssignmentDetail({
           </div>
 
           {isTeacher && (
-            <TeacherProgress 
-              submissions={submissions} 
-              assignment={assignment} 
-              classId={classId} 
+            <TeacherProgress
+              submissions={submissions}
+              assignment={assignment}
+              classId={classId}
             />
           )}
 
@@ -106,10 +120,11 @@ export default function AssignmentDetail({
 
         {/* Right Sidebar: Configuration & Status (Desktop only) */}
         <aside className="hidden lg:flex w-full lg:w-80 shrink-0 flex-col gap-6">
-          <ConfigurationSection 
+          <ConfigurationSection
             isTeacher={isTeacher}
             isTurnedIn={isTurnedIn}
             isGraded={isGraded}
+            isPastDeadline={isPastDeadline}
             assignment={assignment}
             submission={submission}
             onShowForm={() => setShowSubmissionForm(true)}
@@ -120,12 +135,12 @@ export default function AssignmentDetail({
       {showSubmissionForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-2xl relative">
-            <SubmissionForm 
-              assignment={assignment} 
-              submission={submission} 
-              classId={classId} 
-              onClose={() => setShowSubmissionForm(false)} 
-              onSuccess={() => { setShowSubmissionForm(false); router.refresh(); }} 
+            <SubmissionForm
+              assignment={assignment}
+              submission={submission}
+              classId={classId}
+              onClose={() => setShowSubmissionForm(false)}
+              onSuccess={() => { setShowSubmissionForm(false); router.refresh(); }}
             />
           </div>
         </div>
@@ -135,10 +150,10 @@ export default function AssignmentDetail({
 }
 
 /* ── Configuration & Status Component ── */
-function ConfigurationSection({ 
-  isTeacher, isTurnedIn, isGraded, assignment, submission, onShowForm 
-}: { 
-  isTeacher: boolean; isTurnedIn: boolean; isGraded: boolean; assignment: Assignment; submission: any; onShowForm: () => void;
+function ConfigurationSection({
+  isTeacher, isTurnedIn, isGraded, isPastDeadline, assignment, submission, onShowForm
+}: {
+  isTeacher: boolean; isTurnedIn: boolean; isGraded: boolean; isPastDeadline: boolean; assignment: Assignment; submission: any; onShowForm: () => void;
 }) {
   return (
     <div className="flex flex-col gap-6">
@@ -147,6 +162,7 @@ function ConfigurationSection({
         <StudentStatus
           isTurnedIn={isTurnedIn}
           isGraded={isGraded}
+          isPastDeadline={isPastDeadline}
           onShowForm={onShowForm}
         />
       )}

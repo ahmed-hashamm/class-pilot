@@ -2,6 +2,8 @@
 
 import { Check, Plus, UserX } from "lucide-react"
 import StudentAvatar from "./GroupCard/StudentAvatar"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface GroupMemberSelectItemProps {
   user: any
@@ -19,15 +21,18 @@ export function GroupMemberSelectItem({
   const name = user.users?.full_name || user.users?.email || "Unknown"
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => onToggle(user.user_id, isAssignedElsewhere)}
       disabled={isAssignedElsewhere}
-      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl border-2 text-[13px] font-bold transition-all group/item
-        ${isSelected 
-          ? "bg-navy text-white border-navy shadow-md shadow-navy/10" 
+      className={cn(
+        "w-full h-auto flex items-center justify-between px-3.5 py-2.5 rounded-2xl border-2 text-[13px] font-bold transition-all group/item",
+        isSelected 
+          ? "bg-navy text-white border-navy shadow-md shadow-navy/10 hover:bg-navy/90 hover:text-white" 
           : isAssignedElsewhere
-            ? "bg-secondary/20 border-border/10 text-muted-foreground/40 cursor-not-allowed"
-            : "bg-white border-border/50 hover:bg-secondary/50 hover:border-border cursor-pointer"}`}
+            ? "bg-secondary/20 border-border/10 text-muted-foreground/40 cursor-not-allowed opacity-50"
+            : "bg-white border-border/50 hover:bg-secondary/50 hover:border-border text-foreground hover:text-navy"
+      )}
     >
       <div className="flex items-center gap-3">
         <StudentAvatar 
@@ -52,6 +57,6 @@ export function GroupMemberSelectItem({
             : "bg-secondary text-muted-foreground/30 group-hover/item:bg-navy/10"}`}>
         {isSelected ? <Check size={12} /> : isAssignedElsewhere ? <UserX size={12} /> : <Plus size={12} />}
       </div>
-    </button>
+    </Button>
   )
 }

@@ -59,7 +59,6 @@ export default function CreateAssignmentForm({ classId, userId, rubrics, initial
           label={isEditing ? "Save changes" : "Create assignment"}
           loadingLabel={isEditing ? "Saving changes..." : "Creating assignment..."}
           className="w-full py-4 shadow-md"
-          size="lg"
         />
       </div>
     </form>

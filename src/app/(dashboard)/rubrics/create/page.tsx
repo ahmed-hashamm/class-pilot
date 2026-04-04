@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import CreateRubricForm from '@/components/features/grading/CreateRubricForm'
+import CreateRubricForm from '@/components/features/rubrics/CreateRubricForm'
 import { BookOpen, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 

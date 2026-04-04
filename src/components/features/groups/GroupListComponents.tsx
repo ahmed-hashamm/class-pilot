@@ -1,6 +1,5 @@
-"use client";
-
 import { Users2, Plus } from "lucide-react";
+import { FeatureButton } from "@/components/ui/FeatureButton";
 
 export function GroupHeader({
   isTeacher,
@@ -21,13 +20,12 @@ export function GroupHeader({
         </div>
       </div>
       {isTeacher && (
-        <button
+        <FeatureButton
           onClick={onNewGroup}
-          className="inline-flex items-center gap-2 bg-navy text-white font-semibold
-            text-[13px] px-5 py-2.5 rounded-xl shadow-sm hover:bg-navy/90
-            hover:-translate-y-0.5 transition-all border-none cursor-pointer">
-          <Plus size={14} /> New group
-        </button>
+          label="New group"
+          icon={Plus}
+          className="px-5 py-2.5"
+        />
       )}
     </div>
   );
@@ -54,13 +52,12 @@ export function GroupEmptyState({
           : "Your teacher hasn't created any groups yet."}
       </p>
       {isTeacher && (
-        <button
+        <FeatureButton
           onClick={onNewGroup}
-          className="mt-2 inline-flex items-center gap-2 bg-navy text-white
-            font-semibold text-[13px] px-5 py-2.5 rounded-xl
-            hover:bg-navy/90 transition border-none cursor-pointer">
-          <Plus size={14} /> Create first group
-        </button>
+          label="Create first group"
+          icon={Plus}
+          className="mt-2 px-5 py-2.5"
+        />
       )}
     </div>
   );

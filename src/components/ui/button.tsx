@@ -2,7 +2,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils/cn'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'yellow'
   size?: 'sm' | 'md' | 'lg'
 }
 
@@ -11,18 +11,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          'inline-flex items-center justify-center rounded-lg font-medium transition-colors',
+          'inline-flex items-center justify-center rounded-lg font-medium transition-colors gap-2',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-          'disabled:pointer-events-none disabled:opacity-50',
+          'disabled:pointer-events-none disabled:opacity-50 cursor-pointer',
           {
-            'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500': variant === 'primary',
-            'bg-gray-200 text-gray-900 hover:bg-gray-300 focus-visible:ring-gray-500': variant === 'secondary',
-            'border border-gray-300 bg-transparent hover:bg-gray-50 focus-visible:ring-gray-500': variant === 'outline',
-            'hover:bg-gray-100 focus-visible:ring-gray-500': variant === 'ghost',
-            'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500': variant === 'danger',
+            'bg-navy text-white hover:bg-navy/90 focus-visible:ring-navy': variant === 'primary',
+            'bg-secondary text-foreground hover:bg-navy hover:text-white border border-border focus-visible:ring-navy': variant === 'secondary',
+            'bg-transparent text-muted-foreground hover:bg-secondary/50 hover:text-navy focus-visible:ring-navy': variant === 'outline',
+            'hover:bg-secondary/50 text-muted-foreground hover:text-foreground focus-visible:ring-navy/20': variant === 'ghost',
+            'bg-red-50 text-red-600 border border-red-200 hover:bg-red-500 hover:text-white focus-visible:ring-red-500': variant === 'danger',
+            'bg-yellow text-navy hover:bg-yellow-hover hover:-translate-y-0.5 focus-visible:ring-yellow': variant === 'yellow',
             'h-8 px-3 text-sm': size === 'sm',
-            'h-10 px-4 text-base': size === 'md',
-            'h-12 px-6 text-lg': size === 'lg',
+            'h-10 px-4 text-[13px] font-bold': size === 'md',
+            'h-12 px-6 text-base font-bold': size === 'lg',
           },
           className
         )}

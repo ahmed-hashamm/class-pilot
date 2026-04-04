@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Pencil } from 'lucide-react'
-import RubricForm from '@/components/features/grading/CreateRubricForm'
+import RubricForm from '@/components/features/rubrics/CreateRubricForm'
 
 export default async function EditRubricPage({
   params,

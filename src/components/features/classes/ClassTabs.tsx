@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { TAB_INDICATOR_TRANSITION } from "@/lib/animations";
 import ClassSettingsModal from "./modals/ClassSettingsModal";
 import { CLASS_TABS } from "@/lib/data/classes";
@@ -36,19 +37,21 @@ export default function ClassTabs({
             const isActive = activeTab === tab.id && !tab.onClick;
 
             return (
-              <button
+              <Button
                 key={tab.id}
+                variant={isActive ? "yellow" : "ghost"}
+                size="sm"
                 onClick={() => tab.onClick ? tab.onClick() : setActiveTab(tab.id)}
                 className={`relative inline-flex items-center gap-2 px-3.5 py-2
-                  rounded-md text-[13px] font-bold transition-all duration-200
+                  rounded-md text-[13px] font-bold transition-all duration-200 h-auto
                   ${isActive
-                    ? "bg-yellow text-navy shadow-sm"
+                    ? "shadow-sm"
                     : "bg-white/10 border border-white/15 text-white/75 hover:bg-white/18 hover:text-white"
                   }`}
               >
                 <Icon size={14} className={`shrink-0 ${isActive ? "text-navy" : "text-white/60"}`} />
                 {tab.label}
-              </button>
+              </Button>
             );
           })}
         </div>

@@ -1,6 +1,8 @@
 import { getUserDashboardData } from '@/lib/db_data_fetching/dashboard'
 import DashboardBanner from '@/components/features/dashboard/DashboardBanner'
 import ClassList from '@/components/features/dashboard/ClassList'
+import { Plus, Link as LinkIcon, BookOpen } from 'lucide-react'
+import { Button } from '@/components/ui'
 
 export default async function DashboardPage() {
   const result = await getUserDashboardData()
@@ -16,54 +18,47 @@ export default async function DashboardPage() {
   const isEmpty = !dashboardData || dashboardData.length === 0
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-50/50">
       <DashboardBanner userName={userName} userId={user.id} />
 
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-8">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-10 md:py-14">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center text-center
-            py-20 border-2 border-dashed border-border rounded-2xl bg-white">
+            py-24 border-2 border-dashed border-zinc-200 rounded-[32px] bg-white shadow-sm ring-8 ring-zinc-50/50 group">
 
-            <div className="size-16 rounded-2xl bg-navy/8 border border-navy/15
-              flex items-center justify-center mb-5">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <rect x="3" y="5" width="22" height="18" rx="4" stroke="#043873" strokeWidth="1.8" />
-                <path d="M9 11h10M9 15h7" stroke="#043873" strokeWidth="1.8" strokeLinecap="round" />
-                <circle cx="21" cy="21" r="6" fill="white" stroke="#043873" strokeWidth="1.5" />
-                <path d="M21 18v3l2 1" stroke="#043873" strokeWidth="1.3" strokeLinecap="round" />
-              </svg>
+            <div className="size-20 rounded-[28px] bg-navy/5 border border-navy/10
+              flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl group-hover:bg-navy group-hover:text-white">
+              <BookOpen size={32} className="text-navy group-hover:text-white transition-colors duration-500" />
             </div>
 
-            <h2 className="font-black text-[22px] tracking-tight mb-2">
-              No classes yet
+            <h2 className="font-black text-[28px] text-navy tracking-tight mb-3">
+              Ready to start?
             </h2>
-            <p className="text-[14px] text-muted-foreground max-w-xs mb-8 leading-relaxed">
-              Create your first classroom or join one using a class code from your teacher.
+            <p className="text-[15px] text-muted-foreground max-w-sm mb-10 leading-relaxed font-medium">
+              Create your first premium classroom or join an existing one using a code from your teacher.
             </p>
 
-            <div className="flex flex-wrap gap-3 justify-center">
-              <button className="inline-flex items-center gap-2 bg-navy text-white
-                font-semibold text-[14px] px-6 py-3 rounded-lg
-                hover:bg-navy/90 hover:-translate-y-0.5 transition-all
-                cursor-pointer border-none">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-                Create a class
-              </button>
-              <button className="inline-flex items-center gap-2 bg-secondary border border-border
-                text-foreground font-semibold text-[14px] px-6 py-3 rounded-lg
-                hover:border-navy/30 hover:-translate-y-0.5 transition-all cursor-pointer">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6"
-                    strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Join a class
-              </button>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Button size="lg" className="px-8 py-6 rounded-2xl shadow-lg hover:shadow-navy/20 transition-all">
+                <Plus size={18} />
+                <span className="font-black text-[15px]">Create a class</span>
+              </Button>
+              
+              <Button variant="outline" size="lg" className="px-8 py-6 rounded-2xl bg-white hover:bg-zinc-50 border-zinc-200 transition-all font-bold">
+                <LinkIcon size={18} />
+                <span className="text-[15px]">Join with code</span>
+              </Button>
             </div>
           </div>
         ) : (
-          <ClassList dashboardData={dashboardData} />
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-between px-2">
+              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-navy/40">
+                Your Classrooms · {dashboardData.length}
+              </p>
+            </div>
+            <ClassList dashboardData={dashboardData} />
+          </div>
         )}
       </div>
     </div>

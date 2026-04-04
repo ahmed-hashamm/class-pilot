@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ClipboardList, Plus, RefreshCw } from "lucide-react";
+import { FeatureButton } from "@/components/ui";
 
 export function AssignmentsHeader({
   isTeacher,
@@ -24,15 +25,10 @@ export function AssignmentsHeader({
 
       {isTeacher && (
         <Link href={`/classes/${classId}/assignments/create`}>
-          <button
-            className="inline-flex items-center gap-2 bg-navy text-white
-              font-semibold text-[13px] px-5 py-2.5 rounded-xl shadow-sm
-              hover:bg-navy/90 hover:-translate-y-0.5 transition-all
-              cursor-pointer border-none"
-          >
-            <Plus size={14} />
-            Create assignment
-          </button>
+          <FeatureButton
+            label="Create assignment"
+            icon={Plus}
+          />
         </Link>
       )}
     </div>
@@ -55,12 +51,11 @@ export function AssignmentsEmptyState({ isTeacher, classId }: { isTeacher: boole
       </p>
       {isTeacher && (
         <Link href={`/classes/${classId}/assignments/create`}>
-          <button className="mt-2 inline-flex items-center gap-2 bg-navy text-white
-            font-semibold text-[13px] px-5 py-2.5 rounded-xl
-            hover:bg-navy/90 transition cursor-pointer border-none">
-            <Plus size={14} />
-            Create first assignment
-          </button>
+          <FeatureButton
+            label="Create first assignment"
+            icon={Plus}
+            className="mt-2"
+          />
         </Link>
       )}
     </div>

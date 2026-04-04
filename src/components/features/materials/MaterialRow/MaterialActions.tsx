@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MoreVertical, Sparkles, Pencil, Trash2, Loader2 } from "lucide-react";
 import { Material } from "@/lib/types/schema";
+import { Button } from "@/components/ui/button";
 
 interface MaterialActionsProps {
   material: Material;
@@ -21,13 +22,13 @@ export default function MaterialActions({
 
   return (
     <div className="relative">
-      <button
+      <Button
+        variant="ghost"
         onClick={() => setMenuOpen(!menuOpen)}
-        className="p-1 text-muted-foreground hover:text-navy hover:bg-secondary
-          rounded-lg transition-all cursor-pointer bg-transparent border-none"
+        className="p-1.5 h-auto text-muted-foreground hover:text-navy hover:bg-secondary"
       >
         {isSyncing ? <Loader2 size={16} className="animate-spin" /> : <MoreVertical size={18} />}
-      </button>
+      </Button>
 
       {menuOpen && (
         <>
@@ -37,38 +38,35 @@ export default function MaterialActions({
             <div className="px-3 py-2 border-b border-border bg-secondary/20">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Actions</p>
             </div>
-            
-            <button
+
+            <Button
+              variant="ghost"
               onClick={() => { setMenuOpen(false); onSync(material.id); }}
               disabled={isSyncing}
-              className="w-full flex items-center gap-3 px-4 py-3 text-[13px]
-                font-black text-navy hover:bg-secondary transition-all
-                cursor-pointer bg-transparent border-none text-left disabled:opacity-50"
+              className="w-full flex items-center gap-3 px-4 py-3 h-auto text-[13px] font-black text-navy hover:bg-secondary transition-all text-left justify-start rounded-none"
             >
               <Sparkles size={14} className="text-navy/60" />
               {isSyncing ? "Syncing…" : "Sync for AI"}
-            </button>
-            
-            <button
+            </Button>
+
+            <Button
+              variant="ghost"
               onClick={() => { setMenuOpen(false); onEdit(material); }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-[13px]
-                font-black text-navy hover:bg-secondary transition-all
-                cursor-pointer bg-transparent border-none text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 h-auto text-[13px] font-black text-navy hover:bg-secondary transition-all text-left justify-start rounded-none"
             >
               <Pencil size={14} className="text-navy/60" />
               Edit Detail
-            </button>
-            
+            </Button>
+
             <div className="border-t border-border mt-1 pt-1">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => { setMenuOpen(false); onDelete(material.id); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[13px]
-                  font-black text-red-500 hover:bg-red-50 transition-all
-                  cursor-pointer bg-transparent border-none text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 h-auto text-[13px] font-black text-red-500 hover:bg-red-50 transition-all text-left justify-start rounded-none"
               >
                 <Trash2 size={14} />
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         </>

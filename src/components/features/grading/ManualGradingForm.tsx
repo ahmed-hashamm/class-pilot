@@ -4,8 +4,10 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Award, MessageSquare, CheckCheck } from "lucide-react"
 import { GradingSubmissionProps } from "./GradeSubmission"
-import { RubricScoringList } from "./RubricScoringList"
+import { RubricScoringList } from "../rubrics/RubricScoringList"
 import { updateManualGradeAction } from "@/actions/ClassFeaturesActions"
+import { FeatureButton } from "@/components/ui/FeatureButton"
+import { Button } from "@/components/ui/button"
 
 const inputClass = `w-full bg-white border border-border rounded-xl px-4 py-3
   text-[14px] text-foreground placeholder:text-muted-foreground font-medium
@@ -38,7 +40,7 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       const finalGradeValue = calculateTotal()
       const result = await updateManualGradeAction({
@@ -48,7 +50,7 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
       })
 
       if (result.error) throw new Error(result.error)
-      
+
       router.refresh()
       onSuccess()
     } catch (err: unknown) {
@@ -69,10 +71,10 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 pb-8">
       {/* Rubric criteria */}
-      <RubricScoringList 
-        criteria={criteria} 
-        scores={scores} 
-        onScoreChange={handleScoreChange} 
+      <RubricScoringList
+        criteria={criteria}
+        scores={scores}
+        onScoreChange={handleScoreChange}
       />
 
       {/* Final grade */}
@@ -82,7 +84,7 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
         </label>
         <div className="relative group">
           <input
-            type="number" 
+            type="number"
             step="0.1"
             value={overallGrade}
             onChange={(e) => setOverallGrade(e.target.value)}
@@ -114,27 +116,23 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
 
       {/* Actions */}
       <div className="flex flex-col gap-3 pt-2">
-        <button
+        <FeatureButton
           type="submit"
-          disabled={loading || !overallGrade || !feedback.trim()}
-          className="w-full inline-flex items-center justify-center gap-2
-            bg-navy text-white font-black text-[14px] py-3.5 rounded-xl
-            hover:bg-navy/90 transition shadow-md hover:-translate-y-0.5
-            disabled:opacity-60 disabled:translate-y-0 disabled:cursor-not-allowed cursor-pointer border-none">
-          {loading ? (
-            <><Loader2 size={16} className="animate-spin" /> Saving Grade…</>
-          ) : (
-            <><CheckCheck size={16} /> Confirm Evaluation</>
-          )}
-        </button>
-        <button
+          disabled={!overallGrade || !feedback.trim()}
+          loading={loading}
+          loadingLabel="Saving Grade…"
+          className="w-full py-3.5"
+          label="Confirm Evaluation"
+          icon={CheckCheck}
+        />
+        <Button
           type="button"
+          variant="outline"
           onClick={onCancel}
-          className="w-full py-3 font-bold text-[13px] text-muted-foreground uppercase tracking-widest
-            border border-border/60 rounded-xl hover:text-navy hover:border-navy/20
-            hover:bg-navy/5 transition cursor-pointer bg-white">
+          className="w-full py-3 text-muted-foreground uppercase tracking-widest"
+        >
           Discard Changes
-        </button>
+        </Button>
       </div>
     </form>
   )

@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { X, Settings, Save, Loader2, Eye, EyeOff, Trash2 } from "lucide-react";
-import { ConfirmModal } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import { FeatureButton, ConfirmModal } from "@/components/ui";
 import { useClassSettings } from "@/lib/hooks";
 
 interface ModalProps {
@@ -34,16 +37,22 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
           {/* Header */}
           <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
             <h2 className="text-xl font-bold text-navy flex items-center gap-2">
-              <Settings size={20} className="text-accent-dark" /> 
+              <Settings size={20} className="text-secondary" /> 
               Class Settings
             </h2>
-            <button onClick={onClose} disabled={isSaving || isDeleting} className="p-2 hover:bg-zinc-200 rounded-full text-zinc-500 disabled:opacity-30 transition-colors">
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={onClose} 
+              disabled={isSaving || isDeleting} 
+              className="p-2 h-auto w-auto hover:bg-zinc-200 rounded-full text-zinc-500"
+            >
               <X size={20} />
-            </button>
+            </Button>
           </div>
 
           {/* Scrollable Content */}
-          <div className="p-8 space-y-8 overflow-y-auto">
+          <div className="p-8 space-y-8 overflow-y-auto no-scrollbar">
             <div className="space-y-4">
               <h3 className="text-xs font-black text-navy/30 uppercase tracking-[0.2em]">General Info</h3>
               
@@ -55,7 +64,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
                   placeholder="Enter class name..."
                   disabled={isSaving || isDeleting}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 text-navy font-medium rounded-xl border border-zinc-200 focus:ring-2 focus:ring-accent outline-none transition-all disabled:bg-zinc-50"
+                  className="w-full px-4 py-3 text-navy font-medium rounded-xl border border-zinc-200 focus:ring-2 focus:ring-navy outline-none transition-all disabled:bg-zinc-50"
                 />
               </div>
 
@@ -67,7 +76,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
                   placeholder="Add a description..."
                   disabled={isSaving || isDeleting}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-3 text-navy font-medium rounded-xl border border-zinc-200 focus:ring-2 focus:ring-accent outline-none transition-all resize-none disabled:bg-zinc-50"
+                  className="w-full px-4 py-3 text-navy font-medium rounded-xl border border-zinc-200 focus:ring-2 focus:ring-navy outline-none transition-all resize-none disabled:bg-zinc-50"
                 />
               </div>
             </div>
@@ -77,7 +86,10 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
               
               <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-50 border border-zinc-100 transition-all">
                 <div className="flex items-center gap-4">
-                  <div className={`p-2.5 rounded-xl shadow-sm transition-colors ${settings.showClassCode ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-200 text-zinc-500'}`}>
+                  <div className={cn(
+                    "p-2.5 rounded-xl shadow-sm transition-colors",
+                    settings.showClassCode ? 'bg-emerald-50 text-emerald-600' : 'bg-zinc-200 text-zinc-500'
+                  )}>
                     {settings.showClassCode ? <Eye size={20} /> : <EyeOff size={20} />}
                   </div>
                   <div>
@@ -86,57 +98,64 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
                   </div>
                 </div>
                 
-                <button 
+                <Button 
+                  key="toggle-code"
                   type="button"
+                  variant="ghost"
                   disabled={isSaving || isDeleting}
                   onClick={() => handleToggleSetting('showClassCode')}
-                  className={`w-14 h-7 rounded-full transition-all duration-300 relative ${
-                    settings.showClassCode ? 'bg-emerald-500' : 'bg-zinc-300'
-                  } ${isSaving || isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-95'}`}
+                  className={cn(
+                    "w-14 h-7 p-0 rounded-full transition-all duration-300 relative border-none",
+                    settings.showClassCode ? 'bg-emerald-500' : 'bg-zinc-300',
+                    (isSaving || isDeleting) ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-95'
+                  )}
                 >
-                  <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ease-in-out ${
+                  <div className={cn(
+                    "absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ease-in-out",
                     settings.showClassCode ? 'left-8' : 'left-1'
-                  }`} />
-                </button>
+                  )} />
+                </Button>
               </div>
             </div>
 
             {/* Danger Zone */}
             <div className="space-y-4 pt-6 border-t border-red-100">
               <h3 className="text-xs font-black text-red-500 uppercase tracking-[0.2em]">Danger Zone</h3>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={isSaving || isDeleting}
-                className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-50 border border-red-100 hover:bg-red-100 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-50 border border-red-100 hover:bg-red-100 transition-all group h-auto"
               >
                 <div className="text-left">
                   <p className="text-sm font-bold text-red-600">Delete this class</p>
                   <p className="text-[11px] text-red-400 font-medium">Permanently remove all classroom data</p>
                 </div>
                 <Trash2 size={18} className="text-red-400 group-hover:text-red-600 transition-colors" />
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Footer */}
           <div className="p-6 bg-zinc-50/80 border-t border-zinc-100 flex flex-col-reverse sm:flex-row gap-3">
-            <button 
-              type="button" 
+            <Button 
+              variant="secondary"
               onClick={onClose} 
               disabled={isSaving || isDeleting} 
-              className="w-full sm:flex-1 px-4 py-3 rounded-xl font-bold text-zinc-600 hover:bg-zinc-200 transition-all disabled:opacity-50"
+              className="w-full sm:flex-1 py-3 rounded-xl border border-zinc-200"
             >
               Cancel
-            </button>
-            <button 
+            </Button>
+            <FeatureButton 
               onClick={handleSave}
-              disabled={isSaving || isDeleting || !name.trim()}
-              className="w-full sm:flex-1 px-4 py-3 rounded-xl font-bold bg-navy text-accent hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
-            >
-              {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-              <span>{isSaving ? "Updating..." : "Save Changes"}</span>
-            </button>
+              loading={isSaving}
+              disabled={isDeleting || !name.trim()}
+              label={isSaving ? "Updating..." : "Save Changes"}
+              variant="yellow"
+              icon={Save}
+              className="w-full sm:flex-1 py-3 rounded-xl shadow-md"
+            />
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users, PinOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton";
@@ -108,12 +109,21 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                 </h4>
                 {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material" || item.type === "poll" || item.type === "attendance") && (
                   <div className="shrink-0 relative">
-                    <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all cursor-pointer bg-transparent border-none"><MoreVertical size={14} /></button>
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setMenuOpen(!menuOpen)} 
+                      className="p-1.5 h-auto w-auto text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    >
+                      <MoreVertical size={14} />
+                    </Button>
                     {menuOpen && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                         <div className="absolute right-0 top-8 z-50 bg-white border border-border rounded-xl shadow-lg overflow-hidden min-w-[140px]">
-                          <button
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary h-auto rounded-none"
                             onClick={async () => {
                               setMenuOpen(false);
                               const res = await togglePinAction({
@@ -132,23 +142,31 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                                 toast.error(res.error);
                               }
                             }}
-                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left"
                           >
                             {isPinned ? (
                               <><PinOff size={13} className="text-navy" /> Unpin</>
                             ) : (
                               <><Pin size={13} className="text-navy" /> Pin</>
                             )}
-                          </button>
+                          </Button>
 
                           {item.type === "announcement" && (
-                            <button onClick={() => { setMenuOpen(false); setEditOpen(true); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary transition cursor-pointer bg-transparent border-none text-left">
+                            <Button 
+                              variant="ghost"
+                              className="w-full justify-start gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary h-auto rounded-none"
+                              onClick={() => { setMenuOpen(false); setEditOpen(true); }}
+                            >
                               <Pencil size={13} className="text-navy" /> Edit
-                            </button>
+                            </Button>
                           )}
-                          <button onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} disabled={deleting} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 transition cursor-pointer bg-transparent border-none text-left disabled:opacity-50">
+                          <Button 
+                            variant="ghost"
+                            className="w-full justify-start gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 h-auto rounded-none"
+                            onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} 
+                            disabled={deleting}
+                          >
                             <Trash2 size={13} /> Delete
-                          </button>
+                          </Button>
                         </div>
                       </>
                     )}

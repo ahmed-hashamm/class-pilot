@@ -7,7 +7,7 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { SubmissionsList } from "@/components/features/submissions";
 import { Assignment } from "@/lib/types/schema";
 import { gradeAssignmentSubmissionAction } from "@/actions/ClassFeaturesActions";
-import { Button } from "@/components/ui/button";
+import { FeatureButton } from "@/components/ui";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface TeacherProgressProps {
@@ -83,25 +83,16 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
           </div>
         </div>
 
-        <Button
+        <FeatureButton
           onClick={() => setIsConfirmOpen(true)}
-          disabled={isProcessing || pendingSubmissions.length === 0}
+          disabled={pendingSubmissions.length === 0}
+          loading={isProcessing}
           variant="outline"
-          size="sm"
-          className="rounded-xl border-2 border-navy text-navy font-black text-[11px] uppercase tracking-wider hover:bg-navy hover:text-white transition-all gap-2"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="size-3 animate-spin" />
-              Grading {pendingSubmissions.length - gradingIds.length}/{pendingSubmissions.length}...
-            </>
-          ) : (
-            <>
-              <Sparkles className="size-3 fill-current" />
-              Grade All
-            </>
-          )}
-        </Button>
+          icon={Sparkles}
+          label="Grade All"
+          loadingLabel={`Grading ${pendingSubmissions.length - gradingIds.length}/${pendingSubmissions.length}...`}
+          className="border-2 font-black text-[11px] hover:bg-navy hover:text-white px-4 py-2"
+        />
       </div>
 
       <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">

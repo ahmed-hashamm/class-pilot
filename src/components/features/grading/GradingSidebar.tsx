@@ -113,8 +113,8 @@ export function GradingSidebar({
                 <span className="text-[11px] font-black uppercase tracking-widest text-navy">
                   {gradingMode === "ai" ? "AI Evaluation" : "Manual Grading"}
                 </span>
-                <button 
-                  onClick={() => setGradingMode(null)} 
+                <button
+                  onClick={() => setGradingMode(null)}
                   className="text-[12px] font-bold text-muted-foreground hover:text-navy transition cursor-pointer bg-transparent border-none"
                 >
                   Cancel
@@ -123,7 +123,7 @@ export function GradingSidebar({
               {gradingMode === "ai" ? (
                 <AIGradingButton
                   submission={submission}
-                  onGradingStart={() => {}}
+                  onGradingStart={() => { }}
                   onGradingComplete={onGradingComplete}
                 />
               ) : (

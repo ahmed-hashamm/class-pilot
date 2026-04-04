@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Lock, Copy, CheckCheck, Eye, EyeOff } from "lucide-react";
 import SidebarCard from "./SidebarCard";
+import { Button } from "@/components/ui/button";
 
 interface ClassCodeCardProps {
   classCode: string;
@@ -43,20 +44,23 @@ export default function ClassCodeCard({
               font-mono leading-none">
               {classCode}
             </span>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleCopy}
               className={`shrink-0 inline-flex items-center gap-1.5 text-[12px]
-                font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer
+                font-semibold px-3 py-1.5 h-auto rounded-lg transition-all
                 border-none
                 ${copied
                   ? 'bg-green-100 text-green-700'
                   : 'bg-navy/8 text-navy hover:bg-navy/15'
-                }`}>
+                }`}
+            >
               {copied
                 ? <><CheckCheck size={12} />Copied!</>
                 : <><Copy size={12} />Copy</>
               }
-            </button>
+            </Button>
           </div>
 
           {isTeacher && (

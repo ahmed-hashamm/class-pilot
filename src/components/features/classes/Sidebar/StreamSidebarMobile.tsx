@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Button } from '@/components/ui'
 import { HEIGHT_TRANSITION } from '@/lib/animations'
 import ClassCodeCard from './ClassCodeCard'
 import DueSoonCard from './DueSoonCard'
@@ -43,13 +44,13 @@ export default function StreamSidebarMobile({
 
           return (
             <React.Fragment key={box.id}>
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => setActiveBox(isActive ? null : box.id)}
-                className={`flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 relative
+                className={`flex-1 py-4 h-auto text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 relative rounded-none
                   ${isActive ? 'text-navy' : 'text-navy/45 hover:text-navy/60'}`}
               >
                 {box.label}
-
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
@@ -57,7 +58,7 @@ export default function StreamSidebarMobile({
                     transition={{ type: "spring", bounce: 0, duration: 0.4 }}
                   />
                 )}
-              </button>
+              </Button>
 
               {/* Consistent, sharp separator lines */}
               {i < boxes.length - 1 && (
@@ -96,12 +97,13 @@ export default function StreamSidebarMobile({
             </div>
 
             {/* Minimal Dismissal handle */}
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setActiveBox(null)}
-              className="w-full h-8 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity"
+              className="w-full h-8 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity p-0"
             >
               <div className="w-8 h-1 rounded-full bg-navy/40" />
-            </button>
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>

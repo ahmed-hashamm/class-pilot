@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { FeatureButton } from '@/components/ui'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -174,9 +175,12 @@ function LoginContent() {
             {message && (
               <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">{message}</div>
             )}
-            <Button type="submit" className="w-full" variant="primary" disabled={loading}>
-              {loading ? 'Loading...' : isSignup ? 'Sign Up' : 'Sign In'}
-            </Button>
+            <FeatureButton
+              type="submit" 
+              className="w-full" 
+              loading={loading}
+              label={isSignup ? 'Sign Up' : 'Sign In'}
+            />
           </form>
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">

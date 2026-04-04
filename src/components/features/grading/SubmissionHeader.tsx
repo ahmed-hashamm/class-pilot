@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { ArrowLeft, FileText, CheckCircle2, Layout } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface SubmissionHeaderProps {
   isDraft: boolean
@@ -15,15 +16,16 @@ export function SubmissionHeader({ isDraft, finalGrade, totalPoints }: Submissio
 
   return (
     <div className="w-full flex items-center justify-between gap-4 py-2 sm:py-0 border-b sm:border-none">
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => router.back()}
-        className="inline-flex items-center gap-1.5 text-[13px] font-semibold shrink-0
-          text-navy/60 hover:text-navy transition-colors"
+        className="inline-flex items-center gap-1.5 text-[13px] font-semibold shrink-0 text-navy/60 hover:text-navy transition-colors h-auto p-1"
       >
         <ArrowLeft size={16} />
         <span className="hidden xs:inline">Back to Class</span>
         <span className="xs:hidden">Back</span>
-      </button>
+      </Button>
 
       <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
         {isDraft && (

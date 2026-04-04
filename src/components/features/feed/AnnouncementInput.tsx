@@ -91,10 +91,10 @@ export default function AnnouncementInput({
         <FormSection label="Deadline (Optional)" description="When is a response needed?">
           <div className="relative">
             <Timer size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/40" />
-            <Input 
+            <Input
               type="datetime-local"
-              value={deadline} 
-              onChange={(e) => setDeadline(e.target.value)} 
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
               min={new Date().toISOString().slice(0, 16)}
               className="pl-10 rounded-xl border-border bg-gray-50/50 py-6 w-full"
             />
@@ -128,14 +128,14 @@ export default function AnnouncementInput({
 
       <div className="flex items-center justify-between border-t border-border/40 pt-6">
         <div className="flex items-center gap-3">
-          <PinToggle 
-            pinned={isPinned} 
-            onToggle={setIsPinned} 
+          <PinToggle
+            pinned={isPinned}
+            onToggle={setIsPinned}
           />
           {hasContent && (
             <FeatureButton
               label="Clear"
-              variant="ghost"
+              variant="outline"
               onClick={resetForm}
             />
           )}
@@ -146,8 +146,8 @@ export default function AnnouncementInput({
           loading={loading}
           disabled={!hasContent}
           onClick={handlePost}
-          className="min-w-[180px] py-6 shadow-md"
-          size="lg"
+
+
         />
       </div>
     </div>

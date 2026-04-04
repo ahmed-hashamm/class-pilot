@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Plus, MoreVertical, Users, Eye, LogOut, Pin, PinOff } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { format, isAfter, startOfDay } from 'date-fns'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -214,38 +216,46 @@ export default function ClassCard({
                 <Eye size={16} />
               </Link>
               {isTeacher && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => router.push(`/classes/${classId}/assignments/create`)}
                   title="Create Assignment"
-                  className="p-2 rounded-lg text-muted-foreground hover:text-navy
-                    hover:bg-navy/8 transition-colors cursor-pointer bg-transparent border-none">
+                  className="p-2 h-auto text-muted-foreground hover:text-navy hover:bg-navy/8 rounded-lg"
+                >
                   <Plus size={16} />
-                </button>
+                </Button>
               )}
             </div>
 
             <div className="flex items-center gap-1.5">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={togglePin}
                 disabled={isPinning}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[12px] font-bold tracking-tight transition-all duration-200 cursor-pointer border-none
-                  ${isPinned 
-                    ? 'text-navy bg-navy/8 hover:bg-navy/12' 
-                    : 'text-muted-foreground hover:text-navy hover:bg-navy/8'
-                  } ${isPinning ? 'opacity-50 cursor-wait' : ''}`}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1.5 h-auto text-[12px] font-bold tracking-tight rounded-lg transition-all duration-200",
+                  isPinned 
+                    ? "text-navy bg-navy/8 hover:bg-navy/12" 
+                    : "text-muted-foreground hover:text-navy hover:bg-navy/8",
+                  isPinning && "opacity-50 cursor-wait"
+                )}
               >
                 {isPinned ? <Pin size={13} fill="currentColor" /> : <Pin size={13} />}
                 <span>{isPinned ? 'Unpin' : 'Pin'} class</span>
-              </button>
+              </Button>
 
               {!isTeacher && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowLeaveConfirm(true)}
                   title="Leave Class"
-                  className="p-2 rounded-lg text-muted-foreground hover:text-red-500
-                    hover:bg-red-50 transition-colors cursor-pointer bg-transparent border-none">
+                  className="p-2 h-auto text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-lg"
+                >
                   <LogOut size={16} />
-                </button>
+                </Button>
               )}
             </div>
           </div>

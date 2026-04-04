@@ -2,6 +2,8 @@
 
 import { X, Paperclip, UploadCloud, Loader2, AlertCircle, FolderOpen } from 'lucide-react'
 import { useEditMaterial } from '@/lib/hooks'
+import { FeatureButton } from '@/components/ui/FeatureButton'
+import { Button } from '@/components/ui/button'
 
 interface ExistingFile {
     name: string
@@ -48,11 +50,9 @@ export default function EditMaterialModal({ material, onClose, onSuccess }: Prop
                         </div>
                         <h3 className="font-black text-[17px] tracking-tight">Edit material</h3>
                     </div>
-                    <button onClick={onClose}
-                        className="p-1.5 text-muted-foreground hover:text-foreground
-              hover:bg-secondary rounded-lg transition cursor-pointer bg-transparent border-none">
+                    <Button variant="ghost" size="sm" onClick={onClose} className="p-1.5">
                         <X size={16} />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
@@ -103,13 +103,14 @@ export default function EditMaterialModal({ material, onClose, onSuccess }: Prop
                                         <Paperclip size={12} className="text-navy shrink-0" />
                                         <span className="text-[12px] font-medium truncate">{file.name}</span>
                                     </div>
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="ghost"
+                                        size="sm"
                                         onClick={() => removeExistingFile(i)}
-                                        className="shrink-0 text-muted-foreground hover:text-red-500 transition
-                      cursor-pointer bg-transparent border-none ml-2">
+                                        className="shrink-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 p-1 h-auto w-auto ml-2">
                                         <X size={13} />
-                                    </button>
+                                    </Button>
                                 </div>
                             ))}
                         </div>
@@ -143,13 +144,14 @@ export default function EditMaterialModal({ material, onClose, onSuccess }: Prop
                                             <Paperclip size={12} className="text-navy-light shrink-0" />
                                             <span className="text-[12px] font-medium truncate">{file.name}</span>
                                         </div>
-                                        <button
+                                        <Button
                                             type="button"
+                                            variant="ghost"
+                                            size="sm"
                                             onClick={() => removeNewFile(i)}
-                                            className="shrink-0 text-muted-foreground hover:text-red-500 transition
-                        cursor-pointer bg-transparent border-none ml-2">
+                                            className="shrink-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 p-1 h-auto w-auto ml-2">
                                             <X size={13} />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
                             </div>
@@ -159,23 +161,20 @@ export default function EditMaterialModal({ material, onClose, onSuccess }: Prop
 
                 {/* Footer */}
                 <div className="flex flex-col-reverse sm:flex-row gap-3 px-6 pb-6">
-                    <button onClick={onClose}
-                        className="w-full sm:flex-1 py-3 text-[14px] font-semibold text-muted-foreground
-              hover:text-foreground hover:bg-secondary rounded-xl transition
-              cursor-pointer bg-transparent border-none">
+                    <Button onClick={onClose}
+                        variant="ghost"
+                        className="w-full sm:flex-1 py-3"
+                    >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <FeatureButton
                         onClick={handleSave}
                         disabled={loading}
-                        className="w-full sm:flex-1 inline-flex items-center justify-center gap-2
-              bg-navy text-white font-semibold text-[14px] py-3 rounded-xl
-              hover:bg-navy/90 transition disabled:opacity-60 cursor-pointer border-none">
-                        {loading
-                            ? <><Loader2 size={14} className="animate-spin" />Saving…</>
-                            : 'Save changes'
-                        }
-                    </button>
+                        loading={loading}
+                        loadingLabel="Saving…"
+                        label="Save changes"
+                        className="w-full sm:flex-1 py-3"
+                    />
                 </div>
             </div>
         </div>

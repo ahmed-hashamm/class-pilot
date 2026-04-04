@@ -1,72 +1,58 @@
 import { getRubricsList } from '@/lib/db_data_fetching/rubrics'
 import Link from 'next/link'
-import { Plus, FileText, ChevronRight, ChevronLeft, BookOpen } from 'lucide-react'
+import { Plus, FileText, ChevronRight, BookOpen } from 'lucide-react'
+import { Button, PageHeader } from '@/components/ui'
 
 export default async function RubricsPage() {
   const { rubrics } = await getRubricsList()
 
   return (
-    <div className="max-w-3xl mx-auto p-6 flex flex-col gap-8">
-      {/* Back */}
-      <Link href="/dashboard"
-        className="inline-flex items-center gap-1.5 text-[13px] font-semibold
-          text-muted-foreground hover:text-navy transition-colors w-fit">
-        <ChevronLeft size={15} /> Back to dashboard
-      </Link>
-
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-navy flex items-center justify-center">
-            <BookOpen size={17} className="text-yellow" />
-          </div>
-          <div>
-            <h1 className="font-black text-[20px] tracking-tight">Rubrics</h1>
-            <p className="text-[13px] text-muted-foreground">
-              Manage your evaluation standards.
-            </p>
-          </div>
-        </div>
-
-        <Link href="/rubrics/create">
-          <button className="inline-flex items-center gap-2 bg-navy text-white
-            font-semibold text-[13px] px-5 py-2.5 rounded-xl shadow-sm
-            hover:bg-navy/90 hover:-translate-y-0.5 transition-all
-            cursor-pointer border-none">
-            <Plus size={14} /> New rubric
-          </button>
-        </Link>
-      </div>
+    <div className="max-w-4xl mx-auto p-6 md:p-10 flex flex-col">
+      <PageHeader
+        title="Rubrics"
+        description="Manage your evaluation standards"
+        icon={BookOpen}
+        backHref="/dashboard"
+        backLabel="Back to dashboard"
+        action={
+          <Link href="/rubrics/create">
+            <Button variant="primary" className="gap-2">
+              <Plus size={16} />
+              <span>New rubric</span>
+            </Button>
+          </Link>
+        }
+      />
 
       {/* List */}
       {rubrics && rubrics.length > 0 ? (
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
           {rubrics.map((rubric, i) => (
             <Link key={rubric.id} href={`/rubrics/${rubric.id}`}
-              className={`group flex items-center gap-4 px-5 py-4 transition-colors
-                hover:bg-secondary/40
-                ${i < rubrics.length - 1 ? 'border-b border-border' : ''}`}>
+              className={`group flex items-center gap-4 px-6 py-5 transition-all
+                hover:bg-secondary/30
+                ${i < rubrics.length - 1 ? 'border-b border-border/60' : ''}`}>
 
               {/* Icon */}
-              <div className="shrink-0 size-11 rounded-xl bg-navy/8 border border-navy/15
-                flex items-center justify-center group-hover:bg-navy/12 transition-colors">
-                <FileText size={18} className="text-navy" />
+              <div className="shrink-0 size-12 rounded-2xl bg-navy/5 border border-navy/10
+                flex items-center justify-center group-hover:bg-navy group-hover:text-white transition-all duration-300">
+                <FileText size={20} className="group-hover:text-white transition-colors" />
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <h3 className="font-bold text-[15px] text-foreground truncate
-                    group-hover:text-navy transition-colors">
+                <div className="flex items-center gap-2.5 mb-1">
+                  <h3 className="font-bold text-[16px] text-navy truncate
+                    group-hover:translate-x-0.5 transition-transform duration-300">
                     {rubric.name}
                   </h3>
-                  <span className="shrink-0 text-[10px] font-bold uppercase
-                    tracking-wide bg-secondary border border-border
-                    rounded-full px-2 py-0.5 text-muted-foreground">
+                  <span className="shrink-0 text-[10px] font-black uppercase
+                    tracking-widest bg-navy/5 border border-navy/10
+                    rounded-lg px-2 py-0.5 text-navy/40">
                     {Array.isArray(rubric.criteria) ? rubric.criteria.length : 0} criteria
                   </span>
                 </div>
-                <p className="text-[12px] text-muted-foreground">
+                <p className="text-[12px] text-muted-foreground font-medium">
                   Created {rubric.created_at ? new Date(rubric.created_at).toLocaleDateString('en-US', {
                     month: 'short', day: 'numeric', year: 'numeric',
                   }) : 'recently'}
@@ -74,40 +60,41 @@ export default async function RubricsPage() {
               </div>
 
               {/* Points */}
-              <div className="shrink-0 text-right">
-                <p className="font-black text-[20px] text-foreground tabular-nums">
+              <div className="shrink-0 text-right px-4">
+                <p className="font-black text-[22px] text-navy tabular-nums leading-none">
                   {rubric.total_points}
                 </p>
                 <p className="text-[10px] font-bold uppercase tracking-widest
-                  text-muted-foreground">
+                  text-navy/30">
                   pts
                 </p>
               </div>
 
-              <ChevronRight size={16}
-                className="shrink-0 text-muted-foreground/40 group-hover:text-navy
-                  group-hover:translate-x-0.5 transition-all" />
+              <ChevronRight size={18}
+                className="shrink-0 text-muted-foreground/30 group-hover:text-navy
+                  group-hover:translate-x-1 transition-all duration-300" />
             </Link>
           ))}
         </div>
       ) : (
         /* Empty state */
-        <div className="flex flex-col items-center justify-center gap-3
-          py-16 border-2 border-dashed border-border rounded-2xl bg-white text-center">
-          <div className="size-14 rounded-2xl bg-navy/8 border border-navy/15
-            flex items-center justify-center">
-            <FileText size={24} className="text-navy/40" />
+        <div className="flex flex-col items-center justify-center gap-4
+          py-24 border-2 border-dashed border-border/60 rounded-3xl bg-white/50 text-center">
+          <div className="size-16 rounded-2xl bg-navy/5 border border-navy/10
+            flex items-center justify-center mb-2">
+            <FileText size={28} className="text-navy/20" />
           </div>
-          <p className="font-bold text-[16px] tracking-tight">No rubrics yet</p>
-          <p className="text-[13px] text-muted-foreground max-w-xs leading-relaxed">
-            Create your first grading rubric to simplify your feedback process.
-          </p>
+          <div>
+            <p className="font-black text-[18px] text-navy tracking-tight mb-1">No rubrics yet</p>
+            <p className="text-[14px] text-muted-foreground max-w-xs leading-relaxed font-medium">
+              Create your first grading rubric to simplify your feedback process and ensure consistency.
+            </p>
+          </div>
           <Link href="/rubrics/create">
-            <button className="mt-2 inline-flex items-center gap-2 bg-navy text-white
-              font-semibold text-[13px] px-5 py-2.5 rounded-xl
-              hover:bg-navy/90 transition cursor-pointer border-none">
-              <Plus size={14} /> Create first rubric
-            </button>
+            <Button variant="primary" className="mt-2 gap-2 px-6">
+              <Plus size={16} />
+              <span>Create first rubric</span>
+            </Button>
           </Link>
         </div>
       )}

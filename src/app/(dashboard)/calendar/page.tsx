@@ -1,7 +1,7 @@
 import { getCalendarPageData } from "@/lib/db_data_fetching/calendar";
-import { Calendar as CalendarIcon, ChevronLeft, CheckCircle2, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, CheckCircle2 } from "lucide-react";
 import CalenderView from "@/components/features/dashboard/CalenderView";
-import Link from "next/link";
+import { PageHeader } from "@/components/ui";
 
 export default async function CalendarPage() {
   const { assignmentList } = await getCalendarPageData();
@@ -10,40 +10,40 @@ export default async function CalendarPage() {
   const totalPending = assignmentList.filter((a) => !a.isDone).length;
 
   return (
-    <div className="max-w-5xl mx-auto p-6 flex flex-col gap-8">
-      {/* Top bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Link href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-[13px] font-semibold
-            text-muted-foreground hover:text-navy transition-colors w-fit">
-          <ChevronLeft size={15} /> Back to dashboard
-        </Link>
-
-        {/* Stats */}
-        <div className="flex gap-3 flex-wrap">
-          <StatPill
-            icon={<CalendarIcon size={13} />}
-            label="Total"
-            value={assignmentList.length}
-            variant="navy"
-          />
-          <StatPill
-            icon={<Clock size={13} />}
-            label="Pending"
-            value={totalPending}
-            variant="yellow"
-          />
-          <StatPill
-            icon={<CheckCircle2 size={13} />}
-            label="Done"
-            value={totalDone}
-            variant="green"
-          />
-        </div>
-      </div>
+    <div className="max-w-6xl mx-auto p-6 md:p-10 flex flex-col gap-8">
+      <PageHeader
+        title="Calendar"
+        description="Schedule and upcoming deadlines"
+        icon={CalendarIcon}
+        backHref="/dashboard"
+        backLabel="Dashboard"
+        action={
+          <div className="flex gap-3 flex-wrap">
+            <StatPill
+              icon={<CalendarIcon size={14} />}
+              label="Total"
+              value={assignmentList.length}
+              variant="navy"
+            />
+            <StatPill
+              icon={<Clock size={14} />}
+              label="Pending"
+              value={totalPending}
+              variant="yellow"
+            />
+            <StatPill
+              icon={<CheckCircle2 size={14} />}
+              label="Done"
+              value={totalDone}
+              variant="green"
+            />
+          </div>
+        }
+      />
 
       {/* Calendar */}
-      <div className="bg-white border border-border rounded-2xl overflow-hidden">
+      <div className="bg-white border border-border/60 rounded-3xl overflow-hidden shadow-xl
+        ring-8 ring-navy/[0.02]">
         <CalenderView assignments={assignmentList} />
       </div>
     </div>
@@ -60,18 +60,18 @@ function StatPill({
   variant: "navy" | "yellow" | "green"
 }) {
   const styles: Record<string, string> = {
-    navy: "bg-navy/8 text-navy border-navy/15",
-    yellow: "bg-yellow/20 text-navy border-yellow/40",
-    green: "bg-green-50 text-green-700 border-green-200",
+    navy: "bg-navy text-white border-navy/10 shadow-md",
+    yellow: "bg-yellow/20 text-navy border-yellow/30",
+    green: "bg-emerald-50 text-emerald-700 border-emerald-200",
   };
   return (
-    <div className={`inline-flex items-center gap-2.5 border rounded-xl px-4 py-2.5
-      text-[13px] font-semibold ${styles[variant]}`}>
+    <div className={`inline-flex items-center gap-3 border rounded-xl px-4 py-2.5
+      text-[13px] font-bold transition-all hover:-translate-y-0.5 cursor-default ${styles[variant]}`}>
       {icon}
-      <span className="text-[12px] font-bold uppercase tracking-wide opacity-70">
+      <span className="text-[11px] font-black uppercase tracking-[0.15em] opacity-60">
         {label}
       </span>
-      <span className="font-black text-[16px] leading-none">{value}</span>
+      <span className="font-black text-[18px] tabular-nums leading-none">{value}</span>
     </div>
   );
 }

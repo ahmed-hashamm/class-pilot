@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ClassChat from './ClassChat'
 import { MessageCircle, X, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui'
 import { MODAL_VARIANTS, FADE_IN, SPRING_TRANSITION } from '@/lib/animations'
 
 interface ClassChatModalProps {
@@ -56,20 +57,11 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
                 flex flex-col overflow-hidden"
             >
 
-              {/* Close Button */}
-              <button
-                onClick={() => setOpen(false)}
-                className="absolute top-3 right-3 z-10 size-8 rounded-lg
-                  bg-secondary border border-border
-                  flex items-center justify-center
-                  text-muted-foreground hover:text-foreground hover:bg-secondary/80
-                  transition-colors cursor-pointer"
-              >
-                <X size={14} />
-              </button>
-
-              {/* Chat */}
-              <ClassChat classId={classId} />
+              {/* Chat Content */}
+              <ClassChat 
+                classId={classId} 
+                onClose={() => setOpen(false)} 
+              />
             </motion.div>
           </div>
         )}

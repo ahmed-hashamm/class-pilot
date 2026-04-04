@@ -7,7 +7,7 @@ import { getGroupsWithMembers, getAllClassMembers } from "@/lib/db_data_fetching
 import { saveGroup, deleteGroup, removeGroupMember } from "@/actions/ClassActions"
 import GroupModal from "./GroupModal"
 import { Group } from "@/lib/types/schema"
-import { SkeletonLoader, ErrorState, ConfirmModal } from "@/components/common"
+import { SkeletonLoader, ErrorState, ConfirmModal } from "@/components/ui"
 import { GroupListHeader } from "./GroupListHeader"
 import { GroupGrid } from "./GroupGrid"
 
@@ -83,13 +83,13 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
   return (
     <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto px-4">
       <GroupListHeader isTeacher={isTeacher} onAddClick={() => setShowModal(true)} />
-      <GroupGrid
-        groups={groups}
-        isTeacher={isTeacher}
-        onEdit={(g) => { setEditingGroup(g); setShowModal(true) }}
-        onDelete={setGroupToDelete}
-        onRemoveMember={onRemoveMember}
-        onAddClick={() => setShowModal(true)}
+      <GroupGrid 
+        groups={groups} 
+        isTeacher={isTeacher} 
+        onEdit={(g) => { setEditingGroup(g); setShowModal(true) }} 
+        onDelete={setGroupToDelete} 
+        onRemoveMember={onRemoveMember} 
+        onAddClick={() => setShowModal(true)} 
       />
 
       {groupToDelete && (

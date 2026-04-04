@@ -1,6 +1,8 @@
 "use client";
 
 import { Database, Plus, X } from "lucide-react";
+import { FeatureButton } from "@/components/ui/FeatureButton";
+import { Button } from "@/components/ui/button";
 
 export function MaterialsHeader({
   isTeacher,
@@ -24,16 +26,13 @@ export function MaterialsHeader({
       </div>
 
       {isTeacher && (
-        <button
+        <FeatureButton
           onClick={onToggleUpload}
-          className={`inline-flex items-center gap-2 font-semibold text-[13px]
-            px-5 py-2.5 rounded-xl transition-all cursor-pointer border-none
-            ${isUploading
-              ? "bg-secondary border border-border text-foreground hover:border-navy/30"
-              : "bg-navy text-white hover:bg-navy/90 hover:-translate-y-0.5 shadow-sm"
-            }`}>
-          {isUploading ? <><X size={14} />Close</> : <><Plus size={14} />Upload material</>}
-        </button>
+          variant={isUploading ? "secondary" : "primary"}
+          className="px-5 py-2.5"
+          label={isUploading ? "Close" : "Upload material"}
+          icon={isUploading ? X : Plus}
+        />
       )}
     </div>
   );
@@ -60,13 +59,12 @@ export function MaterialsEmptyState({
           : "Your teacher has not uploaded any materials yet."}
       </p>
       {isTeacher && (
-        <button
+        <FeatureButton
           onClick={onToggleUpload}
-          className="mt-2 inline-flex items-center gap-2 bg-navy text-white
-            font-semibold text-[13px] px-5 py-2.5 rounded-xl
-            hover:bg-navy/90 transition cursor-pointer border-none">
-          <Plus size={14} /> Upload first material
-        </button>
+          className="mt-2 px-5 py-2.5"
+          label="Upload first material"
+          icon={Plus}
+        />
       )}
     </div>
   );

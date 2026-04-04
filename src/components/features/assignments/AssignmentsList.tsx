@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAssignmentsByClass } from "@/lib/db_data_fetching/assignments";
 import AssignmentGroup from "./AssignmentGroup";
-import {
-  PageHeader,
-  EmptyState,
+import { 
+  PageHeader, 
+  EmptyState, 
   SkeletonLoader,
-  FeatureButton
-} from "@/components/common";
+  FeatureButton 
+} from "@/components/ui";
 import { ClipboardList, Plus, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
@@ -36,8 +36,8 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
 
   const HeaderAction = isTeacher ? (
     <Link href={`/classes/${classId}/assignments/create`}>
-      <FeatureButton
-        label="Create assignment"
+      <FeatureButton 
+        label="Create assignment" 
         icon={Plus}
       />
     </Link>
@@ -55,13 +55,13 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
   if (error) {
     return (
       <div className="flex flex-col gap-6 py-6">
-        <PageHeader
-          icon={ClipboardList}
-          title="Assignments"
+        <PageHeader 
+          icon={ClipboardList} 
+          title="Assignments" 
           description="Coursework and evaluative materials"
           action={HeaderAction}
         />
-        <EmptyState
+        <EmptyState 
           icon={RefreshCw}
           title="Error loading assignments"
           description="We couldn't load the assignments for this class. Please try again."
@@ -78,23 +78,23 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
 
   return (
     <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
-      <PageHeader
-        icon={ClipboardList}
-        title="Assignments"
+      <PageHeader 
+        icon={ClipboardList} 
+        title="Assignments" 
         description="Manage your coursework, projects, and evaluative materials in one place."
         action={HeaderAction}
       />
 
       {assignments.length === 0 ? (
         <div className="mt-4">
-          <EmptyState
+          <EmptyState 
             icon={ClipboardList}
             title="No assignments yet"
-            description={isTeacher
-              ? "Start by creating your first assignment. You can include attachments, set deadlines, and assign rubrics."
+            description={isTeacher 
+              ? "Start by creating your first assignment. You can include attachments, set deadlines, and assign rubrics." 
               : "Your teacher has not posted any assignments yet. Check back later for updates."}
             actionLabel={isTeacher ? "Create first assignment" : undefined}
-            onAction={isTeacher ? () => { } : undefined}
+            onAction={isTeacher ? () => {} : undefined}
           />
         </div>
       ) : (

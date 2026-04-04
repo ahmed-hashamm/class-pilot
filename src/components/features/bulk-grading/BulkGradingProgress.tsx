@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { CheckCircle2, XCircle, Loader2, Clock } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { SubmissionGradingState } from './BulkGradingHeader'
 
 interface BulkGradingProgressProps {
@@ -79,12 +80,14 @@ export default function BulkGradingProgress({
             )}
           </div>
           {isComplete && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-[11px] font-bold text-muted-foreground hover:text-navy transition-colors"
+              className="text-[11px] font-bold text-muted-foreground hover:text-navy transition-colors h-auto p-0"
             >
               {isExpanded ? 'Hide' : 'Show'} details
-            </button>
+            </Button>
           )}
         </div>
 

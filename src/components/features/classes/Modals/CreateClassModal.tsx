@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, Loader2, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FeatureButton, Button } from '@/components/ui'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -74,7 +74,7 @@ export default function CreateClassModal({ userId, onClose, onSuccess }: CreateC
 
       toast.success('Class created successfully!')
       if (onSuccess) onSuccess()
-      
+
       onClose()
       router.push(`/classes/${classId}`)
       // Removed router.refresh() as React Query invalidate will handle data refetching in Phase 4
@@ -98,9 +98,15 @@ export default function CreateClassModal({ userId, onClose, onSuccess }: CreateC
             <Plus className="text-accent" size={24} />
             Create Class
           </h2>
-          <button onClick={onClose} disabled={isSubmitting} className="text-gray-400 hover:text-gray-600 disabled:opacity-50">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose} 
+            disabled={isSubmitting} 
+            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-2 h-auto"
+          >
             <X size={24} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
@@ -131,12 +137,21 @@ export default function CreateClassModal({ userId, onClose, onSuccess }: CreateC
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-navy hover:bg-navy-light text-white">
-              {isSubmitting ? <Loader2 className="animate-spin" /> : 'Create Class'}
-            </Button>
+            <FeatureButton
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1"
+              label="Cancel"
+            />
+            <FeatureButton
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              className="flex-1"
+              label="Create Class"
+            />
           </div>
         </form>
       </div>

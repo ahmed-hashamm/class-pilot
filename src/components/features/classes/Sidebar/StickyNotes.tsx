@@ -92,9 +92,8 @@
 //     </SidebarCard>
 //   )
 // }
-'use client'
-
 import { useState, useTransition, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 import { X, Plus, StickyNote, Loader2 } from 'lucide-react'
 import SidebarCard from './SidebarCard'
 import {
@@ -143,14 +142,15 @@ export default function StickyNotes({ classId }: { classId: string }) {
       title="Sticky Notes"
       extra={
         notes.length > 0 && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleClearNotes}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold
-              text-red-400 hover:text-red-500 transition-colors cursor-pointer
-              bg-transparent border-none">
+            className="h-auto p-0 text-red-400 hover:text-red-500 hover:bg-transparent"
+          >
             <X size={12} />
             Clear all
-          </button>
+          </Button>
         )
       }
     >
@@ -168,18 +168,16 @@ export default function StickyNotes({ classId }: { classId: string }) {
             transition leading-relaxed"
         />
 
-        <button
+        <Button
           onClick={handleAddNote}
           disabled={!noteText.trim() || isPending}
-          className="inline-flex items-center justify-center gap-2 w-full
-            bg-navy text-white text-[12px] font-semibold py-2 rounded-xl
-            hover:bg-navy/90 transition disabled:opacity-40
-            disabled:cursor-not-allowed cursor-pointer border-none">
+          className="w-full bg-navy text-white text-[12px] font-semibold py-2 rounded-xl h-auto"
+        >
           {isPending
-            ? <><Loader2 size={13} className="animate-spin" />Saving...</>
-            : <><Plus size={13} />Add note</>
+            ? <><Loader2 size={13} className="animate-spin" /> Saving...</>
+            : <><Plus size={13} /> Add note</>
           }
-        </button>
+        </Button>
 
         <p className="text-[10px] text-muted-foreground text-center">
           Tip: <kbd className="font-mono bg-secondary border border-border

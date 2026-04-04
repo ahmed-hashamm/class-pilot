@@ -1,6 +1,7 @@
 "use client"
 
 import { X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface GroupModalHeaderProps {
   editingGroup: any
@@ -16,12 +17,14 @@ export function GroupModalHeader({ editingGroup, onClose }: GroupModalHeaderProp
         </h3>
         <p className="text-[11px] text-muted-foreground font-medium">Assignment collaboration team</p>
       </div>
-      <button 
+      <Button 
+        variant="ghost"
+        size="sm"
         onClick={onClose} 
-        className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-xl transition-all cursor-pointer bg-transparent border-none"
+        className="p-2 h-auto w-auto"
       >
         <X size={18} />
-      </button>
+      </Button>
     </div>
   )
 }

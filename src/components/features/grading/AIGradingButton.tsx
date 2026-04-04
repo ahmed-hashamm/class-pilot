@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Sparkles, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 import { GradingSubmissionProps } from './GradeSubmission'
-import { ConfirmModal } from '@/components/ui'
+import { ConfirmModal, FeatureButton } from '@/components/ui'
 
 interface AIGradingButtonProps {
   submission: GradingSubmissionProps
@@ -75,21 +75,15 @@ export default function AIGradingButton({
         isLoading={loading}
       />
 
-      <button
+      <FeatureButton
         onClick={() => setShowConfirm(true)}
+        loading={loading}
         disabled={loading}
-        className="w-full inline-flex items-center justify-center gap-2
-          bg-navy text-white font-black text-[14px] py-3.5 rounded-xl
-          hover:bg-navy/90 transition shadow-md hover:-translate-y-0.5
-          disabled:opacity-60 disabled:translate-y-0 cursor-pointer border-none">
-        {loading ? (
-          <><Loader2 size={16} className="animate-spin" /> Analyzing Submission…</>
-        ) : alreadyGraded ? (
-          <><RefreshCw size={16} /> Re-run AI Grading</>
-        ) : (
-          <><Sparkles size={16} /> Start AI Evaluation</>
-        )}
-      </button>
+        variant="yellow"
+        className="w-full py-3.5 shadow-md hover:-translate-y-0.5 transition-all"
+        label={loading ? "Analyzing Submission…" : alreadyGraded ? "Re-run AI Grading" : "Start AI Evaluation"}
+        icon={loading ? Loader2 : alreadyGraded ? RefreshCw : Sparkles}
+      />
 
       {/* Error */}
       {error && (

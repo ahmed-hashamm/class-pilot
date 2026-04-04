@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import AnnouncementInput from "./AnnouncementInput";
 import MaterialUpload from "./MaterialUpload";
@@ -10,6 +11,7 @@ import PollInput from "./PollInput";
 import AttendanceInput from "./AttendanceInput";
 import { FEED_ACTIONS } from "@/lib/data/feed";
 import { HEIGHT_TRANSITION, TAB_INDICATOR_TRANSITION } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 // FEED_ACTIONS is imported from @/lib/data/feed
 
@@ -21,11 +23,15 @@ export default function FeedActions({ classId, userId, activeAction, setActiveAc
           {FEED_ACTIONS.map(({ id, label, icon: Icon }) => {
             const isActive = activeAction === id;
             return (
-              <button
+              <Button
                 key={id}
                 type="button"
+                variant="ghost"
                 onClick={() => setActiveAction(activeAction === id ? "none" : id)}
-                className={`relative flex-1 min-w-fit flex items-center justify-center gap-2 px-4 py-3 text-xs font-bold transition-all border-none bg-transparent cursor-pointer ${isActive ? "text-navy" : "text-muted-foreground hover:text-navy hover:bg-secondary/30"}`}
+                className={cn(
+                  "relative flex-1 min-w-fit flex items-center justify-center gap-2 px-4 py-3 h-auto text-xs font-bold transition-all border-none bg-transparent rounded-none",
+                  isActive ? "text-navy" : "text-muted-foreground hover:text-navy hover:bg-secondary/30"
+                )}
               >
                 <Icon size={16} />
                 <span className="relative z-10">{label}</span>
@@ -43,14 +49,17 @@ export default function FeedActions({ classId, userId, activeAction, setActiveAc
                     transition={TAB_INDICATOR_TRANSITION}
                   />
                 )}
-              </button>
+              </Button>
             );
           })}
           <Link href={`/classes/${classId}/assignments/create`} className="flex-1 min-w-fit">
-            <button className="w-full h-full flex items-center justify-center gap-2 px-4 py-3 text-xs font-bold text-muted-foreground hover:text-navy hover:bg-secondary/30 transition-all cursor-pointer border-none bg-transparent">
+            <Button 
+              variant="ghost" 
+              className="w-full h-full justify-center gap-2 px-4 py-3 text-xs font-bold rounded-none hover:bg-secondary/30"
+            >
               <PlusCircle size={16} />
               Assignment
-            </button>
+            </Button>
           </Link>
         </div>
       </CardHeader>

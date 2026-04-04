@@ -528,6 +528,21 @@ export async function submitAssignment({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== parsed.data.userId) throw new Error("Unauthorized")
 
+  // Deadline enforcement — reject submissions after due date
+  const { data: assignmentData } = await supabase
+    .from('assignments')
+    .select('due_date')
+    .eq('id', parsed.data.assignmentId)
+    .maybeSingle()
+
+  const assignmentRow = assignmentData as any
+  if (assignmentRow?.due_date) {
+    const deadline = new Date(assignmentRow.due_date)
+    if (new Date() > deadline) {
+      throw new Error("The deadline for this assignment has passed. Submissions are no longer accepted.")
+    }
+  }
+
   console.log('[submitAssignment] START:', {
     assignmentId: parsed.data.assignmentId,
     userId: parsed.data.userId,

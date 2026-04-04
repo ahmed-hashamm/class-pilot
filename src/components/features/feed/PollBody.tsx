@@ -1,9 +1,8 @@
-"use client";
-
+import { Button } from "@/components/ui/button";
 import { Lock, Clock } from "lucide-react";
 import { usePoll } from "@/lib/hooks";
 import { formatTime } from "@/lib/utils/time";
-import { ConfirmModal } from "@/components/common";
+import { ConfirmModal } from "@/components/ui";
 
 export default function PollBody({ 
   item, 
@@ -44,9 +43,14 @@ export default function PollBody({
           );
         }
         return (
-          <button key={idx} onClick={() => handleVote(idx)} className="flex justify-between w-full px-4 py-2 border border-border rounded-lg text-[14px] font-medium hover:bg-secondary cursor-pointer bg-transparent text-left">
+          <Button 
+            key={idx} 
+            variant="outline"
+            onClick={() => handleVote(idx)} 
+            className="flex justify-between w-full h-auto px-4 py-2 text-[14px] border-border hover:bg-secondary font-medium"
+          >
             {opt}
-          </button>
+          </Button>
         );
       })}
       <ConfirmModal
@@ -72,9 +76,15 @@ export default function PollBody({
           )}
         </div>
         {isTeacher && isActive && (
-          <button onClick={() => setShowCloseConfirm(true)} disabled={closing} className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700 bg-transparent border-none cursor-pointer disabled:opacity-50">
+          <Button 
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowCloseConfirm(true)} 
+            disabled={closing} 
+            className="h-auto p-0 flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-transparent"
+          >
             <Lock size={12} /> {closing ? "Closing…" : "Close Poll"}
-          </button>
+          </Button>
         )}
       </div>
     </div>

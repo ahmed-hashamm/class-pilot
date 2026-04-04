@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { UserMinus } from "lucide-react";
 import StudentAvatar from "./StudentAvatar";
 import { BaseUser } from "@/lib/types/schema";
@@ -30,13 +31,15 @@ export default function GroupMemberRow({
         <span className="text-[13px] font-black text-foreground group-hover/member:text-navy transition-colors">{name}</span>
       </div>
       {isTeacher && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onRemoveMember(groupId, member.user_id)}
           title="Remove member"
-          className="p-2 text-muted-foreground/40 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer bg-transparent border-none"
+          className="p-2 h-auto w-auto text-muted-foreground/40 hover:text-red-500 hover:bg-red-50"
         >
           <UserMinus size={14} />
-        </button>
+        </Button>
       )}
     </div>
   );

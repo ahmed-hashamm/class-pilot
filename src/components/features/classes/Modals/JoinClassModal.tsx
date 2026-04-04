@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { X, Loader2, Users } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FeatureButton, Button } from '@/components/ui'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -83,9 +83,15 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
             <Users className="text-accent" size={24} />
             Join Classroom
           </h2>
-          <button onClick={onClose} disabled={isSubmitting} className="text-gray-400 hover:text-gray-600 disabled:opacity-50">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose} 
+            disabled={isSubmitting} 
+            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-2 h-auto"
+          >
             <X size={24} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
@@ -107,12 +113,21 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
           </div>
 
           <div className="flex gap-3 pt-2">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-navy hover:bg-navy-light text-white">
-              {isSubmitting ? <Loader2 className="animate-spin" /> : 'Join Class'}
-            </Button>
+            <FeatureButton
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1"
+              label="Cancel"
+            />
+            <FeatureButton
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              className="flex-1"
+              label="Join Class"
+            />
           </div>
         </form>
       </div>
