@@ -46,7 +46,10 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      })
     }
   }, [messages, loading])
 
@@ -70,9 +73,9 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
       {/* Messages Area - Grow-to-fit + Scroll */}
       <div
         ref={scrollRef}
-        className="overflow-y-auto px-1 space-y-6 scrollbar-thin scrollbar-thumb-navy/5 hover:scrollbar-thumb-navy/10 transition-all duration-300"
+        className="overflow-y-auto px-1 pr-3 space-y-6 custom-scrollbar transition-all duration-300"
         style={{
-          maxHeight: 'min(600px, 60vh)',
+          maxHeight: 'min(640px, 65vh)',
           marginBottom: messages.length > 0 ? '1.5rem' : '0'
         }}
       >
