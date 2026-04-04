@@ -2,7 +2,7 @@
 
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import {
   getStickyNotesSchema,
@@ -36,7 +36,7 @@ export async function togglePinAction(payload: unknown) {
   const parsed = togglePinSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -61,7 +61,7 @@ export async function deleteClass(classId: string) {
   const parsed = deleteClassSchema.safeParse({ classId })
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -78,7 +78,7 @@ export async function updateClassSettings(payload: any) {
   const parsed = updateClassSettingsSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -104,7 +104,7 @@ export async function getStickyNotes(classId: string): Promise<Note[]> {
   const parsed = getStickyNotesSchema.safeParse({ classId })
   if (!parsed.success) return []
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
@@ -119,7 +119,7 @@ export async function addStickyNote(classId: string, content: string) {
   const parsed = addStickyNoteSchema.safeParse({ classId, content })
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -132,7 +132,7 @@ export async function clearStickyNotes(classId: string) {
   const parsed = clearStickyNotesSchema.safeParse({ classId })
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -144,7 +144,7 @@ export async function clearStickyNotes(classId: string) {
 /* ---------------- CREATE ANNOUNCEMENT ---------------- */
 
 export async function createAnnouncement(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -178,7 +178,7 @@ export async function createAnnouncement(formData: FormData) {
 /* ---------------- UPDATE ANNOUNCEMENT ---------------- */
 
 export async function updateAnnouncement(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -234,7 +234,7 @@ export async function deleteAnnouncement(id: string, classId: string) {
   const parsed = deleteAnnouncementSchema.safeParse({ id, classId })
   if (!parsed.success) throw new Error("Invalid input")
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -247,7 +247,7 @@ export async function deleteAnnouncement(id: string, classId: string) {
 /* ---------------- CREATE MATERIAL ---------------- */
 
 export async function createMaterial(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
@@ -291,7 +291,7 @@ export async function createMaterial(formData: FormData) {
 /* ---------------- UPDATE MATERIAL ---------------- */
 
 export async function updateMaterial(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -350,7 +350,7 @@ export async function deleteMaterial(id: string, classId: string) {
   const parsed = deleteMaterialSchema.safeParse({ id, classId })
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -368,7 +368,7 @@ export async function deleteMaterial(id: string, classId: string) {
 /* ---------------- CREATE ASSIGNMENT ---------------- */
 
 export async function createAssignment(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -416,7 +416,7 @@ export async function createAssignment(formData: FormData) {
 /* ---------------- UPDATE ASSIGNMENT ---------------- */
 
 export async function updateAssignment(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -485,7 +485,7 @@ export async function deleteAssignment(id: string, classId: string) {
   const parsed = deleteAssignmentSchema.safeParse({ id, classId })
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
@@ -524,7 +524,7 @@ export async function submitAssignment({
   const parsed = submitAssignmentSchema.safeParse({ assignmentId, classId, userId, groupId, content, isGroupProject })
   if (!parsed.success) throw new Error("Invalid input")
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== parsed.data.userId) throw new Error("Unauthorized")
 
@@ -590,7 +590,7 @@ export async function saveGroup(
   const parsed = saveGroupSchema.safeParse({ classId, title, groupId, studentIds })
   if (!parsed.success) throw new Error("Invalid input")
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
@@ -616,7 +616,7 @@ export async function removeGroupMember(
   const parsed = removeGroupMemberSchema.safeParse({ projectId, studentId, classId })
   if (!parsed.success) throw new Error("Invalid input")
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -630,7 +630,7 @@ export async function deleteGroup(groupId: string, classId: string) {
   const parsed = deleteGroupSchema.safeParse({ groupId, classId })
   if (!parsed.success) throw new Error("Invalid input")
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
@@ -644,7 +644,7 @@ export async function getClassName(classId: string) {
   const parsed = getClassNameSchema.safeParse({ classId })
   if (!parsed.success) return 'Class'
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return 'Class'
 

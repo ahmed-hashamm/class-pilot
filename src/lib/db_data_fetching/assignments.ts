@@ -114,13 +114,27 @@ export async function getAssignmentsByClass(classId: string) {
 
   if (error) return { assignments: [], error: error.message }
 
-  // Post-process to get counts and personal status
+  // 1. Get user's group IDs for this class to handle group assignments
+  const { data: memberGroups } = await supabase
+    .from('project_members')
+    .select('project_id, group_projects!inner(class_id)')
+    .eq('user_id', user.id)
+    .eq('group_projects.class_id', classId)
+
+  const groupIds = (memberGroups || []).map((m: any) => m.project_id)
+
+  // 2. Post-process to get counts and personal status
   const processed = (data || []).map((a: any) => {
-    const userSubmission = a.submissions?.find((s: any) => s.user_id === user.id)
+    const userSubmission = a.submissions?.find((s: any) => 
+      s.user_id === user.id || 
+      (s.group_id && groupIds.includes(s.group_id))
+    )
+
     return {
       ...a,
       submission_count: a.submissions?.length || 0,
-      user_submission: userSubmission || null
+      user_submission: userSubmission || null,
+      has_submitted: !!userSubmission
     }
   })
 

@@ -3,7 +3,7 @@
 import { Material } from "@/lib/types/schema";
 import { CheckCircle2, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import MaterialActions from "./MaterialActions";
 import MaterialFooter from "./MaterialFooter";
 
@@ -28,7 +28,29 @@ export default function MaterialRow({
   getDisplayName,
 }: MaterialRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const isSyncing = syncingId === material.id;
+
+  useEffect(() => {
+    const element = descriptionRef.current;
+    if (!element) return;
+
+    const checkTruncation = () => {
+      // For line-clamp-1, scrollHeight vs clientHeight is the most reliable check
+      // However, we must temporarily remove the clamp to measure true height
+      // or just check if scrollHeight > clientHeight while clamped
+      const isOverflowing = element.scrollHeight > element.clientHeight;
+      setIsTruncated(isOverflowing);
+    };
+
+    checkTruncation();
+
+    const observer = new ResizeObserver(checkTruncation);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [material.description]);
 
   return (
     <div className="group relative bg-white border border-navy/[0.1] rounded-xl overflow-hidden
@@ -79,20 +101,25 @@ export default function MaterialRow({
         {/* Body Content - Expandable */}
         {material.description && (
           <div
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="cursor-pointer group/desc"
+            onClick={() => isTruncated && setIsExpanded(!isExpanded)}
+            className={`flex items-start gap-1 ${isTruncated ? 'cursor-pointer group/desc' : ''}`}
           >
-            <p className={`text-[13px] leading-relaxed text-muted-foreground/50 transition-all duration-300
-              ${!isExpanded ? 'line-clamp-1' : ''}`}>
+            <p
+              ref={descriptionRef}
+              className={`text-[13px] leading-relaxed text-muted-foreground/50 transition-all duration-300
+              ${!isExpanded ? 'line-clamp-1' : ''}`}
+            >
               {material.description}
             </p>
-            <button className="mt-1 flex items-center gap-0.5 text-[9px] font-bold text-navy/30 group-hover/desc:text-navy transition-colors uppercase tracking-wider">
-              {isExpanded ? (
-                <><ChevronUp size={12} /><span>Less</span></>
-              ) : (
-                <><ChevronDown size={12} /><span>More</span></>
-              )}
-            </button>
+            {(isTruncated || isExpanded) && (
+              <button className="flex items-center gap-0.5 text-[9px] font-bold text-navy/30 group-hover/desc:text-navy transition-colors tracking-wider whitespace-nowrap mt-1">
+                {isExpanded ? (
+                  <><ChevronUp size={12} /><span>less</span></>
+                ) : (
+                  <><ChevronDown size={12} /><span>more</span></>
+                )}
+              </button>
+            )}
           </div>
         )}
 

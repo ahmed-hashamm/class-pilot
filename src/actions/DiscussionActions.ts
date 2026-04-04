@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import {
   sendDiscussionMessageSchema,
@@ -14,7 +14,7 @@ export async function getDiscussionMessageById(payload: unknown) {
   const parsed = getDiscussionMessageSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -31,7 +31,7 @@ export async function getDiscussionMessages(payload: unknown) {
   const parsed = getDiscussionMessagesSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -53,7 +53,7 @@ export async function sendDiscussionMessage(payload: unknown) {
   const parsed = sendDiscussionMessageSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -75,7 +75,7 @@ export async function deleteDiscussionMessage(payload: unknown) {
   const parsed = deleteDiscussionMessageSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 

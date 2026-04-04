@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
@@ -12,7 +12,7 @@ export async function fetchChatHistory(payload: unknown) {
   const parsed = FetchHistorySchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -32,7 +32,7 @@ export async function clearChatHistory(payload: unknown) {
   const parsed = FetchHistorySchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 

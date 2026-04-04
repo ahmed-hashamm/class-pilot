@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import {
   createAttendanceSchema,
@@ -28,7 +28,7 @@ export async function saveRubricAction(payload: unknown) {
     return { data: null, error: parsed.error.errors[0]?.message || 'Invalid input' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -68,7 +68,7 @@ export async function createAttendance(classId: string, date: string, title?: st
   const parsed = createAttendanceSchema.safeParse({ classId, date, title, deadline, pinned })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -99,7 +99,7 @@ export async function markAttendancePresent(attendanceId: string) {
   const parsed = markAttendancePresentSchema.safeParse({ attendanceId })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -125,7 +125,7 @@ export async function closeAttendance(attendanceId: string) {
   const parsed = closeAttendanceSchema.safeParse({ attendanceId })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -151,7 +151,7 @@ export async function createPoll(classId: string, question: string, options: str
   const parsed = createPollSchema.safeParse({ classId, question, options, deadline, pinned })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -182,7 +182,7 @@ export async function submitPollResponse(pollId: string, selectedOptionIndex: nu
   const parsed = submitPollResponseSchema.safeParse({ pollId, selectedOptionIndex })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -208,7 +208,7 @@ export async function closePoll(pollId: string) {
   const parsed = closePollSchema.safeParse({ pollId })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -230,7 +230,7 @@ export async function deleteAttendance(id: string, classId: string) {
   const parsed = deleteAttendanceSchema.safeParse({ id, classId })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Unauthorized' }
 
@@ -249,7 +249,7 @@ export async function deletePoll(id: string, classId: string) {
   const parsed = deletePollSchema.safeParse({ id, classId })
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Unauthorized' }
 
@@ -265,7 +265,7 @@ export async function deletePoll(id: string, classId: string) {
 }
 
 export async function publishAIGrade(submissionId: string) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Unauthorized' }
 
@@ -308,7 +308,7 @@ export async function publishAIGrade(submissionId: string) {
 }
 
 export async function updateGradingStatus(submissionId: string, status: 'pending' | 'in_progress' | 'completed') {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Unauthorized' }
 
@@ -336,7 +336,7 @@ export async function generateAIGradingCriteria(payload: unknown) {
     return { data: null, error: parsed.error.errors[0]?.message || 'Invalid input' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -355,7 +355,7 @@ export async function generateAIGradingCriteria(payload: unknown) {
 
 
 export async function gradeAssignmentSubmissionAction(assignmentId: string, submissionId: string) {
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -378,7 +378,7 @@ export async function setFinalGradeAction(payload: unknown) {
     return { data: null, error: parsed.error.errors[0]?.message || 'Invalid input' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 
@@ -413,7 +413,7 @@ export async function updateManualGradeAction(payload: unknown) {
     return { data: null, error: parsed.error.errors[0]?.message || 'Invalid input' }
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: 'Unauthorized' }
 

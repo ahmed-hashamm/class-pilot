@@ -6,8 +6,8 @@ import { useDiscussion } from '@/lib/hooks/useDiscussion'
 import { DiscussionTopic } from '@/lib/validations/discussion'
 import DiscussionMessage from './DiscussionMessage'
 import DiscussionInput from './DiscussionInput'
-import { createClient } from '@/lib/supabase/client'
 import { useQuery } from '@tanstack/react-query'
+import { getUserProfile } from '@/actions/UserActions'
 
 const TOPIC_LABELS: Record<DiscussionTopic, string> = {
   assignments: 'Work Discussion',
@@ -26,32 +26,25 @@ interface DiscussionPanelProps {
 export default function DiscussionPanel({ classId, topic, userId, isTeacher, hideHeader }: DiscussionPanelProps) {
   const { messages, loading, sending, error, send, remove } = useDiscussion(classId, topic, userId)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
 
-  // Fetch current user details for the input avatar
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser', userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('full_name, avatar_url')
-        .eq('id', userId)
-        .maybeSingle()
-      if (error) throw error
-      return data
-    },
+  // KNOWN: Fetching current user profile via Server Action to align with architecture rules
+  const { data: currentUserResponse } = useQuery({
+    queryKey: ['currentUserProfile', userId],
+    queryFn: () => getUserProfile({ userId }),
     enabled: !!userId
   })
 
-  // Auto-scroll to bottom on new messages
+  const currentUser = currentUserResponse?.data
+
+  // Reset scroll to top when new messages arrive (since newest are now at top)
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
+        top: 0,
         behavior: 'smooth'
       })
     }
-  }, [messages, loading])
+  }, [messages])
 
   return (
     <div className="flex flex-col w-full">
@@ -70,13 +63,22 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
         </div>
       )}
 
+      {/* Input - Now at the top */}
+      <div className="pb-6 border-b border-navy/[0.04] mb-6">
+        <DiscussionInput
+          onSend={send}
+          sending={sending}
+          user={currentUser ?? undefined}
+          placeholder="Add class comment..."
+        />
+      </div>
+
       {/* Messages Area - Grow-to-fit + Scroll */}
       <div
         ref={scrollRef}
-        className="overflow-y-auto px-1 pr-3 space-y-6 custom-scrollbar transition-all duration-300"
+        className="overflow-y-auto px-1 pr-3 space-y-6 no-scrollbar transition-all duration-300"
         style={{
-          maxHeight: 'min(640px, 65vh)',
-          marginBottom: messages.length > 0 ? '1.5rem' : '0'
+          maxHeight: 'min(440px, 45vh)',
         }}
       >
         {loading ? (
@@ -94,7 +96,8 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {messages.map((msg) => (
+            {/* Show newest messages first */}
+            {[...messages].reverse().map((msg) => (
               <DiscussionMessage
                 key={msg.id}
                 message={msg}
@@ -105,16 +108,6 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
             ))}
           </div>
         )}
-      </div>
-
-      {/* Input - Positioned just below messages area */}
-      <div className="pt-4 border-t border-navy/[0.04] mt-0">
-        <DiscussionInput
-          onSend={send}
-          sending={sending}
-          user={currentUser ?? undefined}
-          placeholder="Add class comment..."
-        />
       </div>
     </div>
   )

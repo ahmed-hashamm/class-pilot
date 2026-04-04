@@ -28,8 +28,12 @@ export default function AssignmentCard({
 
   const getStatus = () => {
     if (assignment.has_submitted) {
+      if ((assignment as any).user_submission?.status === 'graded') {
+        return { label: 'Graded', icon: CheckCircle2, color: 'emerald' };
+      }
       return { label: 'Submitted', icon: CheckCircle2, color: 'emerald' };
     }
+
     if (isOverdue) return { label: 'Missing', icon: AlertCircle, color: 'red' };
     if (dueDate && isToday(dueDate)) return { label: 'Due Today', icon: Clock, color: 'amber' };
     return { label: 'Assigned', icon: FileText, color: 'navy' };
