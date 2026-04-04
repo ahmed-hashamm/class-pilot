@@ -26,7 +26,7 @@ export function FeatureButton({
   disabled,
   ...props
 }: FeatureButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center gap-2 font-bold transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 cursor-pointer border-none"
+  const baseStyles = "inline-flex items-center justify-center whitespace-nowrap gap-2 font-bold transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 cursor-pointer border-none"
 
   const variants = {
     primary: "bg-navy text-white hover:bg-navy/90 rounded-xl px-6 py-3",
@@ -39,13 +39,13 @@ export function FeatureButton({
   return (
     <button
       disabled={loading || disabled}
-      className={cn(baseStyles, variants[variant], className)}
+      className={cn(baseStyles, variants[variant], "min-w-fit", className)}
       {...props}
     >
       {loading ? (
-        <Loader2 size={18} className="animate-spin" />
+        <Loader2 size={18} className="animate-spin shrink-0" />
       ) : Icon ? (
-        <Icon size={18} />
+        <Icon size={18} className="shrink-0" />
       ) : null}
       <span className="text-[14px] uppercase tracking-wider">{loading && loadingLabel ? loadingLabel : label}</span>
     </button>

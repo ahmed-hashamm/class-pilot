@@ -48,6 +48,16 @@ export async function POST(req: Request) {
   // 1. Fetch live class feed (assignments, announcements, polls, attendance)
   const feed = await getStreamFeed(classId)
 
+  // Fetch assignment IDs this student has already submitted
+  const { data: userSubmissions } = await (adminClient as any)
+    .from('submissions')
+    .select('assignment_id')
+    .eq('user_id', user.id)
+
+  const submittedIds = new Set(
+    (userSubmissions || []).map((s: any) => s.assignment_id)
+  )
+
   const recentAssignments = feed
     .filter(item => item.type === 'assignment')
     .sort((a, b) => new Date((b as any).created_at).getTime() - new Date((a as any).created_at).getTime())
@@ -55,7 +65,8 @@ export async function POST(req: Request) {
     .map(item => {
       const a = item as any
       const isPast = a.due_date && new Date(a.due_date) < now
-      const status = isPast ? '(Past)' : '(Upcoming)'
+      const isSubmitted = submittedIds.has(a.id)
+      const status = isSubmitted ? '(Submitted)' : isPast ? '(Past Due - Not Submitted)' : '(Upcoming - Not Submitted)'
       const dateStr = a.due_date
         ? new Date(a.due_date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })
         : 'No date'
