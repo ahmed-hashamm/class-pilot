@@ -2,9 +2,9 @@
 
 import { Material } from "@/lib/types/schema";
 import { getFileIcon } from "@/lib/utils/fileIcons";
-import { CheckCircle2, Clock, User } from "lucide-react";
+import { CheckCircle2, Clock, User, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
-import MaterialIcon from "./MaterialIcon";
+import { useState } from "react";
 import MaterialActions from "./MaterialActions";
 import MaterialFooter from "./MaterialFooter";
 
@@ -28,26 +28,39 @@ export default function MaterialRow({
   onDelete,
   getDisplayName,
 }: MaterialRowProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const isSyncing = syncingId === material.id;
   const firstFilePath = material.attachment_paths?.[0] || material.file_url || "";
   const fileInfo = getFileIcon(firstFilePath);
 
   return (
-    <div className="group relative z-0 hover:z-10 focus-within:z-10 flex items-start gap-3.5 p-4 sm:p-5 bg-white border border-border rounded-2xl transition-all duration-300
-      hover:shadow-xl hover:shadow-navy/5 hover:-translate-y-1 active:scale-[0.99]">
+    <div className="group relative z-0 bg-white border border-navy/[0.08] rounded-[24px] transition-all duration-500
+      hover:-translate-y-2 shadow-[0_8px_30px_rgb(20,30,60,0.04),0_4px_8px_rgb(20,30,60,0.02)] 
+      hover:shadow-[0_20px_40px_rgba(20,30,60,0.1),0_10px_20px_rgba(20,30,60,0.05)] active:scale-[0.99] flex flex-col min-h-[140px]">
 
-      {/* Visual Accent */}
-      <div className="absolute left-0 top-4 bottom-4 w-1 bg-navy/10 rounded-r-full group-hover:bg-navy transition-colors" />
+      <div className="relative z-10 p-6 sm:p-8 flex flex-col h-full gap-4">
+        {/* Header Block */}
+        <div className="flex items-start justify-between gap-4 w-full">
+          <div className="flex flex-col gap-1.5 flex-1">
+            <h3 className="font-black text-[18px] sm:text-[20px] text-foreground tracking-tighter leading-tight group-hover:text-navy transition-colors">
+              {material.title}
+            </h3>
+            
+            {/* Posted Date Info */}
+            <div className="flex items-center gap-1.5 text-muted-foreground/40 text-[11px] font-medium italic">
+              <Clock size={11} className="shrink-0 opacity-50" />
+              <span>Posted {material.created_at ? format(new Date(material.created_at), "MMM d") : "Recently"}</span>
+            </div>
+          </div>
 
-      <MaterialIcon fileInfo={fileInfo} />
-
-      <div className="flex-1 min-w-0 flex flex-col">
-        <div className="flex items-center justify-between gap-3 mb-1 w-full">
-          <h3 className="font-black text-[16px] text-foreground flex-1 break-all overflow-hidden group-hover:text-navy transition-colors tracking-tight leading-tight">
-            {material.title}
-          </h3>
-
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-2 z-10">
+            {material.ai_synced && (
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[9px] font-black uppercase tracking-wider">
+                <CheckCircle2 size={10} className="shrink-0" />
+                <span>Synced</span>
+              </div>
+            )}
+            
             {isTeacher && (
               <MaterialActions
                 material={material}
@@ -60,43 +73,31 @@ export default function MaterialRow({
           </div>
         </div>
 
-        <div className="flex flex-col mt-0.5">
-          {/* Metadata Row */}
-          <div className="flex items-center text-[12px] text-muted-foreground font-semibold h-5">
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Clock size={12} className="opacity-40 shrink-0" />
-              <span>{material.created_at ? format(new Date(material.created_at), "MMM d, yyyy") : "No date"}</span>
-            </div>
-
-            {material.ai_synced && (
-              <>
-                <span className="text-border font-extrabold mx-1.5 shrink-0">·</span>
-                <div className="flex items-center text-emerald-600 shrink-0" title="AI Synced">
-                  <CheckCircle2 size={12} className="opacity-80 shrink-0" />
-                </div>
-              </>
-            )}
-
-            <span className="hidden sm:inline text-border font-extrabold mx-1.5">·</span>
-            <span className="hidden sm:inline text-muted-foreground/70 truncate max-w-[150px]">
-              {material.users?.full_name || "Teacher"}
-            </span>
-          </div>
-
-          {/* Teacher Section - Mobile Only */}
-          <div className="sm:hidden flex items-center gap-1.5 text-muted-foreground/60 text-[11px] font-bold uppercase tracking-wide mt-1">
-            <User size={10} className="shrink-0 opacity-40" />
-            <span className="truncate max-w-[150px]">{material.users?.full_name || "Teacher"}</span>
-          </div>
-        </div>
-
+        {/* Body Content - Expandable */}
         {material.description && (
-          <p className="text-[13px] text-muted-foreground/70 line-clamp-2 leading-relaxed mt-3 break-all overflow-hidden max-w-2xl">
-            {material.description}
-          </p>
+          <div 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="cursor-pointer group/desc"
+          >
+            <p className={`text-[14px] leading-relaxed text-muted-foreground/60 tracking-tight transition-all duration-300 ${!isExpanded ? 'line-clamp-1' : ''}`}>
+              {material.description}
+            </p>
+            <button className="mt-1 flex items-center gap-1 text-[10px] font-bold text-navy/40 group-hover/desc:text-navy transition-colors">
+              {isExpanded ? (
+                <><ChevronUp size={15} /></>
+              ) : (
+                <><ChevronDown size={15} /></>
+              )}
+            </button>
+          </div>
         )}
 
-        <MaterialFooter material={material} getDisplayName={getDisplayName} />
+        <hr className="border-navy/15 mt-2" />
+
+        {/* Footer */}
+        <div className="mt-auto">
+          <MaterialFooter material={material} getDisplayName={getDisplayName} />
+        </div>
       </div>
     </div>
   );

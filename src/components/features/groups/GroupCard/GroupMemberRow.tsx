@@ -22,13 +22,14 @@ export default function GroupMemberRow({
   const name = member.users?.full_name || "Unknown";
   
   return (
-    <div className="group/member flex items-center justify-between pl-3 pr-2 py-2 rounded-2xl bg-secondary/30 border border-transparent hover:border-navy/10 hover:bg-white hover:shadow-lg hover:shadow-navy/5 transition-all min-w-[220px] flex-1">
-      <div className="flex items-center gap-3">
+    <div className="group/member flex items-center justify-between pl-2.5 pr-2 py-1.5 rounded-xl bg-secondary/30 border border-transparent hover:border-navy/10 hover:bg-white hover:shadow-sm hover:shadow-navy/5 transition-all min-w-[220px] flex-1">
+      <div className="flex items-center gap-2.5">
         <StudentAvatar
           name={name}
           src={member.users?.avatar_url}
+          className="size-6 text-[9px]"
         />
-        <span className="text-[13px] font-black text-foreground group-hover/member:text-navy transition-colors">{name}</span>
+        <span className="text-[12px] font-bold text-foreground group-hover/member:text-navy transition-colors">{name}</span>
       </div>
       {isTeacher && (
         <Button

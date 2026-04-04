@@ -8,14 +8,14 @@ interface AssignmentDateBoxProps {
 
 export default function AssignmentDateBox({ dueDate, muted }: AssignmentDateBoxProps) {
   return (
-    <div className={`w-20 sm:w-24 shrink-0 flex flex-col items-center justify-center border-r border-border transition-colors
+    <div className={`w-20 sm:w-24 shrink-0 flex flex-col items-center justify-center border-r-2 border-border/80 transition-colors
       ${muted ? "bg-secondary/30" : "bg-secondary/10 group-hover:bg-navy/5"}`}>
       {dueDate ? (
         <>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 mb-1">
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
             {format(dueDate, "MMM")}
           </span>
-          <span className={`text-2xl font-black leading-none ${muted ? "text-muted-foreground/60" : "text-navy"}`}>
+          <span className={`text-4xl font-black tracking-tighter leading-none ${muted ? "text-muted-foreground/60" : "text-navy"}`}>
             {format(dueDate, "d")}
           </span>
           <span className={`text-[10px] font-bold text-muted-foreground/40 mt-1`}>

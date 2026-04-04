@@ -21,7 +21,7 @@ export default function MaterialActions({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative z-30">
       <Button
         variant="ghost"
         onClick={() => setMenuOpen(!menuOpen)}
