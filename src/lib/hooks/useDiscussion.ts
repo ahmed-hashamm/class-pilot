@@ -2,7 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { getDiscussionMessages, sendDiscussionMessage, deleteDiscussionMessage } from '@/actions/DiscussionActions'
+import { 
+  getDiscussionMessages, 
+  sendDiscussionMessage, 
+  deleteDiscussionMessage,
+  getDiscussionMessageById 
+} from '@/actions/DiscussionActions'
 import { DiscussionTopic } from '@/lib/validations/discussion'
 
 export interface DiscussionMessage {
@@ -21,6 +26,8 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'ERROR' | 'JOINING'>('JOINING')
+  
   const mountedRef = useRef(true)
 
   // Initial fetch
@@ -38,20 +45,28 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
           setMessages((result.data as DiscussionMessage[]) || [])
         }
       })
+      .catch(() => {
+        if (mountedRef.current) setError('Failed to load messages')
+      })
       .finally(() => {
         if (mountedRef.current) setLoading(false)
       })
 
-    return () => { mountedRef.current = false }
+    return () => { 
+      mountedRef.current = false 
+    }
   }, [classId, topic])
 
   // Real-time subscription
   useEffect(() => {
-    if (!classId) return
+    if (!classId || !topic) return
+    
     const supabase = createClient()
-
+    
+    // KNOWN: Using a simplified channel name to avoid subscription errors in some environments
+    const channelName = `class_discussion_${classId}_${topic}`
     const channel = supabase
-      .channel(`discussion_${classId}_${topic}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -64,18 +79,14 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
           const newMsg = payload.new as any
           if (newMsg.topic !== topic) return
 
-          // Fetch the full message with user info
-          const { data } = await supabase
-            .from('discussion_messages' as any)
-            .select('id, content, created_at, user_id, users(full_name, avatar_url)')
-            .eq('id', newMsg.id)
-            .maybeSingle()
+          // KNOWN: Fetch full message detail via Server Action to keep business logic on server
+          const result = await getDiscussionMessageById({ messageId: newMsg.id })
 
-          if (data && mountedRef.current) {
+          if (result.data && mountedRef.current) {
             setMessages((prev) => {
-              // Avoid duplicates
-              if (prev.some((m) => m.id === (data as any).id)) return prev
-              return [...prev, data as unknown as DiscussionMessage]
+              // Deduplicate: check if message was already added via optimistic update
+              if (prev.some((m) => m.id === (result.data as any).id)) return prev
+              return [...prev, result.data as unknown as DiscussionMessage]
             })
           }
         }
@@ -95,7 +106,11 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (mountedRef.current) {
+          setStatus(status as any)
+        }
+      })
 
     return () => {
       supabase.removeChannel(channel)
@@ -103,32 +118,62 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
   }, [classId, topic])
 
   const send = useCallback(async (content: string) => {
-    if (!content.trim()) return
+    const trimmed = content.trim()
+    if (!trimmed || !userId) return
+    
     setSending(true)
+    setError(null)
+    
     try {
-      const result = await sendDiscussionMessage({ classId, topic, content: content.trim() })
+      const result = await sendDiscussionMessage({ 
+        classId, 
+        topic, 
+        content: trimmed 
+      })
+      
       if (result.error) {
         setError(result.error)
+        return
       }
-      // Real-time subscription will handle adding the message
-    } catch {
+
+      // Optimistic update using payload from Server Action
+      if (result.data && mountedRef.current) {
+        const newMessage = result.data as unknown as DiscussionMessage
+        setMessages((prev) => {
+          if (prev.some(m => m.id === newMessage.id)) return prev
+          return [...prev, newMessage]
+        })
+      }
+    } catch (err) {
       setError('Failed to send message')
     } finally {
-      setSending(false)
+      if (mountedRef.current) {
+        setSending(false)
+      }
     }
-  }, [classId, topic])
+  }, [classId, topic, userId])
 
   const remove = useCallback(async (messageId: string) => {
     try {
+      // Optimistically remove
+      setMessages((prev) => prev.filter(m => m.id !== messageId))
+      
       const result = await deleteDiscussionMessage({ messageId, classId })
       if (result.error) {
         setError(result.error)
       }
-      // Real-time subscription will handle removing the message
-    } catch {
+    } catch (err) {
       setError('Failed to delete message')
     }
   }, [classId])
 
-  return { messages, loading, sending, error, send, remove }
+  return { 
+    messages, 
+    loading, 
+    sending, 
+    error, 
+    status,
+    send, 
+    remove 
+  }
 }

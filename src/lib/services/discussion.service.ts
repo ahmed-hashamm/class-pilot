@@ -30,7 +30,7 @@ export const DiscussionService = {
         content,
         user_id: userId,
       } as any)
-      .select('id, content, created_at, user_id')
+      .select('id, content, created_at, user_id, users(full_name, avatar_url)')
       .maybeSingle()
 
     if (error) throw error
@@ -48,5 +48,17 @@ export const DiscussionService = {
       .eq('id', messageId)
 
     if (error) throw error
+  },
+
+  async getMessage(messageId: string) {
+    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const { data, error } = await supabase
+      .from('discussion_messages' as any)
+      .select('id, content, created_at, user_id, users(full_name, avatar_url)')
+      .eq('id', messageId)
+      .maybeSingle()
+
+    if (error) throw error
+    return data as any
   },
 }

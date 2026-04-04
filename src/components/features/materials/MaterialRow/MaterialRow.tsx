@@ -31,14 +31,14 @@ export default function MaterialRow({
   const isSyncing = syncingId === material.id;
 
   return (
-    <div className="group relative bg-white border border-navy/[0.06] rounded-xl overflow-hidden
+    <div className="group relative bg-white border border-navy/[0.1] rounded-xl overflow-hidden
       transition-all duration-300 hover:-translate-y-1
       shadow-[0_2px_12px_rgb(20,30,60,0.03)]
       hover:shadow-[0_12px_32px_rgba(20,30,60,0.08),0_4px_12px_rgba(20,30,60,0.04)]
       hover:border-navy/[0.12] flex flex-col">
 
       {/* Top glow on hover */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full gap-3">
         {/* Header Block */}

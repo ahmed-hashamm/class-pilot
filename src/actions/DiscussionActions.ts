@@ -6,8 +6,26 @@ import {
   sendDiscussionMessageSchema,
   deleteDiscussionMessageSchema,
   getDiscussionMessagesSchema,
+  getDiscussionMessageSchema,
 } from '@/lib/validations/discussion'
 import { DiscussionService } from '@/lib/services/discussion.service'
+
+export async function getDiscussionMessageById(payload: unknown) {
+  const parsed = getDiscussionMessageSchema.safeParse(payload)
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: 'Unauthorized' }
+
+  try {
+    const message = await DiscussionService.getMessage(parsed.data.messageId)
+    return { data: message, error: null }
+  } catch (err: any) {
+    console.error('[getDiscussionMessageById] Error:', err)
+    return { data: null, error: 'Failed to find message details' }
+  }
+}
 
 export async function getDiscussionMessages(payload: unknown) {
   const parsed = getDiscussionMessagesSchema.safeParse(payload)
