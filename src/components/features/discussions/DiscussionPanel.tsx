@@ -20,9 +20,10 @@ interface DiscussionPanelProps {
   topic: DiscussionTopic
   userId: string
   isTeacher: boolean
+  hideHeader?: boolean
 }
 
-export default function DiscussionPanel({ classId, topic, userId, isTeacher }: DiscussionPanelProps) {
+export default function DiscussionPanel({ classId, topic, userId, isTeacher, hideHeader }: DiscussionPanelProps) {
   const { messages, loading, sending, error, send, remove } = useDiscussion(classId, topic, userId)
   const scrollRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
@@ -52,23 +53,25 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher }: D
   return (
     <div className="flex flex-col w-full">
       {/* Minimal Header - Dynamic Label */}
-      <div className="flex items-center gap-2 mb-6 px-1">
-        <Users2 size={18} className="text-foreground/40" />
-        <h3 className="text-sm font-semibold text-foreground/70 tracking-tight capitalize">
-          {TOPIC_LABELS[topic]}
-        </h3>
-        {messages.length > 0 && (
-          <span className="ml-auto text-[11px] font-medium text-foreground/20">
-            {messages.length} {messages.length === 1 ? 'comment' : 'comments'}
-          </span>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="flex items-center gap-2 mb-6 px-1">
+          <Users2 size={18} className="text-foreground/40" />
+          <h3 className="text-sm font-semibold text-foreground/70 tracking-tight capitalize">
+            {TOPIC_LABELS[topic]}
+          </h3>
+          {messages.length > 0 && (
+            <span className="ml-auto text-[11px] font-medium text-foreground/20">
+              {messages.length} {messages.length === 1 ? 'comment' : 'comments'}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Messages Area - Grow-to-fit + Scroll */}
       <div
         ref={scrollRef}
         className="overflow-y-auto px-1 space-y-6 scrollbar-thin scrollbar-thumb-navy/5 hover:scrollbar-thumb-navy/10 transition-all duration-300"
-        style={{ 
+        style={{
           maxHeight: 'min(600px, 60vh)',
           marginBottom: messages.length > 0 ? '1.5rem' : '0'
         }}

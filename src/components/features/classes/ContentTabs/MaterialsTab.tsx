@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MaterialsList from "@/components/features/materials/MaterialsList";
-import { DiscussionPanel } from "@/components/features/discussions";
+import { DiscussionPanel, DiscussionDrawer } from "@/components/features/discussions";
 import { PageHeader, FeatureButton } from "@/components/ui";
 import { Database, Plus, X } from "lucide-react";
 
@@ -26,15 +26,24 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   ) : null;
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader 
-        icon={Database} 
-        title="Class Materials" 
+    <div className="flex flex-col">
+      <PageHeader
+        icon={Database}
+        title="Class Materials"
         description="Lecture notes, slides, and shared references."
         action={HeaderAction}
       />
 
+      {/* Mobile Discussion Drawer - Contextual placement below header */}
+      <DiscussionDrawer
+        classId={classId}
+        topic="materials"
+        userId={userId}
+        isTeacher={isTeacher}
+      />
+
       <div className="flex gap-10 items-start">
+        {/* Main content */}
         <div className="flex-1 min-w-0">
           <MaterialsList
             classId={classId}
@@ -46,7 +55,7 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
           />
         </div>
 
-        {/* Discussion Board - Wider, no box */}
+        {/* Desktop Sidebar Discussion */}
         <div className="hidden lg:block w-[450px] shrink-0 sticky top-8 pt-6">
           <DiscussionPanel
             classId={classId}
