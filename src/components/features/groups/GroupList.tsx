@@ -14,11 +14,16 @@ import { GroupGrid } from "./GroupGrid"
 interface GroupListProps {
   classId: string
   isTeacher: boolean
+  hideHeader?: boolean
+  externalModal?: boolean
+  onCloseModal?: () => void
 }
 
-export default function GroupList({ classId, isTeacher }: GroupListProps) {
+export default function GroupList({ classId, isTeacher, hideHeader = false, externalModal, onCloseModal }: GroupListProps) {
   const queryClient = useQueryClient()
-  const [showModal, setShowModal] = useState(false)
+  const [internalModal, setInternalModal] = useState(false)
+  const showModal = externalModal ?? internalModal;
+  const setShowModal = onCloseModal ?? setInternalModal;
   const [editingGroup, setEditingGroup] = useState<Group | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
@@ -82,7 +87,9 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
 
   return (
     <div className="flex flex-col gap-10 py-8">
-      <GroupListHeader isTeacher={isTeacher} onAddClick={() => setShowModal(true)} />
+      {!hideHeader && (
+        <GroupListHeader isTeacher={isTeacher} onAddClick={() => setShowModal(true)} />
+      )}
       <GroupGrid 
         groups={groups} 
         isTeacher={isTeacher} 

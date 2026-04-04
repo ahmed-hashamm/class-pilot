@@ -22,10 +22,15 @@ interface MaterialsListProps {
   classId: string;
   isTeacher: boolean;
   userId: string;
+  hideHeader?: boolean;
+  externalUploading?: boolean;
+  onExternalUploadToggle?: () => void;
 }
 
-export default function MaterialsList({ classId, isTeacher, userId }: MaterialsListProps) {
-  const [isUploading, setIsUploading] = useState(false);
+export default function MaterialsList({ classId, isTeacher, userId, hideHeader = false, externalUploading, onExternalUploadToggle }: MaterialsListProps) {
+  const [internalUploading, setInternalUploading] = useState(false);
+  const isUploading = externalUploading ?? internalUploading;
+  const toggleUpload = onExternalUploadToggle ?? (() => setInternalUploading(v => !v));
   const [editing, setEditing] = useState<Material | null>(null);
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [materialToDelete, setMaterialToDelete] = useState<Material | null>(null);
@@ -89,7 +94,7 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
       label={isUploading ? "Close" : "Upload material"}
       icon={isUploading ? X : Plus}
       variant={isUploading ? "outline" : "primary"}
-      onClick={() => setIsUploading(!isUploading)}
+      onClick={toggleUpload}
       className={isUploading ? "bg-muted" : ""}
     />
   ) : null;
@@ -106,12 +111,14 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
   if (error) {
     return (
       <div className="flex flex-col gap-6 py-6">
-        <PageHeader
-          icon={Database}
-          title="Class Materials"
-          description="Shared documents and resources"
-          action={HeaderAction}
-        />
+        {!hideHeader && (
+          <PageHeader
+            icon={Database}
+            title="Class Materials"
+            description="Shared documents and resources"
+            action={HeaderAction}
+          />
+        )}
         <EmptyState
           icon={RefreshCw}
           title="Error loading materials"
@@ -125,19 +132,21 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
 
   return (
     <div className="flex flex-col gap-10 py-8">
-      <PageHeader
-        icon={Database}
-        title="Class Materials"
-        description="Access lecture notes, project resources, and shared documents."
-        action={HeaderAction}
-      />
+      {!hideHeader && (
+        <PageHeader
+          icon={Database}
+          title="Class Materials"
+          description="Access lecture notes, project resources, and shared documents."
+          action={HeaderAction}
+        />
+      )}
 
       {isUploading && (
         <div className="bg-white border border-border rounded-3xl p-8 animate-in fade-in slide-in-from-top-2 duration-300 shadow-xl shadow-navy/5">
           <MaterialUpload
             classId={classId}
             userId={userId}
-            onSuccess={() => { setIsUploading(false); refetch(); }}
+            onSuccess={() => { toggleUpload(); refetch(); }}
           />
         </div>
       )}
@@ -151,7 +160,7 @@ export default function MaterialsList({ classId, isTeacher, userId }: MaterialsL
               ? "Upload documents, slides, or files for your students to access."
               : "Your teacher has not uploaded any materials yet."}
             actionLabel={isTeacher ? "Upload first material" : undefined}
-            onAction={isTeacher ? () => setIsUploading(true) : undefined}
+            onAction={isTeacher ? toggleUpload : undefined}
           />
         </div>
       ) : (

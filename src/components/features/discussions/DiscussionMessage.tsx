@@ -3,6 +3,7 @@
 import { format } from 'date-fns'
 import { Trash2 } from 'lucide-react'
 import { DiscussionMessage as DiscussionMessageType } from '@/lib/hooks/useDiscussion'
+import { cn } from '@/lib/utils'
 
 interface DiscussionMessageProps {
   message: DiscussionMessageType
@@ -15,52 +16,51 @@ export default function DiscussionMessage({ message, isOwn, isTeacher, onDelete 
   const name = message.users?.full_name || 'Unknown'
   const initials = name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
   const canDelete = isOwn || isTeacher
+  const avatarUrl = message.users?.avatar_url
 
   return (
-    <div className={`group flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
+    <div className="group flex gap-3 px-1">
       {/* Avatar */}
-      <div className={`shrink-0 size-8 rounded-xl flex items-center justify-center text-[10px] font-black
-        shadow-sm transition-transform group-hover:scale-105
-        ${isOwn
-          ? 'bg-navy text-white ring-2 ring-navy/10'
-          : 'bg-secondary text-navy/60 ring-2 ring-navy/[0.04]'
-        }`}>
-        {initials}
+      <div className="shrink-0 mt-1">
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={name} className="size-8 rounded-full object-cover" />
+        ) : (
+          <div className="size-8 rounded-full bg-navy/5 flex items-center justify-center text-navy/40 text-[10px] font-bold border border-navy/[0.03]">
+            {initials}
+          </div>
+        )}
       </div>
 
-      {/* Bubble */}
-      <div className={`relative max-w-[78%] flex flex-col gap-0.5
-        ${isOwn ? 'items-end' : 'items-start'}`}>
-        <div className={`flex items-center gap-1.5 mb-0.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
-          <span className={`text-[10px] font-bold tracking-tight
-            ${isOwn ? 'text-navy' : 'text-foreground/60'}`}>
+      {/* Message Content */}
+      <div className="flex-1 min-w-0 flex flex-col gap-1">
+        <div className="flex items-baseline gap-2">
+          <span className="text-[12px] font-bold text-foreground/80 truncate max-w-[150px]">
             {isOwn ? 'You' : name}
           </span>
-          <span className="text-[9px] text-muted-foreground/30 font-medium">
+          <span className="text-[10px] text-muted-foreground/40 font-medium">
             {format(new Date(message.created_at), 'h:mm a')}
           </span>
+
+          {/* Delete Action - Visible on hover */}
+          {canDelete && (
+            <button
+              onClick={() => onDelete(message.id)}
+              className="opacity-0 group-hover:opacity-100 transition-all p-1 hover:text-red-500 text-muted-foreground/30 ml-auto"
+              title="Delete comment"
+            >
+              <Trash2 size={12} />
+            </button>
+          )}
         </div>
 
-        <div className={`px-3.5 py-2.5 text-[13px] leading-relaxed transition-all
-          ${isOwn
-            ? 'bg-navy text-white rounded-2xl rounded-tr-md shadow-md shadow-navy/10'
-            : 'bg-white border border-navy/[0.06] text-foreground rounded-2xl rounded-tl-md shadow-sm'
-          }`}>
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <div className={cn(
+          "text-[13px] leading-snug break-words whitespace-pre-wrap p-2.5 rounded-2xl transition-all",
+          isOwn 
+            ? "bg-navy/[0.03] text-navy font-medium border border-navy/[0.05]" 
+            : "text-foreground/70"
+        )}>
+          {message.content}
         </div>
-
-        {/* Delete Button */}
-        {canDelete && (
-          <button
-            onClick={() => onDelete(message.id)}
-            className="absolute -top-1.5 -right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200
-              p-1.5 rounded-lg bg-white border border-red-100 shadow-sm
-              hover:bg-red-50 text-red-400 hover:text-red-600 hover:scale-110"
-            title="Delete message"
-          >
-            <Trash2 size={10} />
-          </button>
-        )}
       </div>
     </div>
   )

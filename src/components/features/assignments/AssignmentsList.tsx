@@ -17,9 +17,10 @@ import { Assignment } from "@/lib/types/schema";
 interface AssignmentsListProps {
   classId: string;
   isTeacher: boolean;
+  hideHeader?: boolean;
 }
 
-export default function AssignmentsList({ classId, isTeacher }: AssignmentsListProps) {
+export default function AssignmentsList({ classId, isTeacher, hideHeader = false }: AssignmentsListProps) {
   const { data: assignments = [], isLoading, error, refetch } = useQuery({
     queryKey: ["classAssignments", classId],
     queryFn: async () => {
@@ -29,10 +30,9 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
     },
   });
 
-  const getDisplayName = (path: string) => {
-    const fileName = path.split("/").pop() || "File";
-    return fileName.includes("-") ? fileName.split("-").slice(1).join("-") : fileName;
-  };
+  const now = new Date();
+  const upcoming = assignments.filter((a) => !a.due_date || new Date(a.due_date) >= now);
+  const past = assignments.filter((a) => a.due_date && new Date(a.due_date) < now);
 
   const HeaderAction = isTeacher ? (
     <Link href={`/classes/${classId}/assignments/create`}>
@@ -46,7 +46,7 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
   if (isLoading) {
     return (
       <div className="flex flex-col gap-10 py-8">
-        <SkeletonLoader variant="header" />
+        {!hideHeader && <SkeletonLoader variant="header" />}
         <SkeletonLoader variant="list" count={4} />
       </div>
     );
@@ -55,63 +55,79 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
   if (error) {
     return (
       <div className="flex flex-col gap-6 py-6">
-        <PageHeader 
-          icon={ClipboardList} 
-          title="Assignments" 
-          description="Coursework and evaluative materials"
-          action={HeaderAction}
-        />
-        <EmptyState 
-          icon={RefreshCw}
-          title="Error loading assignments"
-          description="We couldn't load the assignments for this class. Please try again."
-          actionLabel="Retry"
-          onAction={() => refetch()}
+        {!hideHeader && (
+          <PageHeader 
+            icon={ClipboardList} 
+            title="Assignments" 
+            description="Manage and track class assignments."
+            action={HeaderAction}
+          />
+        )}
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3">
+          <div className="size-12 rounded-xl bg-red-100 flex items-center justify-center">
+            <RefreshCw className="size-6 text-red-600" />
+          </div>
+          <h3 className="text-lg font-bold text-red-900">Failed to load assignments</h3>
+          <p className="text-red-600 max-w-sm">
+            There was an error loading the assignments. Please try refreshing the page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (assignments.length === 0) {
+    return (
+      <div className="flex flex-col gap-6 py-6">
+        {!hideHeader && (
+          <PageHeader 
+            icon={ClipboardList} 
+            title="Assignments" 
+            description="Manage and track class assignments."
+            action={HeaderAction}
+          />
+        )}
+        <EmptyState
+          icon={ClipboardList}
+          title="No assignments yet"
+          description={isTeacher 
+            ? "Create your first assignment to start tracking student progress." 
+            : "Your teacher has not posted any assignments yet."}
+          actionLabel={isTeacher ? "Create first assignment" : undefined}
+          onAction={isTeacher ? () => window.location.href = `/classes/${classId}/assignments/create` : undefined}
         />
       </div>
     );
   }
 
-  const now = new Date();
-  const upcoming = assignments.filter((a) => !a.due_date || new Date(a.due_date) >= now);
-  const past = assignments.filter((a) => a.due_date && new Date(a.due_date) < now);
-
   return (
-    <div className="flex flex-col gap-10 py-8">
-      <PageHeader 
-        icon={ClipboardList} 
-        title="Assignments" 
-        description="Manage your coursework, projects, and evaluative materials in one place."
-        action={HeaderAction}
-      />
+    <div className="flex flex-col gap-10 py-6">
+      {!hideHeader && (
+        <PageHeader 
+          icon={ClipboardList} 
+          title="Assignments" 
+          description="Manage and track class assignments."
+          action={HeaderAction}
+        />
+      )}
 
-      {assignments.length === 0 ? (
-        <div className="mt-4">
-          <EmptyState 
-            icon={ClipboardList}
-            title="No assignments yet"
-            description={isTeacher 
-              ? "Start by creating your first assignment. You can include attachments, set deadlines, and assign rubrics." 
-              : "Your teacher has not posted any assignments yet. Check back later for updates."}
-            actionLabel={isTeacher ? "Create first assignment" : undefined}
-            onAction={isTeacher ? () => {} : undefined}
-          />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-12">
+        {upcoming.length > 0 && (
           <AssignmentGroup
             label="Upcoming"
             assignments={upcoming}
             classId={classId}
           />
+        )}
+        {past.length > 0 && (
           <AssignmentGroup
             label="Past"
             assignments={past}
             classId={classId}
             muted
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

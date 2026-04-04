@@ -1,16 +1,18 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { MessageSquare, Loader2, Sparkles } from 'lucide-react'
+import { Users2, Loader2, Sparkles } from 'lucide-react'
 import { useDiscussion } from '@/lib/hooks/useDiscussion'
 import { DiscussionTopic } from '@/lib/validations/discussion'
 import DiscussionMessage from './DiscussionMessage'
 import DiscussionInput from './DiscussionInput'
+import { createClient } from '@/lib/supabase/client'
+import { useQuery } from '@tanstack/react-query'
 
 const TOPIC_LABELS: Record<DiscussionTopic, string> = {
   assignments: 'Work Discussion',
   materials: 'Materials Discussion',
-  groups: 'Groups Discussion',
+  groups: 'Group Discussion',
 }
 
 interface DiscussionPanelProps {
@@ -23,104 +25,91 @@ interface DiscussionPanelProps {
 export default function DiscussionPanel({ classId, topic, userId, isTeacher }: DiscussionPanelProps) {
   const { messages, loading, sending, error, send, remove } = useDiscussion(classId, topic, userId)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const supabase = createClient()
+
+  // Fetch current user details for the input avatar
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('full_name, avatar_url')
+        .eq('id', userId)
+        .maybeSingle()
+      if (error) throw error
+      return data
+    },
+    enabled: !!userId
+  })
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages])
+  }, [messages, loading])
 
   return (
-    <div className="flex flex-col bg-white rounded-2xl border border-navy/[0.08] overflow-hidden
-      shadow-[0_8px_30px_rgb(20,30,60,0.04),0_4px_8px_rgb(20,30,60,0.02)]"
-      style={{ height: 'calc(100vh - 260px)', minHeight: '420px' }}
-    >
-      {/* Navy Header */}
-      <div className="relative px-4 py-3.5 bg-navy overflow-hidden">
-        {/* Subtle decorative dots */}
-        <div className="absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}
-        />
-
-        <div className="relative flex items-center gap-3">
-          <div className="size-8 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center
-            ring-1 ring-white/10">
-            <MessageSquare size={15} className="text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-[13px] font-bold text-white tracking-tight leading-none">
-              {TOPIC_LABELS[topic]}
-            </h3>
-            <p className="text-[10px] text-white/50 mt-0.5 font-medium">
-              {messages.length} message{messages.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm">
-            <div className="size-1.5 rounded-full bg-emerald-300 animate-pulse" />
-            <span className="text-[9px] text-white/70 font-bold uppercase tracking-wider">Live</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Messages Area */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-3 space-y-3 min-h-0 bg-gradient-to-b from-navy/[0.02] to-white"
-      >
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="size-10 rounded-2xl bg-navy/5 flex items-center justify-center animate-pulse">
-              <Loader2 className="size-5 text-navy/30 animate-spin" />
-            </div>
-            <p className="text-[11px] text-muted-foreground/40 font-medium">Loading messages...</p>
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-2">
-            <div className="size-10 rounded-2xl bg-red-50 flex items-center justify-center">
-              <MessageSquare size={18} className="text-red-300" />
-            </div>
-            <p className="text-[12px] text-red-400 font-medium">{error}</p>
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="relative">
-              <div className="size-14 rounded-2xl bg-navy/[0.04] flex items-center justify-center">
-                <Sparkles size={22} className="text-navy/15" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 size-5 rounded-lg bg-white border border-navy/[0.06]
-                flex items-center justify-center shadow-sm">
-                <MessageSquare size={10} className="text-navy/30" />
-              </div>
-            </div>
-            <div className="text-center">
-              <p className="text-[12px] text-foreground/50 font-bold tracking-tight">
-                No messages yet
-              </p>
-              <p className="text-[10px] text-muted-foreground/35 mt-0.5">
-                Be the first to start the conversation!
-              </p>
-            </div>
-          </div>
-        ) : (
-          messages.map((msg) => (
-            <DiscussionMessage
-              key={msg.id}
-              message={msg}
-              isOwn={msg.user_id === userId}
-              isTeacher={isTeacher}
-              onDelete={remove}
-            />
-          ))
+    <div className="flex flex-col w-full">
+      {/* Minimal Header - Dynamic Label */}
+      <div className="flex items-center gap-2 mb-6 px-1">
+        <Users2 size={18} className="text-foreground/40" />
+        <h3 className="text-sm font-semibold text-foreground/70 tracking-tight capitalize">
+          {TOPIC_LABELS[topic]}
+        </h3>
+        {messages.length > 0 && (
+          <span className="ml-auto text-[11px] font-medium text-foreground/20">
+            {messages.length} {messages.length === 1 ? 'comment' : 'comments'}
+          </span>
         )}
       </div>
 
-      {/* Input */}
-      <DiscussionInput
-        onSend={send}
-        sending={sending}
-        placeholder={`Message ${TOPIC_LABELS[topic].toLowerCase()}...`}
-      />
+      {/* Messages Area - Grow-to-fit + Scroll */}
+      <div
+        ref={scrollRef}
+        className="overflow-y-auto px-1 space-y-6 scrollbar-thin scrollbar-thumb-navy/5 hover:scrollbar-thumb-navy/10 transition-all duration-300"
+        style={{ 
+          maxHeight: 'min(600px, 60vh)',
+          marginBottom: messages.length > 0 ? '1.5rem' : '0'
+        }}
+      >
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-10 gap-3">
+            <Loader2 className="size-5 text-navy/20 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
+            <p className="text-[12px] text-red-400 font-medium">Failed to load comments</p>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10 gap-3 opacity-30">
+            <Sparkles size={20} className="text-navy/20" />
+            <p className="text-[11px] font-medium">No comments yet</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {messages.map((msg) => (
+              <DiscussionMessage
+                key={msg.id}
+                message={msg}
+                isOwn={msg.user_id === userId}
+                isTeacher={isTeacher}
+                onDelete={remove}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Input - Positioned just below messages area */}
+      <div className="pt-4 border-t border-navy/[0.04] mt-0">
+        <DiscussionInput
+          onSend={send}
+          sending={sending}
+          user={currentUser ?? undefined}
+          placeholder="Add class comment..."
+        />
+      </div>
     </div>
   )
 }

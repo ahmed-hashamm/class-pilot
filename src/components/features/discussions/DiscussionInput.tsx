@@ -1,58 +1,90 @@
 'use client'
 
-import { useState, FormEvent, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { Send, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface DiscussionInputProps {
   onSend: (content: string) => Promise<void>
   sending: boolean
-  placeholder?: string
+  placeholder: string
+  user?: { full_name: string | null; avatar_url: string | null }
 }
 
-export default function DiscussionInput({ onSend, sending, placeholder = 'Type a message...' }: DiscussionInputProps) {
-  const [input, setInput] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
+export default function DiscussionInput({ onSend, sending, placeholder, user }: DiscussionInputProps) {
+  const [content, setContent] = useState('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!input.trim() || sending) return
-    const text = input.trim()
-    setInput('')
-    await onSend(text)
-    inputRef.current?.focus()
+  const handleSend = async () => {
+    if (!content.trim() || sending) return
+    await onSend(content.trim())
+    setContent('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  // Handle auto-expanding height
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value)
+    e.target.style.height = 'auto'
+    e.target.style.height = `${e.target.scrollHeight}px`
+  }
+
+  const initials = user?.full_name?.split(' ').map(n => n[0]).join('') || '?'
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex items-center gap-2.5 px-3.5 py-3 bg-white border-t border-navy/[0.06]"
-    >
-      <input
-        ref={inputRef}
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder={placeholder}
-        disabled={sending}
-        maxLength={2000}
-        className="flex-1 bg-secondary/40 border border-navy/[0.04] text-[13px] h-9 rounded-xl px-3.5
-          focus:outline-none focus:ring-2 focus:ring-navy/10 focus:border-navy/10
-          placeholder:text-muted-foreground/30 disabled:opacity-50 transition-all"
-      />
-      <button
-        type="submit"
-        disabled={sending || !input.trim()}
-        className="shrink-0 size-9 rounded-xl bg-navy text-white
-          flex items-center justify-center shadow-sm
-          hover:bg-navy/90 hover:shadow-md hover:scale-105
-          disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100
-          transition-all duration-200 active:scale-95"
-      >
-        {sending
-          ? <Loader2 className="size-3.5 animate-spin" />
-          : <Send className="size-3.5" style={{ transform: 'translateX(1px)' }} />
-        }
-      </button>
-    </form>
+    <div className="flex items-start gap-3 w-full group">
+      {/* User Avatar */}
+      <div className="flex-shrink-0 mt-1">
+        {user?.avatar_url ? (
+          <img 
+            src={user.avatar_url} 
+            alt={user.full_name || 'User'} 
+            className="size-8 rounded-full object-cover"
+          />
+        ) : (
+          <div className="size-8 rounded-full bg-navy/10 flex items-center justify-center text-navy/60 text-[11px] font-bold border border-navy/5">
+            {initials}
+          </div>
+        )}
+      </div>
+
+      {/* Pill Input Container */}
+      <div className={cn(
+        "flex-1 flex items-end gap-2 bg-white border border-navy/[0.08] hover:border-navy/[0.15] transition-all rounded-[24px] px-4 py-2",
+        content && "border-navy/20 shadow-sm"
+      )}>
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          rows={1}
+          className="flex-1 bg-transparent border-none outline-none resize-none text-[13px] py-1 placeholder:text-muted-foreground/30 min-h-[22px] max-h-[120px]"
+        />
+        
+        {/* Send Button */}
+        <button
+          onClick={handleSend}
+          disabled={!content.trim() || sending}
+          className="p-1 rounded-full text-navy/20 hover:text-navy transition-colors disabled:opacity-30 flex-shrink-0"
+        >
+          {sending ? (
+            <Loader2 className="size-4 animate-spin text-navy/40" />
+          ) : (
+            <Send className="size-5" />
+          )}
+        </button>
+      </div>
+    </div>
   )
 }
