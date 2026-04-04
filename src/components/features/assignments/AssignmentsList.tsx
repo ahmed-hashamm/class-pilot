@@ -45,7 +45,7 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
+      <div className="flex flex-col gap-10 py-8">
         <SkeletonLoader variant="header" />
         <SkeletonLoader variant="list" count={4} />
       </div>
@@ -77,7 +77,7 @@ export default function AssignmentsList({ classId, isTeacher }: AssignmentsListP
   const past = assignments.filter((a) => a.due_date && new Date(a.due_date) < now);
 
   return (
-    <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto">
+    <div className="flex flex-col gap-10 py-8">
       <PageHeader 
         icon={ClipboardList} 
         title="Assignments" 

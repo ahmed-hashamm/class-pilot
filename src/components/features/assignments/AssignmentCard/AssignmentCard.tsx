@@ -28,36 +28,39 @@ export default function AssignmentCard({
 
   const getStatus = () => {
     if (assignment.has_submitted) {
-      // Note: mapping logic can be more complex if submission status is available
-      return { label: 'Submitted', icon: CheckCircle2, text: 'text-green-600', bg: 'sm:bg-green-50 sm:border-green-100' };
+      return { label: 'Submitted', icon: CheckCircle2, color: 'emerald' };
     }
-    if (isOverdue) return { label: 'Missing', icon: AlertCircle, text: 'text-red-600', bg: 'sm:bg-red-50 sm:border-red-100' };
-    if (dueDate && isToday(dueDate)) return { label: 'Due Today', icon: Clock, text: 'text-orange-600', bg: 'sm:bg-orange-50 sm:border-orange-100' };
-    return { label: 'Assigned', icon: FileText, text: 'text-navy/60', bg: 'sm:bg-navy/5 sm:border-navy/10' };
+    if (isOverdue) return { label: 'Missing', icon: AlertCircle, color: 'red' };
+    if (dueDate && isToday(dueDate)) return { label: 'Due Today', icon: Clock, color: 'amber' };
+    return { label: 'Assigned', icon: FileText, color: 'navy' };
   };
+
 
   const status = getStatus();
 
   return (
     <Link
       href={`/classes/${classId}/assignments/${assignment.id}?from=work`}
-      className={`group relative flex flex-col bg-white border border-navy/[0.08] rounded-[24px] transition-all duration-500
-        hover:-translate-y-2 shadow-[0_8px_30px_rgb(20,30,60,0.04),0_4px_8px_rgb(20,30,60,0.02)] 
-        hover:shadow-[0_20px_40px_rgba(20,30,60,0.1),0_10px_20px_rgba(20,30,60,0.05)] active:scale-[0.98]
-        ${muted ? "opacity-75 grayscale-[0.2]" : ""}`}
+      className={`group relative flex flex-col bg-white border border-navy/[0.06] rounded-xl overflow-hidden
+        transition-all duration-300 hover:-translate-y-1
+        shadow-[0_2px_12px_rgb(20,30,60,0.03)]
+        hover:shadow-[0_12px_32px_rgba(20,30,60,0.08),0_4px_12px_rgba(20,30,60,0.04)]
+        hover:border-navy/[0.12]
+        ${muted ? "opacity-60 grayscale-[0.15]" : ""}`}
     >
-      <div className="relative z-10 p-6 sm:p-8 flex flex-col h-full gap-4">
+      {/* Top glow on hover */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full gap-3">
         <AssignmentHeader assignment={assignment} status={status} />
 
         {assignment.description && (
-          <p className="text-[14px] leading-relaxed text-muted-foreground/60 line-clamp-1 max-w-[90%] tracking-tight">
+          <p className="text-[13px] leading-relaxed text-muted-foreground/50 line-clamp-2 max-w-[90%]">
             {assignment.description}
           </p>
         )}
 
-        <hr className="border-navy/20 mt-2" />
-
-        <div className="mt-auto">
+        <div className="border-t border-dashed border-navy/[0.06] pt-3 mt-auto">
           <AssignmentFooter assignment={assignment} />
         </div>
       </div>

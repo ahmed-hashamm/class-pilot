@@ -45,7 +45,8 @@ export default function TabContent({
         <GroupsTab 
           key={classId} 
           classId={classId} 
-          isTeacher={isTeacher} 
+          isTeacher={isTeacher}
+          userId={userId}
         />
       );
 

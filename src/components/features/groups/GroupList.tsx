@@ -72,7 +72,7 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
 
   if (loadingGroups || loadingMembers) {
     return (
-      <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto px-4">
+      <div className="flex flex-col gap-10 py-8">
         <SkeletonLoader variant="header" /><SkeletonLoader variant="card" count={4} />
       </div>
     )
@@ -81,7 +81,7 @@ export default function GroupList({ classId, isTeacher }: GroupListProps) {
   if (errorGroups) return <ErrorState message="Failed to load groups." onRetry={() => refetchGroups()} />
 
   return (
-    <div className="flex flex-col gap-10 py-8 max-w-5xl mx-auto px-4">
+    <div className="flex flex-col gap-10 py-8">
       <GroupListHeader isTeacher={isTeacher} onAddClick={() => setShowModal(true)} />
       <GroupGrid 
         groups={groups} 
