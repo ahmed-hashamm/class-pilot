@@ -1,7 +1,7 @@
 'use client'
 
 import { format } from 'date-fns'
-import { Trash2, ShieldCheck, CircleUserRound } from 'lucide-react'
+import { Trash2, GraduationCap } from 'lucide-react'
 import { DiscussionMessage as DiscussionMessageType } from '@/lib/hooks/useDiscussion'
 import { cn } from '@/lib/utils'
 
@@ -41,7 +41,7 @@ export default function DiscussionMessage({ message, isOwn, isTeacher, onDelete 
       <div className="flex-1 min-w-0 flex flex-col gap-1">
         <div className="flex items-center gap-2">
           {isAuthorTeacher && (
-            <CircleUserRound size={13} className="text-navy shrink-0" />
+            <GraduationCap size={13} className="text-navy shrink-0" />
           )}
           <span className={cn(
             "text-[12px] font-bold truncate max-w-[150px]",

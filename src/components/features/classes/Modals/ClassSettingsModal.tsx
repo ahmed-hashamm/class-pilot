@@ -10,7 +10,7 @@ import { useClassSettings } from "@/lib/hooks";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  classData: any; 
+  classData: any;
 }
 
 export default function ClassSettingsModal({ isOpen, onClose, classData }: ModalProps) {
@@ -24,27 +24,27 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
   } = useClassSettings(isOpen, onClose, classData);
 
   if (!isOpen) return null;
-  
+
   return (
     <>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div 
-          className="absolute inset-0 bg-navy/40 backdrop-blur-sm" 
-          onClick={() => !isSaving && !isDeleting && onClose()} 
+        <div
+          className="absolute inset-0 bg-navy/40 backdrop-blur-sm"
+          onClick={() => !isSaving && !isDeleting && onClose()}
         />
-        
+
         <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
           {/* Header */}
           <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
             <h2 className="text-xl font-bold text-navy flex items-center gap-2">
-              <Settings size={20} className="text-secondary" /> 
+              <Settings size={20} className="text-secondary" />
               Class Settings
             </h2>
-            <Button 
+            <Button
               variant="ghost"
               size="sm"
-              onClick={onClose} 
-              disabled={isSaving || isDeleting} 
+              onClick={onClose}
+              disabled={isSaving || isDeleting}
               className="p-2 h-auto w-auto hover:bg-zinc-200 rounded-full text-zinc-500"
             >
               <X size={20} />
@@ -55,11 +55,11 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
           <div className="p-8 space-y-8 overflow-y-auto no-scrollbar">
             <div className="space-y-4">
               <h3 className="text-xs font-black text-navy/30 uppercase tracking-[0.2em]">General Info</h3>
-              
+
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase ml-1">Class Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={name}
                   placeholder="Enter class name..."
                   disabled={isSaving || isDeleting}
@@ -70,7 +70,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
 
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase ml-1">Description</label>
-                <textarea 
+                <textarea
                   rows={2}
                   value={description}
                   placeholder="Add a description..."
@@ -83,7 +83,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
 
             <div className="space-y-4 pt-6 border-t border-zinc-100">
               <h3 className="text-xs font-black text-navy/30 uppercase tracking-[0.2em]">Privacy Settings</h3>
-              
+
               <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-50 border border-zinc-100 transition-all">
                 <div className="flex items-center gap-4">
                   <div className={cn(
@@ -97,8 +97,8 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
                     <p className="text-[11px] text-zinc-500 font-medium">Students can see the join code</p>
                   </div>
                 </div>
-                
-                <Button 
+
+                <Button
                   key="toggle-code"
                   type="button"
                   variant="ghost"
@@ -139,20 +139,20 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
 
           {/* Footer */}
           <div className="p-6 bg-zinc-50/80 border-t border-zinc-100 flex flex-col-reverse sm:flex-row gap-3">
-            <Button 
+            <Button
               variant="secondary"
-              onClick={onClose} 
-              disabled={isSaving || isDeleting} 
+              onClick={onClose}
+              disabled={isSaving || isDeleting}
               className="w-full sm:flex-1 py-3 rounded-xl border border-zinc-200"
             >
               Cancel
             </Button>
-            <FeatureButton 
+            <FeatureButton
               onClick={handleSave}
               loading={isSaving}
               disabled={isDeleting || !name.trim()}
               label={isSaving ? "Updating..." : "Save Changes"}
-              variant="yellow"
+              variant="primary"
               icon={Save}
               className="w-full sm:flex-1 py-3 rounded-xl shadow-md"
             />
