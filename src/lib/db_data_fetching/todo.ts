@@ -20,7 +20,7 @@ export interface TodoAssignment {
   due_date: string;
   points: number;
   is_group_project: boolean;
-  classes: { name: string } | null;
+  classes: { id: string; name: string } | null;
   submissions?: TodoSubmission[];
 }
 
@@ -43,7 +43,7 @@ export async function getTodoPageData() {
         .from('assignments')
         .select(`
           id, title, due_date, points, is_group_project,
-          classes(name),
+          classes(id, name),
           submissions!left(status, final_grade, user_id, group_id)
         `)
         .in('class_id', classIds)

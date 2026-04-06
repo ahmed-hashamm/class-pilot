@@ -17,7 +17,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
     material: 'materials',
   }
   const bucketName = bucketMap[type] || ''
-  
+
   let url = '#'
   if (path.startsWith('http')) {
     url = path
@@ -40,7 +40,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
   };
 
   const fullFileName = getBaseName(path);
-  
+
   // Only trim prefixes (the '-' logic) if it looks like a Supabase UUID prefix
   // and we don't have an explicit label.
   const displayName = label || (
@@ -52,7 +52,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
   const innerContent = (
     <>
       <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
-        <div className="rounded-lg bg-navy/8 border border-navy/15 p-2 text-navy flex items-center justify-center transition-colors group-hover:bg-navy group-hover:text-white shrink-0">
+        <div className="rounded-lg bg-navy/8 border border-navy/15 p-2 text-navy flex items-center justify-center transition-colors duration-500 group-hover:bg-navy group-hover:text-white  shrink-0">
           <FileIcon size={16} />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden">
@@ -71,7 +71,7 @@ export default function AttachmentButton({ path, type, label, asDiv = false }: A
 
   if (asDiv) {
     return (
-      <div 
+      <div
         onClick={(e) => {
           e.stopPropagation();
           if (url !== '#') window.open(url, '_blank');

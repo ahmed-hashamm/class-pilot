@@ -45,12 +45,10 @@ export default function AssignmentCard({
   return (
     <Link
       href={`/classes/${classId}/assignments/${assignment.id}?from=work`}
-      className={`group relative flex flex-col bg-white border border-navy/[0.1] rounded-xl overflow-hidden
-        transition-all duration-300 hover:-translate-y-1
-        shadow-[0_2px_12px_rgb(20,30,60,0.03)]
-        hover:shadow-[0_12px_32px_rgba(20,30,60,0.08),0_4px_12px_rgba(20,30,60,0.04)]
-        hover:border-navy/[0.12]
-        ${muted ? "opacity-60 grayscale-[0.15]" : ""}`}
+      className={`group relative flex flex-col bg-navy/5 hover:bg-white overflow-hidden
+        items-stretch transition-all duration-500
+       border rounded-md  hover:shadow-md hover:-translate-y-0.5 border-b-4 border-navy/90
+        ${muted ? "opacity-80 grayscale-[0.1]" : ""}`}
     >
       {/* Top glow on hover */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

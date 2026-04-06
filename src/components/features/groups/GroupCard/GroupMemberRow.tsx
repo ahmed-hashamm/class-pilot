@@ -20,9 +20,9 @@ export default function GroupMemberRow({
   onRemoveMember,
 }: GroupMemberRowProps) {
   const name = member.users?.full_name || "Unknown";
-  
+
   return (
-    <div className="group/member flex items-center justify-between pl-2.5 pr-2 py-1.5 rounded-xl bg-secondary/30 border border-transparent hover:border-navy/10 hover:bg-white hover:shadow-sm hover:shadow-navy/5 transition-all min-w-[220px] flex-1">
+    <div className="group/member flex items-center justify-between p-1.5 rounded-xl bg-secondary/30 border border-transparent hover:border-navy/10  hover:shadow-sm hover:shadow-navy/5 transition-all min-w-[220px] flex-1">
       <div className="flex items-center gap-2.5">
         <StudentAvatar
           name={name}

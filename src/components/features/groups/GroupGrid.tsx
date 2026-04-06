@@ -14,22 +14,22 @@ interface GroupGridProps {
   onAddClick: () => void
 }
 
-export function GroupGrid({ 
-  groups, 
-  isTeacher, 
-  onEdit, 
-  onDelete, 
+export function GroupGrid({
+  groups,
+  isTeacher,
+  onEdit,
+  onDelete,
   onRemoveMember,
-  onAddClick 
+  onAddClick
 }: GroupGridProps) {
   if (groups.length === 0) {
     return (
       <div className="mt-4">
-        <EmptyState 
+        <EmptyState
           icon={Users2}
           title="No groups yet"
-          description={isTeacher 
-            ? "Create a group and assign students to collaborate on projects." 
+          description={isTeacher
+            ? "Create a group and assign students to collaborate on projects."
             : "Your teacher hasn't created any groups yet."}
           actionLabel={isTeacher ? "Create first group" : undefined}
           onAction={isTeacher ? onAddClick : undefined}
@@ -39,7 +39,7 @@ export function GroupGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="flex flex-col bg-white border border-border/60 rounded-md overflow-hidden shadow-sm divide-y divide-border/60 ">
       {groups.map((group) => (
         <GroupCard
           key={group.id}

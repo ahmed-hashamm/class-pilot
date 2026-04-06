@@ -5,12 +5,13 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { PageHeader } from "@/components/ui";
+import Link from "next/link";
 
 export default async function TodoPage() {
   const { user, done, missing, assigned, myGroupIds } = await getTodoPageData();
 
   return (
-    <div className="max-w-4xl mx-auto p-6 md:p-10 flex flex-col gap-10">
+    <div className="max-w-3xl mx-auto p-6 md:p-10 flex flex-col gap-6">
       <PageHeader
         title="My Assignments"
         description="Track your individual and team progress"
@@ -20,7 +21,7 @@ export default async function TodoPage() {
       />
 
       {/* Summary pills */}
-      <div className="flex gap-3 flex-wrap -mt-2">
+      <div className="flex gap-3 flex-wrap">
         <SummaryPill label="Assigned" count={assigned.length} variant="navy" />
         <SummaryPill label="Missing" count={missing.length} variant="red" />
         <SummaryPill label="Done" count={done.length} variant="green" />
@@ -92,15 +93,14 @@ function Section({ title, icon, items, emptyIcon, emptyTitle, emptyDesc, status,
           <p className="text-[13px] text-muted-foreground font-medium">{emptyDesc}</p>
         </div>
       ) : (
-        <div className="bg-white border border-border/60 rounded-2xl overflow-hidden shadow-sm">
-          {items.map((a: any, i: number) => (
+        <div className="flex flex-col gap-3">
+          {items.map((a: any) => (
             <TodoItem
               key={a.id}
               assignment={a}
               status={status}
               userId={userId}
               myGroupIds={myGroupIds}
-              isLast={i === items.length - 1}
             />
           ))}
         </div>
@@ -110,7 +110,7 @@ function Section({ title, icon, items, emptyIcon, emptyTitle, emptyDesc, status,
 }
 
 /* ── Todo item ── */
-function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
+function TodoItem({ assignment, status, userId, myGroupIds }: any) {
   const submission = assignment.submissions?.find((sub: any) =>
     assignment.is_group_project ? myGroupIds.includes(sub.group_id) : sub.user_id === userId
   );
@@ -118,8 +118,6 @@ function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
   const isGraded = submission?.status === "graded";
   const isMissing = status === "missing";
   const isDone = status === "done";
-
-  const accentBar = isMissing ? "bg-red-500" : isDone ? "bg-emerald-500" : "bg-navy";
 
   const statusPill = isMissing
     ? "bg-red-50 text-red-600 border-red-200"
@@ -135,12 +133,9 @@ function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
         : "Upcoming";
 
   return (
-    <div className={`flex items-stretch group transition-colors hover:bg-secondary/20
-      ${!isLast ? "border-b border-border/60" : ""}`}>
-
-      {/* Accent bar */}
-      <div className={`w-1 shrink-0 ${accentBar} transition-all duration-300 opacity-60 group-hover:opacity-100 group-hover:w-1.5`} />
-
+    <Link href={`/classes/${assignment.classes?.id}/assignments/${assignment.id}`} className="flex items-stretch group transition-all duration-300
+      bg-navy/5 hover:bg-white overflow-hidden
+       border rounded-md  hover:shadow-md hover:-translate-y-0.5 border-b-4 border-navy/90">
       <div className="flex flex-1 items-center justify-between gap-6 px-6 py-5">
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
@@ -181,7 +176,7 @@ function TodoItem({ assignment, status, userId, myGroupIds, isLast }: any) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
