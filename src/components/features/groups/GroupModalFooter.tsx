@@ -17,9 +17,9 @@ export function GroupModalFooter({
 }: GroupModalFooterProps) {
   return (
     <div className="p-6 pt-2 flex gap-3 bg-secondary/10 border-t border-border">
-      <Button 
+      <Button
         variant="ghost"
-        onClick={onCancel} 
+        onClick={onCancel}
         className="flex-1 py-3.5 text-muted-foreground font-black text-[12px] uppercase tracking-widest hover:bg-secondary rounded-2xl"
       >
         Cancel

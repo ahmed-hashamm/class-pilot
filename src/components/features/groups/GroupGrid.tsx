@@ -39,7 +39,7 @@ export function GroupGrid({
   }
 
   return (
-    <div className="flex flex-col bg-white border border-border/60 rounded-md overflow-hidden shadow-sm divide-y divide-border/60 ">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       {groups.map((group) => (
         <GroupCard
           key={group.id}

@@ -11,15 +11,14 @@ interface GroupHeaderProps {
 
 export default function GroupHeader({ group, isTeacher, onEdit, onDelete }: GroupHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-3 p-5">
-      <div className="flex flex-col gap-1 flex-1 min-w-0">
-        <h3 className="font-bold text-[15px] sm:text-[16px] text-foreground tracking-tight leading-snug
-          group-hover:text-navy transition-colors line-clamp-1">
+    <div className="flex items-start justify-between gap-3 px-6 py-4 ">
+      <div className="flex flex-col min-w-0">
+        <h3 className="font-black text-[15px] sm:text-[16px] text-navy uppercase tracking-widest leading-none truncate">
           {group.title}
         </h3>
 
         {/* Member Count Badge */}
-        <div className="flex items-center gap-1 text-muted-foreground/35 text-[11px] font-medium">
+        <div className="flex items-center gap-1.5 mt-2 text-muted-foreground/40 text-[10px] font-bold uppercase tracking-widest">
           <Users size={10} className="shrink-0" />
           <span>{group.project_members?.length || 0} members</span>
         </div>
@@ -27,24 +26,22 @@ export default function GroupHeader({ group, isTeacher, onEdit, onDelete }: Grou
 
       {/* Action Buttons */}
       {isTeacher && (
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 transition-opacity duration-300">
           <Button
-            variant="secondary"
+            variant="ghost"
             size="sm"
             onClick={() => onEdit(group)}
-            className="size-8 p-0 rounded-lg bg-secondary/60 border-transparent transition-all duration-200
-              hover:bg-navy/10 hover:text-navy"
+            className="size-7 p-0 rounded-md text-navy/40 hover:text-navy hover:bg-navy/10 transition-all outline-none"
           >
-            <Pencil size={13} />
+            <Pencil size={12} />
           </Button>
           <Button
-            variant="danger"
+            variant="ghost"
             size="sm"
             onClick={() => onDelete(group)}
-            className="size-8 p-0 rounded-lg bg-red-50/60 text-red-400 border-transparent transition-all duration-200
-              hover:bg-red-500 hover:text-white"
+            className="size-7 p-0 rounded-md text-navy/40 hover:text-red-500 hover:bg-red-50 transition-all outline-none"
           >
-            <Trash2 size={13} />
+            <Trash2 size={12} />
           </Button>
         </div>
       )}

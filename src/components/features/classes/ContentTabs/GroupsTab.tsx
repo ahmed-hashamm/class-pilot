@@ -46,7 +46,7 @@ export default function GroupsTab({ classId, isTeacher, userId }: GroupsTabProps
             isTeacher={isTeacher}
             hideHeader={true}
             externalModal={showGroupModal}
-            onCloseModal={() => setShowGroupModal(false)}
+            onCloseModal={setShowGroupModal}
           />
         </div>
 

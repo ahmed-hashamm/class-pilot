@@ -17,10 +17,10 @@ export function GroupModalHeader({ editingGroup, onClose }: GroupModalHeaderProp
         </h3>
         <p className="text-[11px] text-muted-foreground font-medium">Assignment collaboration team</p>
       </div>
-      <Button 
+      <Button
         variant="ghost"
         size="sm"
-        onClick={onClose} 
+        onClick={onClose}
         className="p-2 h-auto w-auto"
       >
         <X size={18} />

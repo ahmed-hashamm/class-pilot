@@ -23,7 +23,7 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
   ) : null;
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <PageHeader
         icon={ClipboardList}
         title="Assignments"

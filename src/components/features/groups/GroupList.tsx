@@ -16,14 +16,17 @@ interface GroupListProps {
   isTeacher: boolean
   hideHeader?: boolean
   externalModal?: boolean
-  onCloseModal?: () => void
+  onCloseModal?: (val: boolean) => void
 }
 
 export default function GroupList({ classId, isTeacher, hideHeader = false, externalModal, onCloseModal }: GroupListProps) {
   const queryClient = useQueryClient()
   const [internalModal, setInternalModal] = useState(false)
   const showModal = externalModal ?? internalModal;
-  const setShowModal = onCloseModal ?? setInternalModal;
+  const setShowModal = (val: boolean) => {
+    if (onCloseModal) onCloseModal(val);
+    setInternalModal(val);
+  }
   const [editingGroup, setEditingGroup] = useState<Group | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
@@ -90,13 +93,13 @@ export default function GroupList({ classId, isTeacher, hideHeader = false, exte
       {!hideHeader && (
         <GroupListHeader isTeacher={isTeacher} onAddClick={() => setShowModal(true)} />
       )}
-      <GroupGrid 
-        groups={groups} 
-        isTeacher={isTeacher} 
-        onEdit={(g) => { setEditingGroup(g); setShowModal(true) }} 
-        onDelete={setGroupToDelete} 
-        onRemoveMember={onRemoveMember} 
-        onAddClick={() => setShowModal(true)} 
+      <GroupGrid
+        groups={groups}
+        isTeacher={isTeacher}
+        onEdit={(g) => { setEditingGroup(g); setShowModal(true) }}
+        onDelete={setGroupToDelete}
+        onRemoveMember={onRemoveMember}
+        onAddClick={() => setShowModal(true)}
       />
 
       {groupToDelete && (
@@ -108,6 +111,7 @@ export default function GroupList({ classId, isTeacher, hideHeader = false, exte
       )}
       {showModal && (
         <GroupModal
+          key={editingGroup?.id || "new"}
           editingGroup={editingGroup} groups={groups} allMembers={allMembers}
           onClose={() => { setShowModal(false); setEditingGroup(null); setLocalError(null) }}
           onSave={onSave} submitting={submitting} error={localError}
