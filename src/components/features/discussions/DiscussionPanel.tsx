@@ -36,21 +36,21 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
 
   const currentUser = currentUserResponse?.data
 
-  // Reset scroll to top when new messages arrive (since newest are now at top)
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
-        top: 0,
+        top: scrollRef.current.scrollHeight,
         behavior: 'smooth'
       })
     }
   }, [messages])
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full h-[calc(100vh-220px)]">
       {/* Minimal Header - Dynamic Label */}
       {!hideHeader && (
-        <div className="flex items-center gap-2 mb-6 px-1">
+        <div className="flex items-center gap-2 mb-6 px-1 shrink-0">
           <Users2 size={18} className="text-foreground/40" />
           <h3 className="text-sm font-semibold text-foreground/70 tracking-tight capitalize">
             {TOPIC_LABELS[topic]}
@@ -63,23 +63,10 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
         </div>
       )}
 
-      {/* Input - Now at the top */}
-      <div className="pb-6 border-b border-navy/[0.04] mb-6">
-        <DiscussionInput
-          onSend={send}
-          sending={sending}
-          user={currentUser ?? undefined}
-          placeholder="Add class comment..."
-        />
-      </div>
-
-      {/* Messages Area - Grow-to-fit + Scroll */}
+      {/* Messages Area - GROW & SCROLL */}
       <div
         ref={scrollRef}
-        className="overflow-y-auto px-1 pr-3 space-y-6 no-scrollbar transition-all duration-300"
-        style={{
-          maxHeight: 'min(440px, 45vh)',
-        }}
+        className="flex-1 overflow-y-auto px-1 pr-3 space-y-6 no-scrollbar pb-10 transition-all duration-300 min-h-0"
       >
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
@@ -90,14 +77,14 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
             <p className="text-[12px] text-red-400 font-medium">Failed to load comments</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-3 opacity-30">
+          <div className="flex flex-col items-center justify-center py-10 gap-3 opacity-15">
             <Sparkles size={20} className="text-navy/20" />
             <p className="text-[11px] font-medium">No comments yet</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            {/* Show newest messages first */}
-            {[...messages].reverse().map((msg) => (
+          <div className="flex flex-col gap-6 ">
+            {/* Show messages in chronological order (newest at bottom) */}
+            {messages.map((msg) => (
               <DiscussionMessage
                 key={msg.id}
                 message={msg}
@@ -108,6 +95,16 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
             ))}
           </div>
         )}
+      </div>
+
+      {/* Input - Now at the bottom */}
+      <div className="pt-6 border-t border-navy/[0.04] mt-auto">
+        <DiscussionInput
+          onSend={send}
+          sending={sending}
+          user={currentUser ?? undefined}
+          placeholder="Add class comment..."
+        />
       </div>
     </div>
   )

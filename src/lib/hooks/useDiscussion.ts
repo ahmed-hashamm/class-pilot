@@ -15,6 +15,7 @@ export interface DiscussionMessage {
   content: string
   created_at: string
   user_id: string
+  is_author_teacher: boolean
   users: {
     full_name: string | null
     avatar_url: string | null

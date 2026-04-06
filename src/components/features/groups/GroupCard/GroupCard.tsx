@@ -20,8 +20,8 @@ export default function GroupCard({
   onRemoveMember,
 }: GroupCardProps) {
   return (
-    <div className="group relative flex flex-col bg-white border border-navy/90 border-b-4 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-navy transition-all duration-300 ">
-      <div className="relative z-10 flex flex-col h-full overflow-hidden">
+    <div className="group relative flex flex-col border-b-4 rounded-2xl overflow-hidden shadow-md border border-navy hover:shadow-xl hover:-translate-y-1 hover:border-navy transition-all duration-300 ">
+      <div className="relative z-10 flex flex-col h-full overflow-hidden bg-navy/5 hover:bg-white transition-all duration-300 ">
         <GroupHeader
           group={group}
           isTeacher={isTeacher}
