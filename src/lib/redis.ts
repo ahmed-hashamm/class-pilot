@@ -63,6 +63,27 @@ export const redisSafe = {
   },
 
   /**
+   * Clears the cached profile for a user.
+   */
+  async invalidateUserCache(userId: string): Promise<void> {
+    await this.del(`user:profile:${userId}`)
+  },
+
+  /**
+   * Clears the cached metadata for a class.
+   */
+  async invalidateClassCache(classId: string): Promise<void> {
+    await this.del(`class:name:${classId}`)
+  },
+
+  /**
+   * Clears the cached role for a user in a specific class.
+   */
+  async invalidateRoleCache(classId: string, userId: string): Promise<void> {
+    await this.del(`role:class:${classId}:user:${userId}`)
+  },
+
+  /**
    * Clears the cached feed for a specific class.
    * Call this in actions when a new post is created.
    */

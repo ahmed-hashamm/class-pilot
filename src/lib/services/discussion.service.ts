@@ -17,6 +17,15 @@ export interface DiscussionMessage {
 
 export const DiscussionService = {
   async getMessages(classId: string, topic: DiscussionTopic, limit = 50, offset = 0) {
+    const { redisSafe } = await import('@/lib/redis')
+    const cacheKey = `discussion:messages:${classId}:${topic}`
+    
+    // Only cache the first page (offset 0) for performance
+    if (offset === 0) {
+      const cached = await redisSafe.get<any[]>(cacheKey)
+      if (cached) return cached
+    }
+
     const supabase = (await createClient() as unknown) as SupabaseClient<Database>
 
     // 1. Fetch Teacher ID to identify authoritative messages
@@ -40,10 +49,17 @@ export const DiscussionService = {
     if (error) throw error
 
     // 3. Map messages with is_author_teacher flag
-    return ((data as unknown as DiscussionMessage[]) || []).map(msg => ({
+    const messages = ((data as unknown as DiscussionMessage[]) || []).map(msg => ({
       ...msg,
       is_author_teacher: msg.user_id === teacherId
     }))
+
+    // 4. Cache first page for 30 seconds
+    if (offset === 0 && messages.length > 0) {
+      await redisSafe.set(cacheKey, messages, { ex: 30 })
+    }
+
+    return messages
   },
 
   async sendMessage(classId: string, topic: DiscussionTopic, content: string, userId: string) {
@@ -71,6 +87,10 @@ export const DiscussionService = {
     if (!data) throw new Error('Failed to create discussion message')
 
     const message = data as unknown as DiscussionMessage
+
+    // Invalidate first page cache
+    const { redisSafe } = await import('@/lib/redis')
+    await redisSafe.del(`discussion:messages:${classId}:${topic}`)
 
     return {
       ...message,

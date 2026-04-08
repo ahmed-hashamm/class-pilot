@@ -103,22 +103,8 @@ export const ClassService = {
   }) {
     const supabase = (await createClient() as unknown) as SupabaseClient<Database>
 
-    const { data: member } = await supabase
-      .from('class_members')
-      .select('role')
-      .eq('class_id', data.classId)
-      .eq('user_id', data.userId)
-      .maybeSingle()
-
-    const { data: classData } = await supabase
-      .from('classes')
-      .select('created_by')
-      .eq('id', data.classId)
-      .maybeSingle()
-
-    const isAuthorized = 
-      (member && (member as any).role === 'teacher') || 
-      (classData && (classData as any).created_by === data.userId)
+    const role = await this.getUserRole(data.classId, data.userId)
+    const isAuthorized = role === 'teacher'
 
     let query = supabase.from('announcements')
       .update({ 
@@ -149,16 +135,8 @@ export const ClassService = {
 
     if (!announcement) throw new Error("Announcement not found")
 
-    const { data: member } = await supabase
-      .from('class_members')
-      .select('role')
-      .eq('class_id', (announcement as any).class_id)
-      .eq('user_id', userId)
-      .maybeSingle()
-
-    const isAuthorized = 
-      ((announcement as any).created_by === userId) ||
-      (member && (member as any).role === 'teacher')
+    const role = await this.getUserRole((announcement as any).class_id, userId)
+    const isAuthorized = ((announcement as any).created_by === userId) || (role === 'teacher')
 
     if (!isAuthorized) throw new Error("Unauthorized")
 
@@ -304,13 +282,68 @@ export const ClassService = {
       description: data.description,
       settings: data.settings
     } as any).eq('id', data.classId).eq('created_by', data.userId)
+    
     if (error) throw error
+
+    // Invalidate cache
+    const { redisSafe } = await import('@/lib/redis')
+    await redisSafe.invalidateClassCache(data.classId)
   },
 
   async getClassName(classId: string) {
+    const { redisSafe } = await import('@/lib/redis')
+    const cacheKey = `class:name:${classId}`
+    
+    const cached = await redisSafe.get<string>(cacheKey)
+    if (cached) return cached
+
     const supabase = (await createClient() as unknown) as SupabaseClient<Database>
     const { data } = await supabase.from('classes').select('name').eq('id', classId).maybeSingle()
-    return (data as any)?.name || 'Class'
+    const name = (data as any)?.name || 'Class'
+    
+    if (data) {
+      await redisSafe.set(cacheKey, name, { ex: 1800 }) // 30 mins
+    }
+    
+    return name
+  },
+
+  async getUserRole(classId: string, userId: string): Promise<'teacher' | 'student' | null> {
+    const { redisSafe } = await import('@/lib/redis')
+    const cacheKey = `role:class:${classId}:user:${userId}`
+
+    const cached = await redisSafe.get<'teacher' | 'student'>(cacheKey)
+    if (cached) return cached
+
+    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    
+    // 1. Check if owner (teacher by default)
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', classId)
+      .maybeSingle()
+    
+    if (classData?.created_by === userId) {
+      await redisSafe.set(cacheKey, 'teacher', { ex: 600 }) // 10 mins
+      return 'teacher'
+    }
+
+    // 2. Check class_members table
+    const { data: member } = await supabase
+      .from('class_members')
+      .select('role')
+      .eq('class_id', classId)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    const role = (member as any)?.role || null
+    
+    if (role) {
+      await redisSafe.set(cacheKey, role, { ex: 600 }) // 10 mins
+    }
+
+    return role
   },
 
   async togglePin(data: { type: string; id: string; pinned: boolean; userId: string }) {
