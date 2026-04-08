@@ -66,7 +66,7 @@ export default function DiscussionMessage({ message, isOwn, isTeacher, onDelete 
         </div>
 
         <div className={cn(
-          "text-[13px] leading-snug break-words whitespace-pre-wrap p-2.5 rounded-2xl transition-all",
+          "text-[13px] leading-snug break-words whitespace-pre-wrap p-2 rounded-2xl transition-all",
           isOwn
             ? "bg-navy/[0.03] text-navy font-medium border border-navy/[0.05]"
             : "text-foreground/70"

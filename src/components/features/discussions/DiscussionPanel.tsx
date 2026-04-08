@@ -1,13 +1,15 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { Users2, Loader2, Sparkles } from 'lucide-react'
+import { Users2, Sparkles } from 'lucide-react'
 import { useDiscussion } from '@/lib/hooks/useDiscussion'
 import { DiscussionTopic } from '@/lib/validations/discussion'
 import DiscussionMessage from './DiscussionMessage'
 import DiscussionInput from './DiscussionInput'
 import { useQuery } from '@tanstack/react-query'
 import { getUserProfile } from '@/actions/UserActions'
+
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader'
 
 const TOPIC_LABELS: Record<DiscussionTopic, string> = {
   assignments: 'Work Discussion',
@@ -66,13 +68,14 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
       {/* Messages Area - GROW & SCROLL */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-1 pr-3 space-y-6 no-scrollbar pb-10 transition-all duration-300 min-h-0"
+        className="flex-1 overflow-y-auto px-1 pr-3 space-y-6 no-scrollbar pb-6 transition-all duration-300 min-h-0"
       >
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-3">
-            <Loader2 className="size-5 text-navy/20 animate-spin" />
+          <div className="py-2">
+            <SkeletonLoader variant="chat" count={3} />
           </div>
         ) : error ? (
+
           <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
             <p className="text-[12px] text-red-400 font-medium">Failed to load comments</p>
           </div>
@@ -98,7 +101,7 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
       </div>
 
       {/* Input - Now at the bottom */}
-      <div className="pt-6 border-t border-navy/[0.04] mt-auto">
+      <div className="pt-6 border-t border-navy/[0.06] mt-auto">
         <DiscussionInput
           onSend={send}
           sending={sending}

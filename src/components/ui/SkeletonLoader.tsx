@@ -3,7 +3,7 @@
 import React from 'react'
 
 interface SkeletonLoaderProps {
-  variant?: 'card' | 'list' | 'text' | 'form' | 'header'
+  variant?: 'card' | 'list' | 'text' | 'form' | 'header' | 'chat'
   count?: number
 }
 
@@ -81,12 +81,31 @@ export function SkeletonLoader({ variant = 'card', count = 1 }: SkeletonLoaderPr
     </div>
   )
 
+  const ChatSkeleton = () => (
+    <div className="w-full space-y-8 animate-pulse">
+      {items.map((_, i) => (
+        <div key={i} className="flex items-start gap-4">
+          <div className="size-8 rounded-full bg-secondary/30 shrink-0" />
+          <div className="flex-1 space-y-3">
+            <div className="h-3 bg-secondary/30 rounded-full w-24" />
+            <div className="space-y-2">
+              <div className="h-3 bg-secondary/10 rounded-full w-4/5" />
+              <div className="h-3 bg-secondary/10 rounded-full w-2/3" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
   if (variant === 'list') return <ListSkeleton />
   if (variant === 'form') return <FormSkeleton />
   if (variant === 'header') return <HeaderSkeleton />
+  if (variant === 'chat') return <ChatSkeleton />
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {items.map((_, i) => <CardSkeleton key={i} />)}
     </div>
   )
 }
+
