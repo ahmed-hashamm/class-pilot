@@ -9,6 +9,7 @@ import {
   getDiscussionMessageById 
 } from '@/actions/DiscussionActions'
 import { DiscussionTopic } from '@/lib/validations/discussion'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 export interface DiscussionMessage {
   id: string
@@ -23,49 +24,40 @@ export interface DiscussionMessage {
 }
 
 export function useDiscussion(classId: string, topic: DiscussionTopic, userId: string) {
-  const [messages, setMessages] = useState<DiscussionMessage[]>([])
-  const [loading, setLoading] = useState(true)
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [status, setStatus] = useState<'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'ERROR' | 'JOINING'>('JOINING')
-  
+  const queryClient = useQueryClient()
   const mountedRef = useRef(true)
+  const [sending, setSending] = useState(false)
+  const [errorVisible, setErrorVisible] = useState<string | null>(null)
+  const [status, setStatus] = useState<'SUBSCRIBED' | 'TIMED_OUT' | 'CLOSED' | 'ERROR' | 'JOINING'>('JOINING')
 
-  // Initial fetch
+  // Using React Query for persistent caching across tab unmounts
+  const { 
+    data: messages = [], 
+    isLoading: loading,
+    error: queryError
+  } = useQuery({
+    queryKey: ['discussion', classId, topic],
+    queryFn: async () => {
+      const result = await getDiscussionMessages({ classId, topic, limit: 50, offset: 0 })
+      if (result.error) throw new Error(result.error)
+      return result.data as DiscussionMessage[]
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes fresh
+    gcTime: 1000 * 60 * 30, // Keep in memory for 30 mins
+  })
+
   useEffect(() => {
     mountedRef.current = true
-    setLoading(true)
-    setError(null)
+    return () => { mountedRef.current = false }
+  }, [])
 
-    getDiscussionMessages({ classId, topic, limit: 50, offset: 0 })
-      .then((result) => {
-        if (!mountedRef.current) return
-        if (result.error) {
-          setError(result.error)
-        } else {
-          setMessages((result.data as DiscussionMessage[]) || [])
-        }
-      })
-      .catch(() => {
-        if (mountedRef.current) setError('Failed to load messages')
-      })
-      .finally(() => {
-        if (mountedRef.current) setLoading(false)
-      })
-
-    return () => { 
-      mountedRef.current = false 
-    }
-  }, [classId, topic])
-
-  // Real-time subscription
+  // Real-time subscription - syncs with React Query cache
   useEffect(() => {
     if (!classId || !topic) return
     
     const supabase = createClient()
-    
-    // KNOWN: Using a simplified channel name to avoid subscription errors in some environments
     const channelName = `class_discussion_${classId}_${topic}`
+    
     const channel = supabase
       .channel(channelName)
       .on(
@@ -80,15 +72,19 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
           const newMsg = payload.new as any
           if (newMsg.topic !== topic) return
 
-          // KNOWN: Fetch full message detail via Server Action to keep business logic on server
+          // Fetch full message detail to get user avatar/name
           const result = await getDiscussionMessageById({ messageId: newMsg.id })
 
           if (result.data && mountedRef.current) {
-            setMessages((prev) => {
-              // Deduplicate: check if message was already added via optimistic update
-              if (prev.some((m) => m.id === (result.data as any).id)) return prev
-              return [...prev, result.data as unknown as DiscussionMessage]
-            })
+            const fullMsg = result.data as unknown as DiscussionMessage
+            // Update React Query cache directly
+            queryClient.setQueryData<DiscussionMessage[]>(
+              ['discussion', classId, topic],
+              (prev = []) => {
+                if (prev.some((m) => m.id === fullMsg.id)) return prev
+                return [...prev, fullMsg]
+              }
+            )
           }
         }
       )
@@ -102,28 +98,27 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
         },
         (payload) => {
           const oldMsg = payload.old as any
-          if (mountedRef.current) {
-            setMessages((prev) => prev.filter((m) => m.id !== oldMsg.id))
-          }
+          queryClient.setQueryData<DiscussionMessage[]>(
+            ['discussion', classId, topic],
+            (prev = []) => prev.filter((m) => m.id !== oldMsg.id)
+          )
         }
       )
       .subscribe((status) => {
-        if (mountedRef.current) {
-          setStatus(status as any)
-        }
+        if (mountedRef.current) setStatus(status as any)
       })
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [classId, topic])
+  }, [classId, topic, queryClient])
 
   const send = useCallback(async (content: string) => {
     const trimmed = content.trim()
     if (!trimmed || !userId) return
     
     setSending(true)
-    setError(null)
+    setErrorVisible(null)
     
     try {
       const result = await sendDiscussionMessage({ 
@@ -133,46 +128,53 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
       })
       
       if (result.error) {
-        setError(result.error)
+        setErrorVisible(result.error)
         return
       }
 
-      // Optimistic update using payload from Server Action
+      // Optimistically update React Query cache
       if (result.data && mountedRef.current) {
         const newMessage = result.data as unknown as DiscussionMessage
-        setMessages((prev) => {
-          if (prev.some(m => m.id === newMessage.id)) return prev
-          return [...prev, newMessage]
-        })
+        queryClient.setQueryData<DiscussionMessage[]>(
+          ['discussion', classId, topic],
+          (prev = []) => {
+            if (prev.some(m => m.id === newMessage.id)) return prev
+            return [...prev, newMessage]
+          }
+        )
       }
     } catch (err) {
-      setError('Failed to send message')
+      setErrorVisible('Failed to send message')
     } finally {
-      if (mountedRef.current) {
-        setSending(false)
-      }
+      if (mountedRef.current) setSending(false)
     }
-  }, [classId, topic, userId])
+  }, [classId, topic, userId, queryClient])
 
   const remove = useCallback(async (messageId: string) => {
     try {
-      // Optimistically remove
-      setMessages((prev) => prev.filter(m => m.id !== messageId))
+      // Optimistically remove from cache
+      queryClient.setQueryData<DiscussionMessage[]>(
+        ['discussion', classId, topic],
+        (prev = []) => prev.filter(m => m.id !== messageId)
+      )
       
       const result = await deleteDiscussionMessage({ messageId, classId })
       if (result.error) {
-        setError(result.error)
+        setErrorVisible(result.error)
+        // If error, we might want to invalidate and re-fetch to restore the message
+        queryClient.invalidateQueries({ queryKey: ['discussion', classId, topic] })
       }
     } catch (err) {
-      setError('Failed to delete message')
+      setErrorVisible('Failed to delete message')
+      queryClient.invalidateQueries({ queryKey: ['discussion', classId, topic] })
     }
-  }, [classId])
+  }, [classId, topic, queryClient])
 
   return { 
     messages, 
     loading, 
     sending, 
-    error, 
+    error: errorVisible || (queryError as any)?.message || null, 
     status,
     send, 
     remove 

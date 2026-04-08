@@ -70,12 +70,11 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-1 pr-3 space-y-6 no-scrollbar pb-6 transition-all duration-300 min-h-0"
       >
-        {loading ? (
+        {loading && messages.length === 0 ? (
           <div className="py-2">
             <SkeletonLoader variant="chat" count={3} />
           </div>
         ) : error ? (
-
           <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
             <p className="text-[12px] text-red-400 font-medium">Failed to load comments</p>
           </div>
