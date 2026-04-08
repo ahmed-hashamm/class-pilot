@@ -18,7 +18,7 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
     <>
       {/* Floating Button */}
       <motion.button
-        whileHover={{ scale: 1.05 }}
+
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2
@@ -28,7 +28,12 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
           group"
       >
         <Sparkles size={16} className="text-yellow" />
-        <span className="text-[13px] font-semibold">Ask Class AI</span>
+        {/*animate the opening of the text */}
+        <motion.span
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="text-[13px] font-semibold">Ask Class AI</motion.span>
       </motion.button>
 
       {/* Modal Overlay */}
@@ -58,9 +63,9 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
             >
 
               {/* Chat Content */}
-              <ClassChat 
-                classId={classId} 
-                onClose={() => setOpen(false)} 
+              <ClassChat
+                classId={classId}
+                onClose={() => setOpen(false)}
               />
             </motion.div>
           </div>

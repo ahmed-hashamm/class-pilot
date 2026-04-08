@@ -39,9 +39,8 @@ export function GroupGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 divide-y-2">
+    <div className="grid grid-cols-1 gap-5">
       {groups.map((group) => (
-
         <GroupCard
           key={group.id}
           group={group}
@@ -50,8 +49,6 @@ export function GroupGrid({
           onDelete={() => onDelete(group)}
           onRemoveMember={onRemoveMember}
         />
-
-
       ))}
     </div>
   )
