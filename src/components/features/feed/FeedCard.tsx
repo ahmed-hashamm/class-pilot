@@ -86,11 +86,6 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
         isLoading={deleting}
       />
       <div className={`bg-navy/5 hover:bg-white border rounded-md  hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 border-b-4 border-navy/90`}>
-
-        {/* Pinned Accent Bar */}
-        {/* {isPinned && (
-          <div className="absolute left-0 top-6 bottom-6 w-1 bg-navy shadow-[0_0_10px_rgba(251,191,36,0.3)] z-10 rounded-r-full rounded-bl-xl" />
-        )} */}
         {/* Top glow on hover */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="p-4 flex flex-col gap-3.5">
@@ -104,7 +99,7 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                 <h4 className="font-bold text-[14px] text-foreground leading-tight flex-1 break-all overflow-hidden">
                   {item.title || item.question || (item.type === "material" ? "Class Material" : "Post")}
                 </h4>
-                {isPinned && <PinOff size={12} className="text-navy" />}
+                {isPinned && <Pin size={11} fill="currentColor" />}
                 {isTeacher && (
                   <div className="shrink-0 relative">
                     <Button

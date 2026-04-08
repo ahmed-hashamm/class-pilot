@@ -27,17 +27,17 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed top-14 inset-0 z-[100] flex items-center justify-center p-4">
         <div
           className="absolute inset-0 bg-navy/40 backdrop-blur-sm"
           onClick={() => !isSaving && !isDeleting && onClose()}
         />
 
-        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
           {/* Header */}
-          <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
+          <div className="p-4 px-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
             <h2 className="text-xl font-bold text-navy flex items-center gap-2">
-              <Settings size={20} className="text-secondary" />
+              <Settings size={20} className="text-muted-foreground" />
               Class Settings
             </h2>
             <Button
@@ -52,7 +52,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
           </div>
 
           {/* Scrollable Content */}
-          <div className="p-8 space-y-8 overflow-y-auto no-scrollbar">
+          <div className="p-8 py-4 space-y-8 overflow-y-auto no-scrollbar">
             <div className="space-y-4">
               <h3 className="text-xs font-black text-navy/30 uppercase tracking-[0.2em]">General Info</h3>
 
@@ -140,7 +140,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
           {/* Footer */}
           <div className="p-6 bg-zinc-50/80 border-t border-zinc-100 flex flex-col-reverse sm:flex-row gap-3">
             <Button
-              variant="secondary"
+              variant="outline"
               onClick={onClose}
               disabled={isSaving || isDeleting}
               className="w-full sm:flex-1 py-3 rounded-xl border border-zinc-200"

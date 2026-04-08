@@ -18,23 +18,29 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
     <>
       {/* Floating Button */}
       <motion.button
-
+        initial="rest"
+        animate="rest"
+        whileHover="hover"
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2
-          rounded-xl bg-navy px-5 py-3 text-white shadow-lg
-          hover:bg-navy/90
-          transition-all cursor-pointer border-none
-          group"
+        className="fixed bottom-6 right-6 z-40 flex items-center
+          rounded-full bg-navy px-4 py-3.5 text-white shadow-xl
+          hover:bg-navy/90 border-none cursor-pointer
+          group transition-all duration-300"
       >
-        <Sparkles size={16} className="text-yellow" />
-        {/*animate the opening of the text */}
+        <Sparkles size={18} className="text-yellow shrink-0" />
         <motion.span
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="text-[13px] font-semibold">Ask Class AI</motion.span>
+          variants={{
+            rest: { width: 0, opacity: 0, marginLeft: 0 },
+            hover: { width: 'auto', opacity: 1, marginLeft: 10 }
+          }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="text-[13px] font-bold tracking-wide overflow-hidden whitespace-nowrap"
+        >
+          Ask Class AI
+        </motion.span>
       </motion.button>
+
 
       {/* Modal Overlay */}
       <AnimatePresence>
