@@ -47,7 +47,7 @@ export default function DiscussionPanel({ classId, topic, userId, isTeacher, hid
   }, [messages])
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-220px)]">
+    <div className="flex flex-col w-full h-[calc(100vh-220px)] lg:pl-2 lg:border-l-4 rounded-l-lg border-navy/10">
       {/* Minimal Header - Dynamic Label */}
       {!hideHeader && (
         <div className="flex items-center gap-2 mb-6 px-1 shrink-0">

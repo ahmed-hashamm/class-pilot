@@ -11,7 +11,7 @@ interface GroupHeaderProps {
 
 export default function GroupHeader({ group, isTeacher, onEdit, onDelete }: GroupHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-3 px-6 py-4 ">
+    <div className="flex items-start justify-between gap-3 p-2 px-6">
       <div className="flex flex-col min-w-0">
         <h3 className="font-black text-[15px] sm:text-[16px] text-navy uppercase tracking-widest leading-none truncate">
           {group.title}

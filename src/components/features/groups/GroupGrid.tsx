@@ -39,16 +39,20 @@ export function GroupGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      {groups.map((group) => (
-        <GroupCard
-          key={group.id}
-          group={group}
-          isTeacher={isTeacher}
-          onEdit={onEdit}
-          onDelete={() => onDelete(group)}
-          onRemoveMember={onRemoveMember}
-        />
+    <div className="grid grid-cols-1 gap-3">
+      {groups.map((group, i) => (
+        <>
+          <GroupCard
+            key={group.id}
+            group={group}
+            isTeacher={isTeacher}
+            onEdit={onEdit}
+            onDelete={() => onDelete(group)}
+            onRemoveMember={onRemoveMember}
+          />
+          {i !== groups.length - 1 && <div key={i} className=" border-b-2 rounded-b-xl border-navy/10 " />}
+        </>
+
       ))}
     </div>
   )

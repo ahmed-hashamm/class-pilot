@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users, PinOff } from "lucide-react";
+import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users, PinOff, PinIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import FeedItemIcon from "@/components/features/feed/FeedItemIcon";
@@ -85,17 +85,14 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
         variant="danger"
         isLoading={deleting}
       />
-      <div className={`bg-white rounded-xl border transition-all duration-300 relative group
-        ${isPinned
-          ? "border-navy/50 shadow-md bg-navy/[0.02]"
-          : "border-border hover:border-border/80 hover:shadow-sm"}
-        ${isAssignment ? "hover:shadow-md" : ""}`}>
+      <div className={`bg-navy/5 hover:bg-white border rounded-md  hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 border-b-4 border-navy/90`}>
 
         {/* Pinned Accent Bar */}
         {/* {isPinned && (
           <div className="absolute left-0 top-6 bottom-6 w-1 bg-navy shadow-[0_0_10px_rgba(251,191,36,0.3)] z-10 rounded-r-full rounded-bl-xl" />
         )} */}
-
+        {/* Top glow on hover */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="p-4 flex flex-col gap-3.5">
           <div className="flex items-start gap-4">
             <div className={`shrink-0 size-10 rounded-xl flex items-center justify-center shadow-sm ${theme.bgColor} ${theme.iconColor}`}>
@@ -103,16 +100,17 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-3 mb-1 w-full">
+              <div className="flex items-center justify-between gap-1 mb-1 w-full">
                 <h4 className="font-bold text-[14px] text-foreground leading-tight flex-1 break-all overflow-hidden">
                   {item.title || item.question || (item.type === "material" ? "Class Material" : "Post")}
                 </h4>
-                {isTeacher && (item.type === "announcement" || item.type === "assignment" || item.type === "material" || item.type === "poll" || item.type === "attendance") && (
+                {isPinned && <PinOff size={12} className="text-navy" />}
+                {isTeacher && (
                   <div className="shrink-0 relative">
-                    <Button 
+                    <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setMenuOpen(!menuOpen)} 
+                      onClick={() => setMenuOpen(!menuOpen)}
                       className="p-1.5 h-auto w-auto text-muted-foreground hover:text-foreground hover:bg-secondary"
                     >
                       <MoreVertical size={14} />
@@ -151,7 +149,7 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                           </Button>
 
                           {item.type === "announcement" && (
-                            <Button 
+                            <Button
                               variant="ghost"
                               className="w-full justify-start gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-foreground hover:bg-secondary h-auto rounded-none"
                               onClick={() => { setMenuOpen(false); setEditOpen(true); }}
@@ -159,10 +157,10 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                               <Pencil size={13} className="text-navy" /> Edit
                             </Button>
                           )}
-                          <Button 
+                          <Button
                             variant="ghost"
                             className="w-full justify-start gap-2.5 px-4 py-2.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 h-auto rounded-none"
-                            onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }} 
+                            onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); }}
                             disabled={deleting}
                           >
                             <Trash2 size={13} /> Delete
