@@ -83,11 +83,11 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
             <Users className="text-accent" size={24} />
             Join Classroom
           </h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onClose} 
-            disabled={isSubmitting} 
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            disabled={isSubmitting}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-2 h-auto"
           >
             <X size={24} />
@@ -106,6 +106,7 @@ export default function JoinClassModal({ userId, onClose, onSuccess }: JoinClass
               placeholder="e.g. ABC123"
               {...register('classCode')}
               className="text-lg tracking-widest font-mono text-navy uppercase"
+              autoFocus
             />
             {errors.classCode && (
               <p className="text-sm font-medium text-red-600">{errors.classCode.message}</p>

@@ -13,10 +13,15 @@ export default function BlogsPageClock() {
                 {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => {
                     const rad = ((deg - 90) * Math.PI) / 180;
                     const r1 = i % 3 === 0 ? 36 : 38;
+                    const x1 = (100 + r1 * Math.cos(rad)).toFixed(2);
+                    const y1 = (100 + r1 * Math.sin(rad)).toFixed(2);
+                    const x2 = (100 + 42 * Math.cos(rad)).toFixed(2);
+                    const y2 = (100 + 42 * Math.sin(rad)).toFixed(2);
+
                     return (
                         <line key={i}
-                            x1={100 + r1 * Math.cos(rad)} y1={100 + r1 * Math.sin(rad)}
-                            x2={100 + 42 * Math.cos(rad)} y2={100 + 42 * Math.sin(rad)}
+                            x1={x1} y1={y1}
+                            x2={x2} y2={y2}
                             stroke={i % 3 === 0 ? "#043873" : "#E5E5E5"} strokeWidth={i % 3 === 0 ? 1.5 : 1}
                             strokeLinecap="round" />
                     );

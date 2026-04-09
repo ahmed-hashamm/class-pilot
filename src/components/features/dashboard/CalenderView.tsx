@@ -116,15 +116,13 @@ export default function CalenderView({ assignments }: CalenderViewProps) {
           return (
             <div
               key={day}
-              className={`bg-white min-h-[130px] p-2 flex flex-col gap-2 ${
-                isToday ? "bg-blue-50/20" : ""
-              }`}
+              className={`bg-white min-h-[130px] p-2 flex flex-col gap-2 ${isToday ? "bg-blue-50/20" : ""
+                }`}
             >
               <div className="flex items-center justify-end w-full">
                 <span
-                  className={`inline-flex items-center justify-center w-7 h-7 rounded-sm text-sm font-semibold ${
-                    isToday ? "bg-navy text-yellow rounded-md" : "text-slate-700"
-                  }`}
+                  className={`inline-flex items-center justify-center w-7 h-7 rounded-sm text-sm font-semibold ${isToday ? "bg-navy text-yellow rounded-md" : "text-slate-700"
+                    }`}
                 >
                   {day}
                 </span>
@@ -134,22 +132,21 @@ export default function CalenderView({ assignments }: CalenderViewProps) {
               <div className="flex flex-col gap-1.5 overflow-y-auto overflow-x-hidden max-h-[85px] custom-scrollbar">
                 {dayAssignments.map((a) => {
                   const href = a.classes ? `/classes/${a.classes.id}/assignments/${a.id}` : '#';
-                  
+
                   return (
                     <Link
                       key={a.id}
                       href={href}
                       title={a.title}
-                      className={`px-2 py-1.5 rounded-md text-[11px] font-medium truncate border flex items-center gap-1.5 transition-shadow hover:shadow-sm ${
-                        a.isDone
+                      className={`px-2 py-1.5 rounded-md text-[11px] font-medium truncate border flex items-center gap-1.5 transition-shadow hover:shadow-sm ${a.isDone
                           ? "bg-green-50 border-green-200 text-green-700 hover:border-green-300"
                           : "bg-white border-slate-200 text-slate-800 hover:border-slate-300"
-                      }`}
+                        }`}
                     >
                       {a.isDone ? (
                         <CheckCircle2 size={13} className="text-green-600 flex-shrink-0" />
                       ) : (
-                        <Circle size={13} className="text-yellow flex-shrink-0" />
+                        <Circle size={13} className="text-orange-600 flex-shrink-0" />
                       )}
                       <span className="truncate">{a.title}</span>
                     </Link>

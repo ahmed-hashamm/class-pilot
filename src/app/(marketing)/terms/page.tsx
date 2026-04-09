@@ -4,30 +4,49 @@ import LegalPageLayout, { P, UL, LI, A, Strong, Section } from "@/components/lay
 import { TERMS_SECTIONS, PRIVACY_SECTIONS } from "@/lib/data/marketing/terms";
 import React from "react";
 
+interface MarketingDataSection {
+  title: string;
+  intro?: string;
+  paragraphs?: string[];
+  list?: string[];
+  paragraphsAfter?: string[];
+  footer?: string;
+}
+
+/**
+ * Helper to render text with **bold** markers
+ */
+function formatText(text: string) {
+  if (!text.includes("**")) return text;
+  return text.split("**").map((part, i) => (
+    i % 2 === 1 ? <Strong key={i}>{part}</Strong> : part
+  ));
+}
+
 /**
  * Helper to render sections from data
  */
-function renderDataSections(data: any[]): Section[] {
+function renderDataSections(data: MarketingDataSection[]): Section[] {
   return data.map((section) => ({
     title: section.title,
     content: (
       <React.Fragment>
         {section.intro && <P>{section.intro}</P>}
-        {section.paragraphs && section.paragraphs.map((p: string, idx: number) => (
-          <P key={idx}>{p.includes('**') ? p.split('**').map((part, i) => i % 2 === 1 ? <Strong key={i}>{part}</Strong> : part) : p}</P>
+        {section.paragraphs && section.paragraphs.map((p, idx) => (
+          <P key={idx}>{formatText(p)}</P>
         ))}
         {section.list && (
           <UL>
-            {section.list.map((item: string, idx: number) => (
-              <LI key={idx}>{item.includes('**') ? item.split('**').map((part, i) => i % 2 === 1 ? <Strong key={i}>{part}</Strong> : part) : item}</LI>
+            {section.list.map((item, idx) => (
+              <LI key={idx}>{formatText(item)}</LI>
             ))}
           </UL>
         )}
-        {section.paragraphsAfter && section.paragraphsAfter.map((p: string, idx: number) => (
-          <P key={idx}>{p.includes('**') ? p.split('**').map((part, i) => i % 2 === 1 ? <Strong key={i}>{part}</Strong> : part) : p}</P>
+        {section.paragraphsAfter && section.paragraphsAfter.map((p, idx) => (
+          <P key={idx}>{formatText(p)}</P>
         ))}
         {section.footer && (
-          <P>{section.footer.includes('**') ? section.footer.split('**').map((part, i) => i % 2 === 1 ? <Strong key={i}>{part}</Strong> : part) : section.footer}</P>
+          <P>{formatText(section.footer)}</P>
         )}
       </React.Fragment>
     ),
