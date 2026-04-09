@@ -1,12 +1,64 @@
 "use client";
 
-import LegalPageLayout, { P, UL, LI, A, Strong } from "@/components/layout/LegalPageLayout";
+import LegalPageLayout, { P, UL, LI, A, Strong, Section } from "@/components/layout/LegalPageLayout";
+import { ACCESSIBILITY_SECTIONS } from "@/lib/data/marketing/accessibility";
+import React from "react";
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   ACCESSIBILITY STATEMENT
-   Route: /accessibility
-───────────────────────────────────────────────────────────────────────────── */
+/**
+ * Helper to render sections from data with simple markdown-like support
+ */
+function renderContent(text: string) {
+  // Simple Link support [text](url)
+  const linkRegex = /\[(.*?)\]\((.*?)\)/g;
+  const parts = text.split(linkRegex);
+  
+  if (parts.length === 1) {
+    // Basic Strong support **text**
+    return text.includes('**') 
+      ? text.split('**').map((part, i) => i % 2 === 1 ? <Strong key={i}>{part}</Strong> : part) 
+      : text;
+  }
+
+  const result = [];
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 3 === 0) {
+      const p = parts[i];
+      result.push(p.includes('**') 
+        ? p.split('**').map((part, j) => j % 2 === 1 ? <Strong key={`${i}-${j}`}>{part}</Strong> : part) 
+        : p);
+    } else if (i % 3 === 1) {
+      result.push(<A key={i} href={parts[i+1]}>{parts[i]}</A>);
+      i++; // skip url part
+    }
+  }
+  return result;
+}
+
+function renderDataSections(data: any[]): Section[] {
+  return data.map((section) => ({
+    title: section.title,
+    content: (
+      <React.Fragment>
+        {section.intro && <P>{renderContent(section.intro)}</P>}
+        {section.paragraphs && section.paragraphs.map((p: string, idx: number) => (
+          <P key={idx}>{renderContent(p)}</P>
+        ))}
+        {section.list && (
+          <UL>
+            {section.list.map((item: string, idx: number) => (
+              <LI key={idx}>{renderContent(item)}</LI>
+            ))}
+          </UL>
+        )}
+        {section.footer && <P>{renderContent(section.footer)}</P>}
+      </React.Fragment>
+    ),
+  }));
+}
+
 export default function AccessibilityPage() {
+  const sections = renderDataSections(ACCESSIBILITY_SECTIONS);
+
   return (
     <LegalPageLayout
       badge="Accessibility"
@@ -14,140 +66,7 @@ export default function AccessibilityPage() {
       subtitle="Class Pilot is committed to making education technology accessible to every teacher and student, regardless of ability."
       lastUpdated="March 2026"
       sections={[
-
-        {
-          title: "Our Commitment",
-          content: (
-            <>
-              <P>
-                Class Pilot is committed to ensuring that our platform is accessible to people
-                with disabilities. We believe that every teacher and student deserves equal
-                access to the tools they need to teach and learn effectively.
-              </P>
-              <P>
-                We aim to conform to the{" "}
-                <A href="https://www.w3.org/WAI/standards-guidelines/wcag/">
-                  Web Content Accessibility Guidelines (WCAG) 2.1
-                </A>{" "}
-                at Level AA. This is an ongoing effort — we are actively working to improve
-                the accessibility of all areas of the platform.
-              </P>
-            </>
-          ),
-        },
-
-        {
-          title: "What We've Done",
-          content: (
-            <>
-              <P>
-                The following accessibility measures are currently in place across Class Pilot:
-              </P>
-              <UL>
-                <LI><Strong>Keyboard navigation:</Strong> All interactive elements — buttons, links, form fields, and modals — are reachable and operable via keyboard alone</LI>
-                <LI><Strong>Screen reader support:</Strong> We use semantic HTML and ARIA labels throughout the interface to ensure compatibility with screen readers such as NVDA, JAWS, and VoiceOver</LI>
-                <LI><Strong>Colour contrast:</Strong> Text and UI elements meet or exceed WCAG AA contrast ratio requirements (4.5:1 for normal text, 3:1 for large text)</LI>
-                <LI><Strong>Focus indicators:</Strong> Visible focus outlines are present on all interactive elements so keyboard users can track their position on the page</LI>
-                <LI><Strong>Responsive design:</Strong> The platform works at all screen sizes and supports browser zoom up to 200% without loss of content or functionality</LI>
-                <LI><Strong>Alternative text:</Strong> All meaningful images include descriptive alt text. Decorative images are marked as presentational</LI>
-                <LI><Strong>Form labels:</Strong> All form inputs have associated labels and clear error messages</LI>
-                <LI><Strong>Consistent navigation:</Strong> Navigation menus and page structure are consistent and predictable across the platform</LI>
-              </UL>
-            </>
-          ),
-        },
-
-        {
-          title: "Known Limitations",
-          content: (
-            <>
-              <P>
-                While we strive for full WCAG 2.1 AA compliance, there are some areas we are
-                still working to improve:
-              </P>
-              <UL>
-                <LI>
-                  <Strong>AI-generated content:</Strong> Feedback and answers generated by
-                  our AI features may occasionally use formatting that is not fully optimised
-                  for screen readers. We are working to improve how AI output is structured
-                  and announced.
-                </LI>
-                <LI>
-                  <Strong>Rich text editor:</Strong> The assignment submission editor has
-                  limited screen reader support in some browsers. A plain text fallback
-                  is available for all submissions.
-                </LI>
-                <LI>
-                  <Strong>PDF attachments:</Strong> PDFs uploaded by teachers are not
-                  automatically made accessible. We recommend teachers upload accessible
-                  PDFs where possible.
-                </LI>
-              </UL>
-              <P>
-                We are actively working on all of the above and aim to address them in
-                upcoming releases.
-              </P>
-            </>
-          ),
-        },
-
-        {
-          title: "Supported Assistive Technologies",
-          content: (
-            <>
-              <P>
-                Class Pilot has been tested with the following assistive technologies:
-              </P>
-              <UL>
-                <LI>NVDA with Chrome (Windows)</LI>
-                <LI>JAWS with Chrome and Edge (Windows)</LI>
-                <LI>VoiceOver with Safari (macOS and iOS)</LI>
-                <LI>TalkBack with Chrome (Android)</LI>
-              </UL>
-              <P>
-                We also support high-contrast mode in Windows and the Increased Contrast
-                accessibility setting on macOS and iOS.
-              </P>
-            </>
-          ),
-        },
-
-        {
-          title: "Tips for Better Accessibility",
-          content: (
-            <>
-              <P>
-                You can adjust your experience using built-in browser and operating system
-                settings:
-              </P>
-              <UL>
-                <LI>
-                  <Strong>Increase text size:</Strong> Use your browser's zoom (Ctrl/Cmd +)
-                  or your operating system's accessibility text size settings
-                </LI>
-                <LI>
-                  <Strong>High contrast:</Strong> Enable high contrast mode in your OS settings
-                  — Class Pilot respects system-level contrast preferences
-                </LI>
-                <LI>
-                  <Strong>Reduce motion:</Strong> If you prefer reduced motion, enable the
-                  "Reduce Motion" setting on your device — our animations will be disabled
-                  automatically
-                </LI>
-                <LI>
-                  <Strong>Keyboard shortcuts:</Strong> Press <code className="text-[12px] font-mono
-                    bg-secondary border border-border rounded px-1.5 py-0.5">Tab</code> to
-                  move between elements and{" "}
-                  <code className="text-[12px] font-mono bg-secondary border border-border
-                    rounded px-1.5 py-0.5">Enter</code>{" "}
-                  or <code className="text-[12px] font-mono bg-secondary border border-border
-                    rounded px-1.5 py-0.5">Space</code> to activate buttons
-                </LI>
-              </UL>
-            </>
-          ),
-        },
-
+        ...sections,
         {
           title: "Feedback & Contact",
           content: (
@@ -166,14 +85,9 @@ export default function AccessibilityPage() {
                 If you need content in an alternative format, we will do our best to accommodate
                 your request.
               </P>
-              <P>
-                If you are not satisfied with our response, you may contact the relevant
-                accessibility enforcement body in your country.
-              </P>
             </>
           ),
         },
-
       ]}
     />
   );

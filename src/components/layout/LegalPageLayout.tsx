@@ -5,12 +5,12 @@ import { useReveal } from "@/lib/hooks/useReveal";
 /* ─────────────────────────────────────────────────────────────────────────────
    TYPES
 ───────────────────────────────────────────────────────────────────────────── */
-interface Section {
+export interface Section {
   title: string;
   content: React.ReactNode;
 }
 
-interface LegalPageLayoutProps {
+export interface LegalPageLayoutProps {
   badge: string;
   title: string;
   subtitle: string;
