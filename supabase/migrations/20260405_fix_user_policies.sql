@@ -12,7 +12,7 @@ CREATE POLICY "Users can view class members profile" ON public.users
     OR
     EXISTS (
       SELECT 1 FROM public.classes
-      WHERE teacher_id = auth.uid()
+      WHERE created_by = auth.uid()
         AND public.users.id IN (
           SELECT user_id FROM public.class_members WHERE class_id = classes.id
         )
@@ -20,7 +20,7 @@ CREATE POLICY "Users can view class members profile" ON public.users
     OR
     EXISTS (
       SELECT 1 FROM public.classes
-      WHERE teacher_id = public.users.id
+      WHERE created_by = public.users.id
         AND auth.uid() IN (
           SELECT user_id FROM public.class_members WHERE class_id = classes.id
         )
@@ -28,7 +28,7 @@ CREATE POLICY "Users can view class members profile" ON public.users
     OR
     EXISTS (
       SELECT 1 FROM public.classes
-      WHERE teacher_id = auth.uid()
+      WHERE created_by = auth.uid()
         AND public.users.id = auth.uid() -- redundant but safe
     )
   );

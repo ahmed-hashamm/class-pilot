@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '@/types/database';
 
 export class AuthService {
-  constructor(private supabase: SupabaseClient<any, any, any>) {}
+  constructor(private supabase: SupabaseClient<Database>) {}
 
   async signIn(email: string, password: string) {
     const { data, error } = await this.supabase.auth.signInWithPassword({
@@ -26,15 +26,13 @@ export class AuthService {
     if (error) throw error;
 
     if (data.user) {
-      const { error: profileError } = await this.supabase.from('users').insert({
+      await this.supabase.from('users').insert({
         id: data.user.id,
         email: data.user.email!,
         full_name: fullName,
         avatar_url: null,
       });
-      if (profileError) {
-        console.error('Profile creation error during signup:', profileError);
-      }
+      // Silent failure for profile creation if auth succeeded — can be fixed via profile page later.
     }
 
     return { data };

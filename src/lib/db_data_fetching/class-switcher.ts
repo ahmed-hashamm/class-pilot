@@ -24,7 +24,6 @@ export async function getClassSwitcherData(): Promise<SwitcherClass[]> {
     .eq('user_id', user.id)
 
   if (memberError) {
-    console.error('Error fetching switcher member data:', memberError)
     return []
   }
 
@@ -35,7 +34,6 @@ export async function getClassSwitcherData(): Promise<SwitcherClass[]> {
     .eq('created_by', user.id)
 
   if (ownedError) {
-    console.error('Error fetching switcher owned data:', ownedError)
     return []
   }
 

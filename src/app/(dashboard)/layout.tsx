@@ -37,8 +37,7 @@ export default async function DashboardLayout({
     } as any)
 
     if (profileError) {
-      console.error('Failed to create user profile in layout:', profileError)
-      // Still render the page, but log the error
+      // Still render the page, but profile creation failed - standard silent fallback
     }
   }
 

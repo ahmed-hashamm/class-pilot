@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     ; (adminClient as any)
       .from('chat_history')
       .insert({ user_id: user.id, class_id: classId, role: 'user', content: question })
-      .then(({ error }: any) => { if (error) console.error('Failed to save user message:', error) })
+      .then(({ error }: any) => { /* Silent failure */ })
 
   // 3. Build enriched search query for vector retrieval
   const recentUserContext = (history || [])
@@ -144,7 +144,7 @@ export async function POST(req: Request) {
     ; (adminClient as any)
       .from('chat_history')
       .insert({ user_id: user.id, class_id: classId, role: 'assistant', content: answer || 'No response' })
-      .then(({ error }: any) => { if (error) console.error('Failed to save assistant message:', error) })
+      .then(({ error }: any) => { /* Silent failure */ })
 
   // 7. Log token usage (fire and forget)
   if (usage) {
@@ -154,7 +154,7 @@ export async function POST(req: Request) {
       model: 'gpt-4o-mini',
       input_tokens: usage.prompt_tokens,
       output_tokens: usage.completion_tokens,
-    }).then(({ error }) => { if (error) console.error('Failed to log AI usage:', error) })
+    }).then(({ error }) => { /* Silent failure */ })
   }
 
   return NextResponse.json({ answer })

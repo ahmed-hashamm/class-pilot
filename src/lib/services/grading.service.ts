@@ -10,10 +10,10 @@ export const GradingService = {
    * Extraction -> AI Grading -> Persistence
    */
   async performAIGrading(assignmentId: string, submissionId: string, teacherId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     // 1. Fetch submission + assignment + rubric
-    const { data: submission, error: submissionError } = await (supabase as any)
+    const { data: submission, error: submissionError } = await supabase
       .from('submissions')
       .select(`
         *,
@@ -41,10 +41,10 @@ export const GradingService = {
     }
 
     // 2. Auth check (teacher role)
-    const { data: member } = await (supabase as any)
+    const { data: member } = await supabase
       .from('class_members')
       .select('role')
-      .eq('class_id', assignment.class_id)
+      .eq('class_id', (assignment as any).class_id)
       .eq('user_id', teacherId)
       .maybeSingle()
 
@@ -65,7 +65,6 @@ export const GradingService = {
     const cachedResult = await redisSafe.get<any>(cacheKey)
 
     if (cachedResult) {
-      console.log(`[Redis Cache Hit] Returning cached grade for submission ${submissionId}`)
       return cachedResult
     }
 
@@ -95,9 +94,9 @@ export const GradingService = {
           }
         })
         
-        extractedText = await extractTextFromSubmission(supabase as any, attachments)
+        extractedText = await extractTextFromSubmission(supabase, attachments)
       } catch (err) {
-        console.error('[GradingService] Text extraction failed:', err)
+        // Silently fail text extraction as per production rules (or use a specialized logger)
       }
     }
 
@@ -129,7 +128,7 @@ export const GradingService = {
     await redisSafe.set(cacheKey, gradingResult, { ex: 86400 })
 
     // 5. Persist to DB as a draft
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('submissions')
       .update({
         ai_grade: gradingResult.total_score,
@@ -138,7 +137,6 @@ export const GradingService = {
       .eq('id', submissionId)
 
     if (updateError) {
-      console.error('[GradingService] DB update failed:', updateError)
       throw new Error(`Failed to save AI grade: ${updateError.message}`)
     }
 
@@ -149,10 +147,10 @@ export const GradingService = {
    * Finalizes the grade for a submission.
    */
   async updateFinalGrade(submissionId: string, teacherId: string, score: number) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     // 1. Fetch submission to get class_id
-    const { data: submission, error: subError } = await (supabase as any)
+    const { data: submission, error: subError } = await supabase
       .from('submissions')
       .select('*, assignments(class_id)')
       .eq('id', submissionId)
@@ -161,10 +159,10 @@ export const GradingService = {
     if (subError || !submission) throw new Error('Submission not found')
 
     // 2. Auth check
-    const { data: member } = await (supabase as any)
+    const { data: member } = await supabase
       .from('class_members')
       .select('role')
-      .eq('class_id', submission.assignments?.class_id)
+      .eq('class_id', (submission as any).assignments?.class_id)
       .eq('user_id', teacherId)
       .maybeSingle()
 
@@ -173,7 +171,7 @@ export const GradingService = {
     }
 
     // 3. Update grade
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('submissions')
       .update({ 
         final_grade: score, 
@@ -191,10 +189,10 @@ export const GradingService = {
    * Updates the manual grade and feedback for a submission.
    */
   async updateManualGrade(submissionId: string, teacherId: string, score: number, feedback: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     // 1. Fetch submission to get class_id
-    const { data: submission, error: subError } = await (supabase as any)
+    const { data: submission, error: subError } = await supabase
       .from('submissions')
       .select('*, assignments(class_id)')
       .eq('id', submissionId)
@@ -203,10 +201,10 @@ export const GradingService = {
     if (subError || !submission) throw new Error('Submission not found')
 
     // 2. Auth check
-    const { data: member } = await (supabase as any)
+    const { data: member } = await supabase
       .from('class_members')
       .select('role')
-      .eq('class_id', submission.assignments?.class_id)
+      .eq('class_id', (submission as any).assignments?.class_id)
       .eq('user_id', teacherId)
       .maybeSingle()
 
@@ -215,7 +213,7 @@ export const GradingService = {
     }
 
     // 3. Update grade
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('submissions')
       .update({ 
         manual_grade: score, 

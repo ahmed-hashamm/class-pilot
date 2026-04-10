@@ -25,7 +25,6 @@ export async function extractTextFromBuffer(buffer: Buffer, fileType: string): P
       return buffer.toString('utf-8')
 
     default:
-      console.warn(`[extract-text] Unsupported file type: ${type}`)
       return ''
   }
 }
@@ -74,7 +73,6 @@ async function extractTextFromFiles(
       .download(attachment.path)
 
     if (error || !data) {
-      console.error(`[extract-text] Failed to download ${attachment.path}:`, error)
       return ''
     }
 
@@ -92,7 +90,6 @@ async function extractPdf(buffer: Buffer): Promise<string> {
     const result = await pdfParse(buffer)
     return result.text + '\n'
   } catch (err) {
-    console.error('[extract-text] PDF extraction failed:', err)
     return ''
   }
 }
@@ -103,7 +100,6 @@ async function extractDocx(buffer: Buffer): Promise<string> {
     const result = await mammoth.extractRawText({ buffer })
     return result.value + '\n'
   } catch (err) {
-    console.error('[extract-text] DOCX extraction failed:', err)
     return ''
   }
 }
@@ -141,7 +137,6 @@ async function extractPptx(buffer: Buffer): Promise<string> {
 
     return slideTexts.join('\n\n') + '\n'
   } catch (err) {
-    console.error('[extract-text] PPTX extraction failed:', err)
     return ''
   }
 }

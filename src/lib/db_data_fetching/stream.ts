@@ -34,7 +34,6 @@ export async function getStreamFeed(classId: string): Promise<StreamItem[]> {
   // 1. Check cache first
   const cached = await redisSafe.get<StreamItem[]>(cacheKey)
   if (cached) {
-    console.log(`[Redis Cache Hit] Serving feed for class ${classId}`)
     return cached
   }
 

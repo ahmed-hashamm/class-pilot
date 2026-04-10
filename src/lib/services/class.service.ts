@@ -16,7 +16,7 @@ export interface Note {
 
 export const ClassService = {
   async getStickyNotes(classId: string, userId: string): Promise<Note[]> {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data } = await supabase
       .from("class_notes")
       .select("id, content, created_at")
@@ -24,11 +24,11 @@ export const ClassService = {
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
     
-    return (data as any) ?? []
+    return (data as Note[]) ?? []
   },
 
   async addStickyNote(classId: string, userId: string, content: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase.from("class_notes").insert({
       class_id: classId,
       user_id: userId,
@@ -38,7 +38,7 @@ export const ClassService = {
   },
 
   async clearStickyNotes(classId: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase
       .from("class_notes")
       .delete()
@@ -48,7 +48,7 @@ export const ClassService = {
   },
 
   async uploadFiles(files: File[], classId: string, bucket: string): Promise<string[]> {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const paths: string[] = []
 
     for (const file of files) {
@@ -56,12 +56,12 @@ export const ClassService = {
         const safeName = file.name.replace(/[^a-z0-9.]/gi, '_')
         const fileName = `${Date.now()}-${safeName}`
 
-        const { data, error: uploadError } = await (supabase.storage
-          .from(bucket) as any)
+        const { data, error: uploadError } = await supabase.storage
+          .from(bucket)
           .upload(`${classId}/${fileName}`, file)
 
         if (uploadError) throw new Error(`Upload to ${bucket} failed: ${uploadError.message}`)
-        paths.push(data.path)
+        if (data) paths.push(data.path)
       }
     }
     return paths
@@ -76,7 +76,7 @@ export const ClassService = {
     pinned: boolean
     deadline: string | null
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error: dbError } = await supabase
       .from('announcements')
       .insert({
@@ -101,7 +101,7 @@ export const ClassService = {
     allPaths: string[]
     pinned: boolean
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     const role = await this.getUserRole(data.classId, data.userId)
     const isAuthorized = role === 'teacher'
@@ -126,7 +126,7 @@ export const ClassService = {
   },
 
   async deleteAnnouncement(id: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: announcement } = await supabase
       .from('announcements')
       .select('class_id, created_by')
@@ -146,7 +146,7 @@ export const ClassService = {
   },
 
   async createMaterial(data: { title: string; description: string | null; classId: string; userId: string; attachmentPaths: string[]; fileTypes: string[]; pinned: boolean }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: inserted, error } = await supabase.from('materials').insert({
       title: data.title,
       description: data.description,
@@ -161,7 +161,7 @@ export const ClassService = {
   },
 
   async updateMaterial(data: { id: string; classId: string; title: string; description: string | null; attachmentPaths: string[]; fileTypes: string[]; pinned: boolean; userId: string }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: inserted, error } = await supabase.from('materials').update({
       title: data.title,
       description: data.description,
@@ -174,7 +174,7 @@ export const ClassService = {
   },
 
   async deleteMaterial(id: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: material } = await supabase.from('materials').select('class_id, created_by').eq('id', id).maybeSingle()
     if (!material) throw new Error("Material not found")
     const { error } = await supabase.from('materials').delete().eq('id', id)
@@ -183,7 +183,7 @@ export const ClassService = {
   },
 
   async createAssignment(data: { title: string; description: string | null; dueDate: string | null; points: number; classId: string; userId: string; submissionType: string; rubricId: string | null; attachmentPaths: string[]; isGroupProject: boolean; pinned: boolean }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: inserted, error } = await supabase.from('assignments').insert({
       title: data.title,
       description: data.description,
@@ -202,7 +202,7 @@ export const ClassService = {
   },
 
   async updateAssignment(data: { assignmentId: string; classId: string; title: string; description: string | null; dueDate: string | null; points: number; submissionType: string; rubricId: string | null; isGroupProject: boolean; allPaths: string[]; pinned: boolean }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: inserted, error } = await supabase.from('assignments').update({
       title: data.title,
       description: data.description,
@@ -219,7 +219,7 @@ export const ClassService = {
   },
 
   async deleteAssignment(id: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: assignment } = await supabase.from('assignments').select('class_id').eq('id', id).maybeSingle()
     if (!assignment) throw new Error("Not found")
     const { error } = await supabase.from('assignments').delete().eq('id', id)
@@ -228,7 +228,7 @@ export const ClassService = {
   },
 
   async submitAssignment(data: { assignmentId: string; userId: string; groupId?: string | null; content?: string; files?: any; isGroupProject: boolean }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: inserted, error } = await supabase.from('submissions').insert({
       assignment_id: data.assignmentId,
       user_id: data.userId,
@@ -243,7 +243,7 @@ export const ClassService = {
   },
 
   async saveGroup(classId: string, title: string, groupId: string | null | undefined, studentIds: string[], userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     if (groupId) {
       const { error } = await supabase.from('group_projects').update({ title }).eq('id', groupId)
       if (error) throw error
@@ -260,17 +260,17 @@ export const ClassService = {
   },
 
   async removeGroupMember(projectId: string, studentId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     await supabase.from('project_members').delete().eq('project_id', projectId).eq('user_id', studentId)
   },
 
   async deleteGroup(groupId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     await supabase.from('group_projects').delete().eq('id', groupId)
   },
 
   async deleteClass(classId: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     
     // 1. Perform deletion with exact count check
     const { error, count } = await supabase
@@ -294,7 +294,7 @@ export const ClassService = {
   },
 
   async updateClassSettings(data: { classId: string; name: string; description: string; settings: any; userId: string }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase.from('classes').update({
       name: data.name,
       description: data.description,
@@ -315,7 +315,7 @@ export const ClassService = {
     const cached = await redisSafe.get<string>(cacheKey)
     if (cached) return cached
 
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data } = await supabase.from('classes').select('name').eq('id', classId).maybeSingle()
     const name = (data as any)?.name || 'Class'
     
@@ -333,7 +333,7 @@ export const ClassService = {
     const cached = await redisSafe.get<'teacher' | 'student'>(cacheKey)
     if (cached) return cached
 
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     
     // 1. Check if owner (teacher by default)
     const { data: classData } = await supabase
@@ -365,7 +365,7 @@ export const ClassService = {
   },
 
   async togglePin(data: { type: string; id: string; pinned: boolean; userId: string }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase.from(data.type as any).update({ pinned: data.pinned } as any).eq('id', data.id)
     if (error) throw error
   }

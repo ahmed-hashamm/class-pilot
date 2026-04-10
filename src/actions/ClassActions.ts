@@ -74,7 +74,7 @@ export async function deleteClass(classId: string) {
   }
 }
 
-export async function updateClassSettings(payload: any) {
+export async function updateClassSettings(payload: unknown) {
   const parsed = updateClassSettingsSchema.safeParse(payload)
   if (!parsed.success) return { data: null, error: "Invalid input" }
 
@@ -91,8 +91,9 @@ export async function updateClassSettings(payload: any) {
     revalidatePath(`/classes/${parsed.data.classId}`)
     revalidatePath('/dashboard')
     return { data: { success: true }, error: null }
-  } catch (err: any) {
-    return { data: null, error: err.message || "Failed to update settings" }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to update settings"
+    return { data: null, error }
   }
 }
 
@@ -114,7 +115,7 @@ export async function getStickyNotes(classId: string): Promise<Note[]> {
 /* ---------------- ADD NOTE ---------------- */
 
 export async function addStickyNote(classId: string, content: string) {
-  if (!content.trim()) return
+  if (!content.trim()) return { data: null, error: "Content is required" }
 
   const parsed = addStickyNoteSchema.safeParse({ classId, content })
   if (!parsed.success) return { data: null, error: "Invalid input" }
@@ -123,7 +124,13 @@ export async function addStickyNote(classId: string, content: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.addStickyNote(parsed.data.classId, user.id, parsed.data.content)
+  try {
+    await ClassService.addStickyNote(parsed.data.classId, user.id, parsed.data.content)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to add note"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- CLEAR NOTES ---------------- */
@@ -136,7 +143,13 @@ export async function clearStickyNotes(classId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.clearStickyNotes(parsed.data.classId, user.id)
+  try {
+    await ClassService.clearStickyNotes(parsed.data.classId, user.id)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to clear notes"
+    return { data: null, error }
+  }
 }
 
 
@@ -146,7 +159,7 @@ export async function clearStickyNotes(classId: string) {
 export async function createAnnouncement(formData: FormData) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
   const classId = formData.get('classId') as string
   const title = formData.get('title') as string || 'Class Update'
@@ -155,24 +168,29 @@ export async function createAnnouncement(formData: FormData) {
   const deadline = formData.get('deadline') as string || null
 
   const parsed = createAnnouncementSchema.safeParse({ classId, title, content, pinned, deadline })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const files = formData.getAll('files') as File[]
-  const attachmentPaths = await ClassService.uploadFiles(files, parsed.data.classId, 'announcements-files')
+  try {
+    const files = formData.getAll('files') as File[]
+    const attachmentPaths = await ClassService.uploadFiles(files, parsed.data.classId, 'announcements-files')
 
-  await ClassService.createAnnouncement({
-    title: parsed.data.title,
-    content: parsed.data.content,
-    classId: parsed.data.classId,
-    userId: user.id,
-    attachmentPaths,
-    pinned: parsed.data.pinned,
-    deadline: parsed.data.deadline,
-  })
+    await ClassService.createAnnouncement({
+      title: parsed.data.title,
+      content: parsed.data.content,
+      classId: parsed.data.classId,
+      userId: user.id,
+      attachmentPaths,
+      pinned: parsed.data.pinned,
+      deadline: parsed.data.deadline,
+    })
 
-  await redisSafe.invalidateFeedCache(parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true }
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to create announcement"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- UPDATE ANNOUNCEMENT ---------------- */
@@ -180,7 +198,7 @@ export async function createAnnouncement(formData: FormData) {
 export async function updateAnnouncement(formData: FormData) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
   const id = formData.get('id') as string
   const classId = formData.get('classId') as string
@@ -189,59 +207,70 @@ export async function updateAnnouncement(formData: FormData) {
   const pinned = formData.get('pinned') === 'true'
 
   const parsed = updateAnnouncementSchema.safeParse({ id, classId, title, content, pinned })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  // Upload new files
-  const newFiles = formData.getAll('files') as File[]
-  const newPaths = await ClassService.uploadFiles(newFiles, parsed.data.classId, 'announcements-files')
+  try {
+    // Upload new files
+    const newFiles = formData.getAll('files') as File[]
+    const newPaths = await ClassService.uploadFiles(newFiles, parsed.data.classId, 'announcements-files')
 
-  // Merge with kept existing paths
-  let existingPaths: string[] = []
-  const existingAttachmentsRaw = formData.get('existingAttachments') as string
-  if (existingAttachmentsRaw) {
-    try {
-      const p = JSON.parse(existingAttachmentsRaw)
-      if (Array.isArray(p)) {
-        existingPaths = p.map((a: any) => {
-          if (typeof a === 'string') return a
-          return a?.url || a?.path || null
-        }).filter(Boolean) as string[]
+    // Merge with kept existing paths
+    let existingPaths: string[] = []
+    const existingAttachmentsRaw = formData.get('existingAttachments') as string
+    if (existingAttachmentsRaw) {
+      try {
+        const p = JSON.parse(existingAttachmentsRaw)
+        if (Array.isArray(p)) {
+          existingPaths = p.map((a: any) => {
+            if (typeof a === 'string') return a
+            return a?.url || a?.path || null
+          }).filter(Boolean) as string[]
+        }
+      } catch (e) {
+        // ignore
       }
-    } catch (e) {
-      // ignore
     }
+    const allPaths: string[] = [...existingPaths, ...newPaths]
+
+    await ClassService.updateAnnouncement({
+      id: parsed.data.id,
+      classId: parsed.data.classId,
+      title: parsed.data.title,
+      content: parsed.data.content,
+      userId: user.id,
+      allPaths,
+      pinned: parsed.data.pinned,
+    })
+
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to update announcement"
+    return { data: null, error }
   }
-  const allPaths: string[] = [...existingPaths, ...newPaths]
-
-  await ClassService.updateAnnouncement({
-    id: parsed.data.id,
-    classId: parsed.data.classId,
-    title: parsed.data.title,
-    content: parsed.data.content,
-    userId: user.id,
-    allPaths,
-    pinned: parsed.data.pinned,
-  })
-
-  await redisSafe.invalidateFeedCache(parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true }
 }
 
 /* ---------------- DELETE ANNOUNCEMENT ---------------- */
 
 export async function deleteAnnouncement(id: string, classId: string) {
   const parsed = deleteAnnouncementSchema.safeParse({ id, classId })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.deleteAnnouncement(parsed.data.id, user.id)
-  await redisSafe.invalidateFeedCache(parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
-  revalidatePath('/dashboard')
+  try {
+    await ClassService.deleteAnnouncement(parsed.data.id, user.id)
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    revalidatePath('/dashboard')
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to delete announcement"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- CREATE MATERIAL ---------------- */
@@ -249,7 +278,7 @@ export async function deleteAnnouncement(id: string, classId: string) {
 export async function createMaterial(formData: FormData) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   const classId = formData.get('classId') as string
   const title = formData.get('title') as string || 'Class Material'
@@ -257,35 +286,40 @@ export async function createMaterial(formData: FormData) {
   const pinned = formData.get('pinned') === 'true'
 
   const parsed = createMaterialSchema.safeParse({ classId, title, description, pinned })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  const files = formData.getAll('files') as File[]
-  if (!files.length) throw new Error('No files provided')
+  try {
+    const files = formData.getAll('files') as File[]
+    if (!files.length) return { data: null, error: 'No files provided' }
 
-  const fileTypes = files.map((file) => {
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!ext || !ALLOWED_FILE_TYPES.includes(ext))
-      throw new Error(`Unsupported file type: ${file.name}`)
-    return ext
-  })
+    const fileTypes = files.map((file) => {
+      const ext = file.name.split('.').pop()?.toLowerCase()
+      if (!ext || !ALLOWED_FILE_TYPES.includes(ext))
+        throw new Error(`Unsupported file type: ${file.name}`)
+      return ext
+    })
 
-  const attachmentPaths = await ClassService.uploadFiles(files, parsed.data.classId, 'materials')
+    const attachmentPaths = await ClassService.uploadFiles(files, parsed.data.classId, 'materials')
 
-  const result = await ClassService.createMaterial({
-    title: parsed.data.title || 'Class Material',
-    description: parsed.data.description ?? null,
-    classId: parsed.data.classId,
-    userId: user.id,
-    attachmentPaths,
-    fileTypes,
-    pinned: parsed.data.pinned,
-  })
+    const result = await ClassService.createMaterial({
+      title: parsed.data.title || 'Class Material',
+      description: parsed.data.description ?? null,
+      classId: parsed.data.classId,
+      userId: user.id,
+      attachmentPaths,
+      fileTypes,
+      pinned: parsed.data.pinned,
+    })
 
-  if (!result) return { success: false, error: 'Failed to create material' }
+    if (!result) return { data: null, error: 'Failed to create material' }
 
-  await redisSafe.invalidateFeedCache(parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
-  return { success: true, materialId: result.id }
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { materialId: result.id, success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to create material"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- UPDATE MATERIAL ---------------- */
@@ -293,7 +327,7 @@ export async function createMaterial(formData: FormData) {
 export async function updateMaterial(formData: FormData) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
   const materialId = formData.get('materialId') as string
   const classId = formData.get('classId') as string
@@ -302,46 +336,52 @@ export async function updateMaterial(formData: FormData) {
   const pinned = formData.get('pinned') === 'true'
 
   const parsed = updateMaterialSchema.safeParse({ materialId, classId, title, description, pinned })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
-  // Upload any newly added files
-  const newFiles = formData.getAll('files') as File[]
-  const newPaths = await ClassService.uploadFiles(newFiles, parsed.data.classId, 'materials')
+  try {
+    // Upload any newly added files
+    const newFiles = formData.getAll('files') as File[]
+    const newPaths = await ClassService.uploadFiles(newFiles, parsed.data.classId, 'materials')
 
-  // Merge with kept existing files
-  let existingPaths: string[] = []
-  const existingFilesRaw = formData.get('existingFiles') as string || formData.get('existingPaths') as string
-  if (existingFilesRaw) {
-    try {
-      const p = JSON.parse(existingFilesRaw)
-      if (Array.isArray(p)) {
-        existingPaths = p.map((f: any) => {
-          if (typeof f === 'string') return f
-          return f?.url || f?.path || null
-        }).filter(Boolean) as string[]
+    // Merge with kept existing files
+    let existingPaths: string[] = []
+    const existingFilesRaw = formData.get('existingFiles') as string || formData.get('existingPaths') as string
+    if (existingFilesRaw) {
+      try {
+        const p = JSON.parse(existingFilesRaw)
+        if (Array.isArray(p)) {
+          existingPaths = p.map((f: any) => {
+            if (typeof f === 'string') return f
+            return f?.url || f?.path || null
+          }).filter(Boolean) as string[]
+        }
+      } catch (e) {
+        // ignore
       }
-    } catch (e) {
-      // ignore
     }
+    const allPaths: string[] = [...existingPaths, ...newPaths]
+
+    // Re-derive file_types from path extensions
+    const fileTypes = allPaths.map((p) => p.split('.').pop()?.toLowerCase() ?? 'file')
+
+    await ClassService.updateMaterial({
+      id: parsed.data.materialId,
+      classId: parsed.data.classId,
+      title: parsed.data.title,
+      description: parsed.data.description ?? null,
+      attachmentPaths: allPaths,
+      fileTypes,
+      pinned: parsed.data.pinned,
+      userId: user.id
+    })
+
+    await redisSafe.invalidateFeedCache(parsed.data.classId)
+    revalidatePath(`/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to update material"
+    return { data: null, error }
   }
-  const allPaths: string[] = [...existingPaths, ...newPaths]
-
-  // Re-derive file_types from path extensions
-  const fileTypes = allPaths.map((p) => p.split('.').pop()?.toLowerCase() ?? 'file')
-
-  await ClassService.updateMaterial({
-    id: parsed.data.materialId,
-    classId: parsed.data.classId,
-    title: parsed.data.title,
-    description: parsed.data.description ?? null,
-    attachmentPaths: allPaths,
-    fileTypes,
-    pinned: parsed.data.pinned,
-    userId: user.id
-  })
-
-  await redisSafe.invalidateFeedCache(parsed.data.classId)
-  revalidatePath(`/classes/${parsed.data.classId}`)
 }
 
 /* ---------------- DELETE MATERIAL ---------------- */
@@ -360,8 +400,9 @@ export async function deleteMaterial(id: string, classId: string) {
     revalidatePath(`/classes/${parsed.data.classId}`)
     revalidatePath('/dashboard')
     return { data: { success: true }, error: null }
-  } catch (err: any) {
-    return { data: null, error: err.message || "Failed to delete material" }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to delete material"
+    return { data: null, error }
   }
 }
 
@@ -383,7 +424,7 @@ export async function createAssignment(formData: FormData) {
   const pinned = formData.get('pinned') === 'true'
 
   const parsed = createAssignmentSchema.safeParse({ classId, title, description, dueDate, points, submissionType, rubricId, isGroupProject, pinned })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const files = formData.getAll('files') as File[]
   const attachmentPaths = await ClassService.uploadFiles(files, parsed.data.classId, 'assignments')
@@ -407,9 +448,10 @@ export async function createAssignment(formData: FormData) {
 
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { data: { id: (result as any).id, success: true }, error: null }
-  } catch (err: any) {
-    return { data: null, error: err.message || "Failed to create assignment" }
+    return { data: { id: result.id, success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to create assignment"
+    return { data: null, error }
   }
 }
 
@@ -473,9 +515,10 @@ export async function updateAssignment(formData: FormData) {
 
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { data: { id: (result as any).id, success: true }, error: null }
-  } catch (err: any) {
-    return { data: null, error: err.message || "Failed to update assignment" }
+    return { data: { id: result.id, success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to update assignment"
+    return { data: null, error }
   }
 }
 
@@ -496,8 +539,9 @@ export async function deleteAssignment(id: string, classId: string) {
     revalidatePath('/dashboard')
     revalidatePath('/todo')
     return { data: { success: true }, error: null }
-  } catch (err: any) {
-    return { data: null, error: err.message || "Failed to delete assignment" }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to delete assignment"
+    return { data: null, error }
   }
 }
 
@@ -522,11 +566,11 @@ export async function submitAssignment({
   isGroupProject,
 }: SubmitAssignmentProps) {
   const parsed = submitAssignmentSchema.safeParse({ assignmentId, classId, userId, groupId, content, isGroupProject })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.id !== parsed.data.userId) throw new Error("Unauthorized")
+  if (!user || user.id !== parsed.data.userId) return { data: null, error: "Unauthorized" }
 
   // Deadline enforcement — reject submissions after due date
   const { data: assignmentData } = await supabase
@@ -535,22 +579,14 @@ export async function submitAssignment({
     .eq('id', parsed.data.assignmentId)
     .maybeSingle()
 
-  const assignmentRow = assignmentData as any
+  const assignmentRow = assignmentData as { due_date: string | null } | null
   if (assignmentRow?.due_date) {
     const deadline = new Date(assignmentRow.due_date)
     if (new Date() > deadline) {
-      throw new Error("The deadline for this assignment has passed. Submissions are no longer accepted.")
+      return { data: null, error: "The deadline for this assignment has passed. Submissions are no longer accepted." }
     }
   }
 
-  console.log('[submitAssignment] START:', {
-    assignmentId: parsed.data.assignmentId,
-    userId: parsed.data.userId,
-    classId,
-    hasContent: !!parsed.data.content,
-    isGroup: parsed.data.isGroupProject,
-    groupId: parsed.data.groupId
-  })
 
   try {
     const data = await ClassService.submitAssignment({
@@ -562,20 +598,14 @@ export async function submitAssignment({
       isGroupProject: parsed.data.isGroupProject,
     })
 
-    if (!data) {
-      console.warn('[submitAssignment] Service returned NULL data!')
-    } else {
-      console.log('[submitAssignment] Success! ID:', data.id)
-    }
-
     revalidatePath(`/classes/${classId}/assignments/${assignmentId}`)
     revalidatePath(`/classes/${classId}`)
     revalidatePath('/todo')
 
-    return data
-  } catch (err: any) {
-    console.error('[submitAssignment] FATAL ERROR:', err)
-    throw err
+    return { data, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to submit assignment"
+    return { data: null, error }
   }
 }
 
@@ -588,22 +618,27 @@ export async function saveGroup(
   studentIds: string[] = []
 ) {
   const parsed = saveGroupSchema.safeParse({ classId, title, groupId, studentIds })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
+  if (!user) return { data: null, error: 'Unauthorized' }
 
-  await ClassService.saveGroup(
-    parsed.data.classId,
-    parsed.data.title,
-    parsed.data.groupId,
-    parsed.data.studentIds,
-    user.id
-  )
+  try {
+    await ClassService.saveGroup(
+      parsed.data.classId,
+      parsed.data.title,
+      parsed.data.groupId,
+      parsed.data.studentIds,
+      user.id
+    )
 
-  revalidatePath(`/dashboard/classes/${parsed.data.classId}`)
-  return { success: true }
+    revalidatePath(`/dashboard/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to save group"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- REMOVE GROUP MEMBER ---------------- */
@@ -614,39 +649,56 @@ export async function removeGroupMember(
   classId: string
 ) {
   const parsed = removeGroupMemberSchema.safeParse({ projectId, studentId, classId })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.removeGroupMember(parsed.data.projectId, parsed.data.studentId)
-  revalidatePath(`/dashboard/classes/${parsed.data.classId}`)
+  try {
+    await ClassService.removeGroupMember(parsed.data.projectId, parsed.data.studentId)
+    revalidatePath(`/dashboard/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to remove group member"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- DELETE GROUP ---------------- */
 
 export async function deleteGroup(groupId: string, classId: string) {
   const parsed = deleteGroupSchema.safeParse({ groupId, classId })
-  if (!parsed.success) throw new Error("Invalid input")
+  if (!parsed.success) return { data: null, error: "Invalid input" }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error("Unauthorized")
+  if (!user) return { data: null, error: "Unauthorized" }
 
-  await ClassService.deleteGroup(parsed.data.groupId)
-  revalidatePath(`/dashboard/classes/${parsed.data.classId}`)
+  try {
+    await ClassService.deleteGroup(parsed.data.groupId)
+    revalidatePath(`/dashboard/classes/${parsed.data.classId}`)
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Failed to delete group"
+    return { data: null, error }
+  }
 }
 
 /* ---------------- GET CLASS NAME ---------------- */
 
-export async function getClassName(classId: string) {
+export async function getClassName(classId: string): Promise<{ data: string | null; error: string | null }> {
   const parsed = getClassNameSchema.safeParse({ classId })
-  if (!parsed.success) return 'Class'
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return 'Class'
+  if (!user) return { data: null, error: 'Unauthorized' }
 
-  return await ClassService.getClassName(parsed.data.classId)
+  try {
+    const name = await ClassService.getClassName(parsed.data.classId)
+    return { data: name, error: null }
+  } catch (err) {
+    return { data: null, error: 'Failed to fetch class name' }
+  }
 }

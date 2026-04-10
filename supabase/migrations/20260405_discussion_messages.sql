@@ -30,7 +30,7 @@ CREATE POLICY "Class members can read discussion messages"
     EXISTS (
       SELECT 1 FROM classes
       WHERE classes.id = discussion_messages.class_id
-        AND classes.teacher_id = auth.uid()
+        AND classes.created_by = auth.uid()
     )
   );
 
@@ -49,7 +49,7 @@ CREATE POLICY "Class members can send discussion messages"
       EXISTS (
         SELECT 1 FROM classes
         WHERE classes.id = discussion_messages.class_id
-          AND classes.teacher_id = auth.uid()
+          AND classes.created_by = auth.uid()
       )
     )
   );
@@ -66,7 +66,7 @@ CREATE POLICY "Teachers can delete any discussion message"
     EXISTS (
       SELECT 1 FROM classes
       WHERE classes.id = discussion_messages.class_id
-        AND classes.teacher_id = auth.uid()
+        AND classes.created_by = auth.uid()
     )
   );
 

@@ -18,7 +18,7 @@ export async function fetchChatHistory(payload: unknown) {
 
   // Check if user is a member of the class (Simplified for now)
   const { data, error } = await supabase
-    .from('chat_history' as any)
+    .from('chat_history')
     .select('role, content')
     .eq('user_id', user.id)
     .eq('class_id', parsed.data.classId)
@@ -38,7 +38,7 @@ export async function clearChatHistory(payload: unknown) {
 
   // Use admin client to bypass RLS — same as insert in route.ts
   const adminClient = createAdminClient()
-  const { error } = await (adminClient as any)
+  const { error } = await adminClient
     .from('chat_history')
     .delete()
     .eq('user_id', user.id)

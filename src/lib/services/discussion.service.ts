@@ -26,7 +26,7 @@ export const DiscussionService = {
       if (cached) return cached
     }
 
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     // 1. Fetch Teacher ID to identify authoritative messages
     const { data: classData } = await supabase
@@ -63,7 +63,7 @@ export const DiscussionService = {
   },
 
   async sendMessage(classId: string, topic: DiscussionTopic, content: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     // Fetch Teacher ID
     const { data: classData } = await supabase
@@ -99,7 +99,7 @@ export const DiscussionService = {
   },
 
   async deleteMessage(messageId: string, userId: string, isTeacher: boolean) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase
       .from('discussion_messages')
       .delete()
@@ -109,7 +109,7 @@ export const DiscussionService = {
   },
 
   async getMessage(messageId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
 
     const { data, error } = await supabase
       .from('discussion_messages')

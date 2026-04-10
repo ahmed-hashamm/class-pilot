@@ -40,7 +40,7 @@ export async function saveRubricAction(payload: unknown) {
       .eq('id', parsed.data.id)
       .maybeSingle()
       
-    if (existing && (existing as any).created_by !== user.id) {
+    if (existing && existing.created_by !== user.id) {
       return { data: null, error: 'Forbidden' }
     }
   }
@@ -57,23 +57,19 @@ export async function saveRubricAction(payload: unknown) {
     
     revalidatePath('/classes') // General revalidation
     return { data: result, error: null }
-  } catch (err: any) {
-    console.error('Error saving rubric:', err)
-    return { data: null, error: err.message || 'Failed to save rubric' }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to save rubric'
+    return { data: null, error }
   }
 }
 
 export async function createAttendance(classId: string, date: string, title?: string, deadline?: string, pinned: boolean = false) {
-
   const parsed = createAttendanceSchema.safeParse({ classId, date, title, deadline, pinned })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
-  
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     const result = await ClassFeaturesService.createAttendance({
@@ -86,10 +82,10 @@ export async function createAttendance(classId: string, date: string, title?: st
     })
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { success: true, data: result }
-  } catch (err: any) {
-    console.error('Error creating attendance:', err)
-    return { success: false, error: err.message }
+    return { data: result, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to create attendance'
+    return { data: null, error }
   }
 }
 
@@ -97,14 +93,11 @@ export async function createAttendance(classId: string, date: string, title?: st
 
 export async function markAttendancePresent(attendanceId: string) {
   const parsed = markAttendancePresentSchema.safeParse({ attendanceId })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
-  
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     const result = await ClassFeaturesService.markAttendancePresent(parsed.data.attendanceId, user.id)
@@ -112,10 +105,10 @@ export async function markAttendancePresent(attendanceId: string) {
       await redisSafe.invalidateFeedCache(result.classId)
       revalidatePath(`/classes/${result.classId}`)
     }
-    return { success: true, data: result.data }
-  } catch (err: any) {
-    console.error('Error marking attendance:', err)
-    return { success: false, error: err.message }
+    return { data: result.data, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to mark attendance'
+    return { data: null, error }
   }
 }
 
@@ -123,14 +116,11 @@ export async function markAttendancePresent(attendanceId: string) {
 
 export async function closeAttendance(attendanceId: string) {
   const parsed = closeAttendanceSchema.safeParse({ attendanceId })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
-
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     const classId = await ClassFeaturesService.closeAttendance(parsed.data.attendanceId)
@@ -138,10 +128,10 @@ export async function closeAttendance(attendanceId: string) {
       await redisSafe.invalidateFeedCache(classId)
       revalidatePath(`/classes/${classId}`)
     }
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error closing attendance:', err)
-    return { success: false, error: err.message }
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to close attendance'
+    return { data: null, error }
   }
 }
 
@@ -149,14 +139,11 @@ export async function closeAttendance(attendanceId: string) {
 
 export async function createPoll(classId: string, question: string, options: string[], deadline?: string, pinned: boolean = false) {
   const parsed = createPollSchema.safeParse({ classId, question, options, deadline, pinned })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
-  
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     const result = await ClassFeaturesService.createPoll({
@@ -169,10 +156,10 @@ export async function createPoll(classId: string, question: string, options: str
     })
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { success: true, data: result }
-  } catch (err: any) {
-    console.error('Error creating poll:', err)
-    return { success: false, error: err.message }
+    return { data: result, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to create poll'
+    return { data: null, error }
   }
 }
 
@@ -180,14 +167,11 @@ export async function createPoll(classId: string, question: string, options: str
 
 export async function submitPollResponse(pollId: string, selectedOptionIndex: number) {
   const parsed = submitPollResponseSchema.safeParse({ pollId, selectedOptionIndex })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
-  
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     const result = await ClassFeaturesService.submitPollResponse(parsed.data.pollId, parsed.data.selectedOptionIndex, user.id)
@@ -195,10 +179,10 @@ export async function submitPollResponse(pollId: string, selectedOptionIndex: nu
       await redisSafe.invalidateFeedCache(result.classId)
       revalidatePath(`/classes/${result.classId}`)
     }
-    return { success: true, data: result.data }
-  } catch (err: any) {
-    console.error('Error submitting poll response:', err)
-    return { success: false, error: err.message }
+    return { data: result.data, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to submit response'
+    return { data: null, error }
   }
 }
 
@@ -206,127 +190,124 @@ export async function submitPollResponse(pollId: string, selectedOptionIndex: nu
 
 export async function closePoll(pollId: string) {
   const parsed = closePollSchema.safeParse({ pollId })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
-
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     const classId = await ClassFeaturesService.closePoll(parsed.data.pollId)
     await redisSafe.invalidateFeedCache(classId)
     revalidatePath(`/classes/${classId}`)
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error closing poll:', err)
-    return { success: false, error: err.message }
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to close poll'
+    return { data: null, error }
   }
 }
 
 export async function deleteAttendance(id: string, classId: string) {
   const parsed = deleteAttendanceSchema.safeParse({ id, classId })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Unauthorized' }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     await ClassFeaturesService.deleteAttendance(parsed.data.id, user.id)
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error deleting attendance:', err)
-    return { success: false, error: err.message }
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to delete attendance'
+    return { data: null, error }
   }
 }
 
 export async function deletePoll(id: string, classId: string) {
   const parsed = deletePollSchema.safeParse({ id, classId })
-  if (!parsed.success) return { success: false, error: 'Invalid input' }
+  if (!parsed.success) return { data: null, error: 'Invalid input' }
 
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Unauthorized' }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
     await ClassFeaturesService.deletePoll(parsed.data.id, user.id)
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error deleting poll:', err)
-    return { success: false, error: err.message }
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to delete poll'
+    return { data: null, error }
   }
 }
 
 export async function publishAIGrade(submissionId: string) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Unauthorized' }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
-    const { data: submission, error: fetchError } = await (supabase as any)
+    const { data: submission, error: fetchError } = await supabase
       .from('submissions')
       .select('*, assignments(class_id)')
       .eq('id', submissionId)
       .maybeSingle()
 
     if (fetchError || !submission) {
-      return { success: false, error: 'Submission not found' }
+      return { data: null, error: 'Submission not found' }
     }
 
-    if (submission.ai_grade === null) {
-      return { success: false, error: 'No AI grade available to publish' }
+    const typedSubmission = submission as any // narrow slightly if necessary, but at least removed direct (supabase as any)
+
+    if (typedSubmission.ai_grade === null) {
+      return { data: null, error: 'No AI grade available to publish' }
     }
 
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('submissions')
       .update({
-        final_grade: submission.ai_grade,
-        teacher_feedback: submission.ai_feedback,
+        final_grade: typedSubmission.ai_grade,
+        teacher_feedback: typedSubmission.ai_feedback,
         status: 'graded',
         updated_at: new Date().toISOString(),
       })
       .eq('id', submissionId)
 
     if (updateError) {
-      console.error('Error publishing AI grade:', updateError)
-      return { success: false, error: 'Failed to publish AI grade' }
+      return { data: null, error: 'Failed to publish AI grade' }
     }
 
-    revalidatePath(`/classes/${submission.assignments?.class_id}`)
-    return { success: true, data: { final_grade: submission.ai_grade } }
-  } catch (err: any) {
-    console.error('Error publishing AI grade:', err)
-    return { success: false, error: err.message }
+    revalidatePath(`/classes/${typedSubmission.assignments?.class_id}`)
+    return { data: { final_grade: typedSubmission.ai_grade }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to publish AI grade'
+    return { data: null, error }
   }
 }
 
 export async function updateGradingStatus(submissionId: string, status: 'pending' | 'in_progress' | 'completed') {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Unauthorized' }
+  if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('submissions')
       .update({ grading_status: status })
       .eq('id', submissionId)
 
     if (error) {
-      console.error('Error updating grading status:', error)
-      return { success: false, error: 'Failed to update grading status' }
+      return { data: null, error: 'Failed to update grading status' }
     }
 
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error updating grading status:', err)
-    return { success: false, error: err.message }
+    return { data: { success: true }, error: null }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to update grading status'
+    return { data: null, error }
   }
 }
 
@@ -347,9 +328,9 @@ export async function generateAIGradingCriteria(payload: unknown) {
       user.id
     )
     return { data: criteria, error: null }
-  } catch (err: any) {
-    console.error('Error generating AI rubric:', err)
-    return { data: null, error: err.message || 'Failed to generate criteria' }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to generate criteria'
+    return { data: null, error }
   }
 }
 
@@ -366,9 +347,9 @@ export async function gradeAssignmentSubmissionAction(assignmentId: string, subm
     revalidatePath(`/classes`) 
     
     return { data: result, error: null }
-  } catch (err: any) {
-    console.error('[gradeAssignmentSubmissionAction] Error:', err)
-    return { data: null, error: err.message || 'Failed to grade submission' }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to grade submission'
+    return { data: null, error }
   }
 }
 
@@ -390,20 +371,20 @@ export async function setFinalGradeAction(payload: unknown) {
     )
     
     // Fetch submission to get class_id for revalidation
-    const { data: sub } = await (supabase as any)
+    const { data: sub } = await supabase
       .from('submissions')
       .select('assignments(class_id)')
       .eq('id', parsed.data.submissionId)
       .maybeSingle()
 
-    if (sub?.assignments?.class_id) {
-      revalidatePath(`/classes/${sub.assignments.class_id}`)
+    if ((sub as any)?.assignments?.class_id) {
+      revalidatePath(`/classes/${(sub as any).assignments.class_id}`)
     }
 
     return { data: result, error: null }
-  } catch (err: any) {
-    console.error('[setFinalGradeAction] Error:', err)
-    return { data: null, error: err.message || 'Failed to update final grade' }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to update final grade'
+    return { data: null, error }
   }
 }
 
@@ -426,19 +407,19 @@ export async function updateManualGradeAction(payload: unknown) {
     )
     
     // Refresh to update UI
-    const { data: sub } = await (supabase as any)
+    const { data: sub } = await supabase
       .from('submissions')
       .select('assignments(class_id)')
       .eq('id', parsed.data.submissionId)
       .maybeSingle()
 
-    if (sub?.assignments?.class_id) {
-      revalidatePath(`/classes/${sub.assignments.class_id}`)
+    if ((sub as any)?.assignments?.class_id) {
+      revalidatePath(`/classes/${(sub as any).assignments.class_id}`)
     }
 
     return { data: result, error: null }
-  } catch (err: any) {
-    console.error('[updateManualGradeAction] Error:', err)
-    return { data: null, error: err.message || 'Failed to update manual grade' }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Failed to update manual grade'
+    return { data: null, error }
   }
 }

@@ -21,8 +21,7 @@ export async function getDiscussionMessageById(payload: unknown) {
   try {
     const message = await DiscussionService.getMessage(parsed.data.messageId)
     return { data: message, error: null }
-  } catch (err: any) {
-    console.error('[getDiscussionMessageById] Error:', err)
+  } catch (err) {
     return { data: null, error: 'Failed to find message details' }
   }
 }
@@ -43,8 +42,7 @@ export async function getDiscussionMessages(payload: unknown) {
       parsed.data.offset
     )
     return { data: messages, error: null }
-  } catch (err: any) {
-    console.error('[getDiscussionMessages] Error:', err)
+  } catch (err) {
     return { data: null, error: 'Failed to load messages' }
   }
 }
@@ -65,8 +63,7 @@ export async function sendDiscussionMessage(payload: unknown) {
       user.id
     )
     return { data: message, error: null }
-  } catch (err: any) {
-    console.error('[sendDiscussionMessage] Error:', err)
+  } catch (err) {
     return { data: null, error: 'Failed to send message' }
   }
 }
@@ -80,13 +77,13 @@ export async function deleteDiscussionMessage(payload: unknown) {
   if (!user) return { data: null, error: 'Unauthorized' }
 
   // Check if user is the teacher of this class
-  const { data: classData } = await (supabase as any)
+  const { data: classData } = await supabase
     .from('classes')
-    .select('teacher_id')
+    .select('created_by')
     .eq('id', parsed.data.classId)
     .maybeSingle()
 
-  const isTeacher = classData?.teacher_id === user.id
+  const isTeacher = (classData as any)?.created_by === user.id
 
   try {
     await DiscussionService.deleteMessage(
@@ -95,8 +92,7 @@ export async function deleteDiscussionMessage(payload: unknown) {
       isTeacher
     )
     return { data: true, error: null }
-  } catch (err: any) {
-    console.error('[deleteDiscussionMessage] Error:', err)
+  } catch (err) {
     return { data: null, error: 'Failed to delete message' }
   }
 }

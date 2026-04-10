@@ -17,7 +17,6 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
-      console.error('Auth callback error:', error)
       return NextResponse.redirect(`${origin}/login?error=auth_failed`)
     }
 
@@ -33,7 +32,7 @@ export async function GET(request: Request) {
         .maybeSingle()
 
       if (profileError) {
-        console.error('Profile fetch error:', profileError)
+        /* Silent failure */
       }
 
       if (!existingProfile) {
@@ -57,7 +56,7 @@ export async function GET(request: Request) {
         ] as any)
 
         if (insertError) {
-          console.error('Failed to create user profile in callback:', insertError)
+          /* Silent failure */
         }
       } else if (!(existingProfile as any).avatar_url) {
         const avatarUrl =
@@ -72,7 +71,7 @@ export async function GET(request: Request) {
             .eq('id', user.id)
 
           if (updateError) {
-            console.error('Failed to update avatar:', updateError)
+            /* Silent failure */
           }
         }
       }

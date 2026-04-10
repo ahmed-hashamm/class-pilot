@@ -16,7 +16,6 @@ export async function getUserDashboardData() {
     .rpc('get_user_dashboard_data', { p_user_id: user.id } as any)
 
   if (error) {
-    console.error('Error loading dashboard:', error)
     return { user, dashboardData: null, error: true }
   }
 

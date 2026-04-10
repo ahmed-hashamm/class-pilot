@@ -12,12 +12,12 @@ export const ClassFeaturesService = {
     userId: string
     pinned: boolean
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: record, error } = await supabase
       .from("attendances")
       .insert({
         class_id: data.classId,
-        title: data.title as any,
+        title: data.title,
         date: data.date,
         deadline: data.deadline,
         created_by: data.userId,
@@ -36,14 +36,14 @@ export const ClassFeaturesService = {
     date: string
     students: { id: string; status: string }[]
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: record, error: recordError } = await supabase
       .from("attendances")
       .insert({
         class_id: data.classId,
-        title: data.title as any,
+        title: data.title,
         date: data.date,
-      } as any)
+      })
       .select()
       .maybeSingle()
 
@@ -56,40 +56,40 @@ export const ClassFeaturesService = {
       status: s.status,
     }))
 
-    const { error: entriesError } = await supabase.from("attendance_records").insert(entries as any)
+    const { error: entriesError } = await supabase.from("attendance_records").insert(entries)
     if (entriesError) throw entriesError
   },
 
   async markAttendancePresent(attendanceId: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: record } = await supabase
       .from('attendances')
       .select('class_id, closed_at')
       .eq('id', attendanceId)
       .maybeSingle()
 
-    if (!record || (record as any).closed_at) throw new Error("Attendance is closed or not found")
+    if (!record || record.closed_at) throw new Error("Attendance is closed or not found")
 
     const { data, error } = await supabase.from('attendance_records').upsert({
       attendance_id: attendanceId,
       user_id: userId,
       status: 'present'
-    } as any).select().maybeSingle()
+    }).select().maybeSingle()
 
     if (error) throw error
-    return { data, classId: (record as any).class_id }
+    return { data, classId: record.class_id }
   },
 
   async closeAttendance(attendanceId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: record } = await supabase.from('attendances').select('class_id').eq('id', attendanceId).maybeSingle()
-    const { error } = await supabase.from('attendances').update({ closed_at: new Date().toISOString() } as any).eq('id', attendanceId)
+    const { error } = await supabase.from('attendances').update({ closed_at: new Date().toISOString() }).eq('id', attendanceId)
     if (error) throw error
-    return (record as any)?.class_id
+    return record?.class_id
   },
 
   async getAttendanceRecords(classId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data, error } = await supabase
       .from("attendances")
       .select("*")
@@ -100,7 +100,7 @@ export const ClassFeaturesService = {
   },
 
   async deleteAttendance(id: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase.from('attendances').delete().eq('id', id)
     if (error) throw error
   },
@@ -114,7 +114,7 @@ export const ClassFeaturesService = {
     userId: string
     pinned: boolean
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: poll, error } = await supabase.from("polls")
       .insert({
         class_id: data.classId,
@@ -131,22 +131,22 @@ export const ClassFeaturesService = {
   },
 
   async submitPollResponse(pollId: string, optionIndex: number, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: poll } = await supabase.from('polls').select('class_id, closed_at').eq('id', pollId).maybeSingle()
-    if (!poll || (poll as any).closed_at) throw new Error("Poll is closed")
+    if (!poll || poll.closed_at) throw new Error("Poll is closed")
 
     await supabase.from('poll_responses').delete().eq('poll_id', pollId).eq('user_id', userId)
     const { data, error } = await supabase.from('poll_responses').insert({
       poll_id: pollId,
       user_id: userId,
       selected_option_index: optionIndex
-    } as any).select().maybeSingle()
+    }).select().maybeSingle()
     if (error) throw error
-    return { data, classId: (poll as any).class_id }
+    return { data, classId: poll.class_id }
   },
 
   async closePoll(pollId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: poll } = await supabase.from('polls').select('class_id').eq('id', pollId).maybeSingle()
     const { error } = await supabase.from('polls').update({ closed_at: new Date().toISOString() } as any).eq('id', pollId)
     if (error) throw error
@@ -154,7 +154,7 @@ export const ClassFeaturesService = {
   },
 
   async deletePoll(pollId: string, userId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase.from("polls").delete().eq("id", pollId)
     if (error) throw error
   },
@@ -167,7 +167,7 @@ export const ClassFeaturesService = {
     const cached = await redisSafe.get<Record<number, number>>(cacheKey)
     if (cached) return cached
 
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data: votes, error } = await supabase.from("poll_responses")
       .select("selected_option_index")
       .eq("poll_id", pollId)
@@ -193,7 +193,7 @@ export const ClassFeaturesService = {
     category: string
     createdBy: string
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { error } = await supabase.from("behavior_logs" as any).insert({
       class_id: data.classId,
       student_id: data.studentId,
@@ -206,7 +206,7 @@ export const ClassFeaturesService = {
   },
 
   async getBehaviorLogs(studentId: string, classId: string) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data, error } = await supabase.from("behavior_logs" as any)
       .select("*")
       .eq("student_id", studentId)
@@ -223,7 +223,7 @@ export const ClassFeaturesService = {
     total_points: number
     created_by: string
   }) {
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     
     if (data.id) {
       const { data: rubric, error } = await supabase

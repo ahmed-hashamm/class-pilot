@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
+import { useAuth } from '@/contexts/AuthContext'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type UserUpdate = Database['public']['Tables']['users']['Update']
@@ -17,6 +18,9 @@ interface ProfileState {
   avatarUrl: string | null
   file: File | null
   preview: string | null
+  // Password updates
+  newPassword?: string
+  confirmPassword?: string
   status: { type: 'success' | 'error'; message: string } | null
 }
 
@@ -26,6 +30,7 @@ interface ProfileState {
 export function useProfile() {
   const supabase = createClient()
   const router = useRouter()
+  const { profile: authProfile, loading: authLoading, checkAuth } = useAuth()
 
   const [state, setState] = useState<ProfileState>({
     loading: false,
@@ -36,34 +41,27 @@ export function useProfile() {
     avatarUrl: null,
     file: null,
     preview: null,
+    newPassword: '',
+    confirmPassword: '',
     status: null,
   })
 
-  // Load profile on mount
+  // Sync with AuthContext on mount or when authProfile changes
   useEffect(() => {
-    const loadProfile = async () => {
-      setState((s) => ({ ...s, initialLoading: true }))
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setState((s) => ({ ...s, initialLoading: false })); return }
-
-      const { data } = await supabase
-        .from('users')
-        .select('full_name, avatar_url')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      const userData = data as UserRow | null
-
-      setState((s) => ({
-        ...s,
-        userId: user.id,
-        fullName: userData?.full_name || '',
-        avatarUrl: userData?.avatar_url || null,
-        initialLoading: false,
-      }))
+    if (!authLoading) {
+      if (authProfile) {
+        setState((s) => ({
+          ...s,
+          userId: authProfile.id,
+          fullName: s.fullName || authProfile.name || '',
+          avatarUrl: authProfile.avatar_url,
+          initialLoading: false,
+        }))
+      } else {
+        setState((s) => ({ ...s, initialLoading: false }))
+      }
     }
-    loadProfile()
-  }, [supabase])
+  }, [authProfile, authLoading])
 
   // File preview
   useEffect(() => {
@@ -101,6 +99,8 @@ export function useProfile() {
         .eq('id', state.userId)
       if (updateError) throw updateError
 
+      await checkAuth() // Refresh global state
+
       setState((s) => ({
         ...s,
         avatarUrl: data.publicUrl,
@@ -125,17 +125,38 @@ export function useProfile() {
         .eq('id', state.userId)
       if (error) throw error
 
+      await checkAuth() // Refresh global state
+
       setState((s) => ({
         ...s,
-        status: { type: 'success', message: 'Changes saved! Redirecting...' },
+        loading: false,
+        status: { type: 'success', message: 'Profile updated successfully!' },
       }))
-      setTimeout(() => router.push('/dashboard'), 1500)
     } catch {
       setState((s) => ({
         ...s,
         loading: false,
         status: { type: 'error', message: 'Could not save changes.' },
       }))
+    }
+  }
+
+  const handleUpdatePassword = async (password: string) => {
+    setState(s => ({ ...s, loading: true, status: null }))
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+      if (error) throw error
+
+      setState(s => ({
+        ...s,
+        loading: false,
+        status: { type: 'success', message: 'Password updated successfully!' }
+      }))
+      return { error: null }
+    } catch (err: any) {
+      const msg = err.message || 'Failed to update password.'
+      setState(s => ({ ...s, loading: false, status: { type: 'error', message: msg } }))
+      return { error: msg }
     }
   }
 
@@ -151,6 +172,7 @@ export function useProfile() {
     clearFile,
     handleAvatarUpload,
     handleSaveProfile,
+    handleUpdatePassword,
     goBack: () => router.push('/dashboard'),
   }
 }

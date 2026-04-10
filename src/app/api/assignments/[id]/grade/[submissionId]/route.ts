@@ -75,7 +75,6 @@ export async function POST(
         
         extractedText = await extractTextFromSubmission(supabase, attachments)
       } catch (err) {
-        console.error('Text extraction failed:', err)
         // We continue with just the typed text if extraction fails
       }
     }
@@ -110,7 +109,6 @@ export async function POST(
       .eq('id', submissionId)
 
     if (updateError) {
-      console.error('Error updating submission:', updateError)
       return NextResponse.json({ error: 'Failed to update submission' }, { status: 500 })
     }
 
@@ -121,7 +119,6 @@ export async function POST(
       scores: gradingResult.scores,
     })
   } catch (error: any) {
-    console.error('AI Grading Error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to grade submission' },
       { status: 500 }

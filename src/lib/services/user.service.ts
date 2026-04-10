@@ -11,7 +11,7 @@ export const UserService = {
     const cached = await redisSafe.get<{ full_name: string | null; avatar_url: string | null }>(cacheKey)
     if (cached) return cached
 
-    const supabase = (await createClient() as unknown) as SupabaseClient<Database>
+    const supabase = await createClient()
     const { data, error } = await supabase
       .from('users')
       .select('full_name, avatar_url')

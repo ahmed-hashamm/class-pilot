@@ -95,7 +95,7 @@ export function useStreamRealtime(classId: string, initialData: StreamItem[]) {
           })
         }
       } catch (err) {
-        console.error('Error refetching realtime row:', err)
+        /* Silent failure - row refetch failed or unmounted */
       }
     }
 

@@ -28,7 +28,6 @@ export async function POST(req: Request) {
     .maybeSingle()
 
   if (error || !materialRaw) {
-    console.error('[ingest] Material not found:', error)
     return NextResponse.json({ error: 'Material not found' }, { status: 404 })
   }
 
@@ -66,7 +65,7 @@ export async function POST(req: Request) {
         chunk_index: i,
       })
     } catch (err) {
-      console.error(`[ingest] Embedding failed for chunk ${i}:`, err)
+      /* Silent failure */
     }
   }
 
@@ -76,7 +75,6 @@ export async function POST(req: Request) {
       .insert(insertPayload as any)
 
     if (insertError) {
-      console.error('[ingest] Failed to insert chunks:', insertError)
       return NextResponse.json({ error: 'Failed to store chunks' }, { status: 500 })
     }
   }

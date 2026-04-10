@@ -6,7 +6,7 @@ import { Redis } from '@upstash/redis'
  */
 
 if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-  console.warn('[Redis] Missing UPSTASH environment variables. Redis features will be disabled.')
+  // Redis features will be disabled.
 }
 
 export const redis = new Redis({
@@ -24,7 +24,6 @@ export const redisSafe = {
     try {
       return await redis.get<T>(key)
     } catch (error) {
-      console.error(`[Redis Error] GET ${key}:`, error)
       return null
     }
   },
@@ -33,7 +32,6 @@ export const redisSafe = {
     try {
       await redis.set(key, value, options as any)
     } catch (error) {
-      console.error(`[Redis Error] SET ${key}:`, error)
     }
   },
 
@@ -41,7 +39,6 @@ export const redisSafe = {
     try {
       await redis.del(key)
     } catch (error) {
-      console.error(`[Redis Error] DEL ${key}:`, error)
     }
   },
 
@@ -49,7 +46,6 @@ export const redisSafe = {
     try {
       return await redis.incr(key)
     } catch (error) {
-      console.error(`[Redis Error] INCR ${key}:`, error)
       return null
     }
   },
@@ -58,7 +54,6 @@ export const redisSafe = {
     try {
       await redis.expire(key, seconds)
     } catch (error) {
-      console.error(`[Redis Error] EXPIRE ${key}:`, error)
     }
   },
 

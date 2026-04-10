@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .maybeSingle()
 
           if (fetchError) {
-            console.error('Error fetching profile, using metadata fallback:', fetchError)
+            /* Silent failure - using metadata fallback */
           }
 
           if (existingProfile) {
@@ -84,13 +84,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .maybeSingle()
             
             if (insertError) {
-              console.error('Failed to create profile, using metadata fallback:', insertError)
+              /* Silent failure - using metadata fallback */
             } else if (newProfile) {
               profileData = newProfile
             }
           }
         } catch (err) {
-          console.error('Profile sync logic failed:', err)
+          /* Silent failure */
         }
 
         // Apply profile data with full metadata fallback
@@ -106,7 +106,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null)
       }
     } catch (error) {
-      console.error('Auth check main error:', error)
       // Only set to false if we explicitly failed to get a user
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -153,7 +152,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 3. Redirect to the server-side signout route to clear cookies
       window.location.href = '/auth/signout'
     } catch (error) {
-      console.error('Sign out navigation error:', error)
       window.location.href = '/login'
     }
   }, [])

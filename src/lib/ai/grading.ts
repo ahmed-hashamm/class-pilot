@@ -65,10 +65,10 @@ async function logAIUsage(data: AIUsageLogData): Promise<void> {
       created_at: new Date().toISOString(),
     })
     if (error) {
-      console.error(`[ai-usage] Failed to log ${data.action_type}:`, error)
+      /* Silent failure */
     }
   } catch (err) {
-    console.error(`[ai-usage] Error logging ${data.action_type}:`, err)
+    /* Silent failure */
   }
 }
 
@@ -147,7 +147,6 @@ export async function generateRubricFromAssignment(
       ...c,
     }))
   } catch (error) {
-    console.error('[rubric-gen] AI Rubric Generation Error:', error)
     throw error
   }
 }
@@ -207,7 +206,6 @@ Respond in JSON format with this structure:
   const model = 'gpt-4o-mini'
 
   try {
-    console.log(`[grading] Starting AI grading with ${model} for submission ${submissionId}`)
 
     const completion = await openai.chat.completions.create({
       model,
@@ -230,7 +228,6 @@ Respond in JSON format with this structure:
     const outputTokens = completion.usage?.completion_tokens || 0
     const totalTokens = completion.usage?.total_tokens || 0
 
-    console.log(`[grading] AI response received - Input: ${inputTokens}, Output: ${outputTokens}, Total: ${totalTokens}`)
 
     await logAIUsage({
       user_id: userId,
@@ -275,10 +272,8 @@ Respond in JSON format with this structure:
       result.total_score = calculatedTotal
     }
 
-    console.log(`[grading] Grading complete - Total score: ${result.total_score}/${rubric.total_points}`)
     return result
   } catch (error) {
-    console.error('[grading] AI Grading Error:', error)
 
     await logAIUsage({
       user_id: userId,

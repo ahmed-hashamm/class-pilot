@@ -3,53 +3,13 @@
 import { useState, useMemo } from "react";
 import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
 import { useReveal } from "@/lib/hooks/useReveal";
-import { Article, ARTICLES, Category, CATEGORIES, CategoryId } from "@/lib/db_data_fetching/supportData";
+import { ARTICLES, CATEGORIES, CategoryId } from "@/lib/db_data_fetching/supportData";
+import { ArticleItem, CategoryGrid, HelpContactCards } from "@/components/features/help";
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   ARTICLE ACCORDION ITEM
-───────────────────────────────────────────────────────────────────────────── */
-function ArticleItem({ article, defaultOpen = false }: { article: Article; defaultOpen?: boolean }) {
-    const [open, setOpen] = useState(defaultOpen);
-
-    return (
-        <div className="border-b border-border last:border-0">
-            <button
-                onClick={() => setOpen(!open)}
-                className="w-full flex items-center justify-between gap-4 py-4
-                    text-left cursor-pointer bg-transparent border-none group"
-            >
-                <span className={`text-[14px] font-semibold transition-colors
-                    ${open ? "text-navy" : "text-foreground group-hover:text-navy"}`}>
-                    {article.title}
-                </span>
-                <span className={`shrink-0 size-6 rounded-full border flex items-center justify-center
-                    transition-all duration-200
-                    ${open ? "bg-navy border-navy" : "bg-transparent border-border"}`}>
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                        className={`transition-transform duration-200 ${open ? "rotate-45" : ""}`}>
-                        <path d="M5 1v8M1 5h8" stroke={open ? "white" : "currentColor"}
-                            strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                </span>
-            </button>
-            {open && (
-                <p className="text-[14px] text-muted-foreground leading-relaxed pb-5 pr-8">
-                    {article.answer}
-                </p>
-            )}
-        </div>
-    );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   PAGE
-───────────────────────────────────────────────────────────────────────────── */
 export default function HelpCenterPage() {
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all");
 
-    // Pass both state values as deps so useReveal re-observes
-    // whenever search results or category articles are newly rendered
     useReveal(`${search}::${activeCategory}`);
 
     /* filtered articles */
@@ -72,8 +32,6 @@ export default function HelpCenterPage() {
 
     return (
         <main className="bg-background text-foreground font-sans overflow-x-hidden ">
-
-            {/* ── HERO ──────────────────────────────────────────────────────────── */}
             <MarketingPagesLayout
                 href="/login"
                 buttonText="Get Started"
@@ -117,8 +75,6 @@ export default function HelpCenterPage() {
             </div>
 
             <div className="max-w-5xl mx-auto px-6 py-14">
-
-                {/* ── SEARCH RESULTS ─────────────────────────────────────────────── */}
                 {isSearching ? (
                     <div className="cp-reveal">
                         <p className="text-[13px] text-muted-foreground mb-5">
@@ -145,7 +101,6 @@ export default function HelpCenterPage() {
                     </div>
                 ) : (
                     <>
-                        {/* ── BROWSE BY CATEGORY ───────────────────────────────────────── */}
                         <section className="mb-14">
                             <div className="cp-reveal mb-6">
                                 <p className="text-[11px] font-bold tracking-[.18em] uppercase text-navy mb-1">
@@ -155,43 +110,9 @@ export default function HelpCenterPage() {
                                     What do you need help with?
                                 </h2>
                             </div>
-
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {CATEGORIES.map((cat, i) => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => setActiveCategory(
-                                            activeCategory === cat.id ? "all" : cat.id
-                                        )}
-                                        className={`cp-reveal text-left p-5 rounded-xl border transition-all duration-200
-                                            cursor-pointer group
-                                            ${activeCategory === cat.id
-                                                ? "bg-navy border-navy text-white"
-                                                : "bg-white border-border hover:border-navy/30 hover:shadow-sm"
-                                            }`}
-                                        style={{ transitionDelay: `${i * 0.05}s` }}>
-                                        <div className={`size-10 rounded-lg flex items-center justify-center mb-3
-                                            transition-colors
-                                            ${activeCategory === cat.id
-                                                ? "bg-white/15 text-white"
-                                                : "bg-navy/8 text-navy"
-                                            }`}>
-                                            {cat.icon}
-                                        </div>
-                                        <p className={`font-bold text-[14px] mb-0.5
-                                            ${activeCategory === cat.id ? "text-white" : "text-foreground"}`}>
-                                            {cat.label}
-                                        </p>
-                                        <p className={`text-[12px] leading-snug
-                                            ${activeCategory === cat.id ? "text-white/65" : "text-muted-foreground"}`}>
-                                            {cat.desc}
-                                        </p>
-                                    </button>
-                                ))}
-                            </div>
+                            <CategoryGrid activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
                         </section>
 
-                        {/* ── CATEGORY ARTICLES (when a category is selected) ─────────── */}
                         {isBrowsing && (
                             <section className="mb-14 cp-reveal">
                                 <div className="flex items-center justify-between mb-4">
@@ -211,7 +132,6 @@ export default function HelpCenterPage() {
                             </section>
                         )}
 
-                        {/* ── POPULAR ARTICLES (shown when no category selected) ───────── */}
                         {!isBrowsing && (
                             <section className="mb-14">
                                 <div className="cp-reveal mb-6">
@@ -230,65 +150,9 @@ export default function HelpCenterPage() {
                     </>
                 )}
 
-                {/* ── CONTACT CTA ──────────────────────────────────────────────────── */}
                 <section className="cp-reveal">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {/* Email */}
-                        <div className="flex items-start gap-4 bg-white border border-border
-                            rounded-2xl p-6 hover:shadow-sm transition-shadow">
-                            <div className="shrink-0 size-11 rounded-xl bg-navy/8 border border-navy/12
-                                flex items-center justify-center text-navy">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <rect x="2" y="4" width="16" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" />
-                                    <path d="M2 7l8 5 8-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="font-bold text-[15px] mb-1">Email support</p>
-                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed">
-                                    Can't find your answer? We usually reply within a few hours.
-                                </p>
-                                <a href="mailto:classpilot.edu@gmail.com"
-                                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-navy
-                                        hover:gap-2.5 transition-all duration-200">
-                                    classpilot.edu@gmail.com
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                        <path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-
-                        {/* Feedback */}
-                        <div className="flex items-start gap-4 bg-yellow/20 border border-yellow/60
-                            rounded-2xl p-6 hover:shadow-sm transition-shadow">
-                            <div className="shrink-0 size-11 rounded-xl bg-yellow border border-yellow/80
-                                flex items-center justify-center text-navy">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M2 4h16v10a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" stroke="currentColor" strokeWidth="1.5" />
-                                    <path d="M6 8h8M6 11h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p className="font-bold text-[15px] mb-1">Send us feedback</p>
-                                <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed">
-                                    Found a bug or have a feature idea? We read every message.
-                                </p>
-                                <a href="/contact"
-                                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-navy
-                                        hover:gap-2.5 transition-all duration-200">
-                                    Share feedback
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                        <path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
+                    <HelpContactCards />
                 </section>
-
             </div>
         </main>
     );

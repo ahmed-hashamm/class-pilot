@@ -54,7 +54,9 @@ export async function getAssignmentDetail(classId: string, assignmentId: string)
       .eq('assignment_id', assignmentId)
       .order('submitted_at', { ascending: false })
 
-    if (subError) console.error('[getAssignmentDetail] Sub Query Error:', subError)
+    if (subError) {
+      /* Silent failure */
+    }
 
     // Find first submission matching user OR any of their groups
     submission = allAssignmentSubmissions?.find(s =>
@@ -63,7 +65,6 @@ export async function getAssignmentDetail(classId: string, assignmentId: string)
     ) || null
   }
 
-  // console.log(`[getAssignmentDetail] Fetching for ${assignment.title}: ${submission ? 'Turned in' : 'Assigned'}`)
 
   // Get all submissions for teacher
   let submissions = null
