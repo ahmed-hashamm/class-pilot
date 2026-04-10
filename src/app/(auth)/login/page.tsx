@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
+import { PasswordRequirements } from '@/components/features/auth/PasswordRequirements'
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -159,15 +160,26 @@ function LoginContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                {!isSignup && (
+                  <Link 
+                    href="/forgot-password" 
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                )}
+              </div>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
               />
+              {isSignup && <PasswordRequirements password={password} />}
             </div>
             {error && (
               <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>

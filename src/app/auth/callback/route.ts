@@ -79,7 +79,9 @@ export async function GET(request: Request) {
     }
   }
 
+  const next = requestUrl.searchParams.get('next') ?? '/dashboard'
+
   return NextResponse.redirect(
-    `${origin}/dashboard?auth=success&t=${Date.now()}`
+    `${origin}${next}${next.includes('?') ? '&' : '?'}auth=success&t=${Date.now()}`
   )
 }
