@@ -17,19 +17,8 @@ import { UserProfileDropdown } from "@/components/ui/UserProfileDropdown";
 
 const DashboardNavbar = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClient();
-
   const { profile, signOut, isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) setUserId(user.id);
-    };
-    if (isAuthenticated || profile) getUserId();
-  }, [isAuthenticated, profile]);
 
   return (
     <nav className="border-b border-gray-200 bg-navy text-primary-foreground sticky top-0 z-50">
@@ -82,9 +71,9 @@ const DashboardNavbar = () => {
       </div>
 
       {/* Modal - The full-width logic is usually handled inside CreateClassModal via Tailwind 'w-full max-w-md' etc. */}
-      {showCreateModal && userId && (
+      {showCreateModal && profile && (
         <CreateClassModal
-          userId={userId}
+          userId={profile.id}
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => {
             router.refresh();

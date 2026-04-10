@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 interface UserProfile {
+  id: string
   name: string
   email: string
   role: string
@@ -94,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Apply profile data with full metadata fallback
         setProfile({
+          id: user.id,
           name: (profileData as any)?.full_name || fullName || user.email?.split('@')[0] || 'User',
           email: (profileData as any)?.email || user.email || '',
           role: 'user',
@@ -136,19 +138,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [checkAuth, supabase])
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
-      await supabase.auth.signOut()
+      // 1. Immediately clear local state for instant UI feedback
       setIsAuthenticated(false)
       setProfile(null)
-      // Use window.location for a full page reload to clear all state
-      window.location.href = '/'
+      setLoading(false)
+
+      // 2. Clear global session
+      await supabase.auth.signOut()
     } catch (error) {
       console.error('Sign out error:', error)
-      // Still redirect even if signOut fails
-      window.location.href = '/'
+    } finally {
+      // 3. Force a complete page reload to a clean state on the login page
+      // Use window.location for the most reliable "panic" redirect
+      window.location.href = '/login'
     }
-  }
+  }, [supabase])
 
   return (
     <AuthContext.Provider
