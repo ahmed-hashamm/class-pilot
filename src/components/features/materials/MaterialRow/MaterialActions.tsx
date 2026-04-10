@@ -9,6 +9,7 @@ interface MaterialActionsProps {
   onSync: (id: string) => void;
   onEdit: (material: Material) => void;
   onDelete: (id: string) => void;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 export default function MaterialActions({
@@ -17,14 +18,20 @@ export default function MaterialActions({
   onSync,
   onEdit,
   onDelete,
+  onOpenChange,
 }: MaterialActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = (val: boolean) => {
+    setMenuOpen(val);
+    onOpenChange?.(val);
+  };
 
   return (
     <div className="relative z-30">
       <Button
         variant="ghost"
-        onClick={() => setMenuOpen(!menuOpen)}
+        onClick={() => toggleMenu(!menuOpen)}
         className="p-1.5 h-auto text-muted-foreground hover:text-navy hover:bg-secondary"
       >
         {isSyncing ? <Loader2 size={16} className="animate-spin" /> : <MoreVertical size={18} />}
@@ -32,7 +39,7 @@ export default function MaterialActions({
 
       {menuOpen && (
         <>
-          <div className="fixed inset-0 z-40 outline-none" onClick={() => setMenuOpen(false)} />
+          <div className="fixed inset-0 z-40 outline-none" onClick={() => toggleMenu(false)} />
           <div className="absolute right-0 top-10 z-50 bg-white border border-border
             rounded-2xl shadow-2xl shadow-navy/10 overflow-hidden min-w-[160px] animate-in fade-in zoom-in-95 duration-200">
             <div className="px-3 py-2 border-b border-border bg-secondary/20">
@@ -41,7 +48,7 @@ export default function MaterialActions({
 
             <Button
               variant="ghost"
-              onClick={() => { setMenuOpen(false); onSync(material.id); }}
+              onClick={() => { toggleMenu(false); onSync(material.id); }}
               disabled={isSyncing}
               className="w-full flex items-center gap-3 px-4 py-3 h-auto text-[13px] font-black text-navy hover:bg-secondary transition-all text-left justify-start rounded-none"
             >
@@ -51,7 +58,7 @@ export default function MaterialActions({
 
             <Button
               variant="ghost"
-              onClick={() => { setMenuOpen(false); onEdit(material); }}
+              onClick={() => { toggleMenu(false); onEdit(material); }}
               className="w-full flex items-center gap-3 px-4 py-3 h-auto text-[13px] font-black text-navy hover:bg-secondary transition-all text-left justify-start rounded-none"
             >
               <Pencil size={14} className="text-navy/60" />
@@ -61,7 +68,7 @@ export default function MaterialActions({
             <div className="border-t border-border mt-1 pt-1">
               <Button
                 variant="ghost"
-                onClick={() => { setMenuOpen(false); onDelete(material.id); }}
+                onClick={() => { toggleMenu(false); onDelete(material.id); }}
                 className="w-full flex items-center gap-3 px-4 py-3 h-auto text-[13px] font-black text-red-500 hover:bg-red-50 transition-all text-left justify-start rounded-none"
               >
                 <Trash2 size={14} />

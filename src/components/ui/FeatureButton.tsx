@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 interface FeatureButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string
   icon?: LucideIcon
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'yellow'
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'yellow' | 'ghost'
   loading?: boolean
   loadingLabel?: string
 }
@@ -34,6 +34,7 @@ export function FeatureButton({
     outline: "bg-transparent text-muted-foreground hover:bg-secondary/50 hover:text-navy rounded-xl px-5 py-2",
     danger: "bg-red-600 text-white hover:bg-red-700 rounded-xl px-5 py-2",
     yellow: "bg-yellow text-navy hover:bg-yellow/90 rounded-xl px-6 py-3 shadow-md",
+    ghost: "bg-transparent text-muted-foreground hover:bg-secondary/50 hover:text-navy rounded-xl px-4 py-2",
   }
 
   return (

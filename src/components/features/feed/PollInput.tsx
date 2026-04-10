@@ -40,7 +40,9 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         isPinned
       )
 
-      if (result.success) {
+      if (result.error) {
+        toast.error(result.error || 'Failed to create poll')
+      } else {
         toast.success('Poll created successfully')
         setQuestion('')
         setOptions(['', ''])
@@ -48,8 +50,6 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         setIsPinned(false)
         if (onSuccess) onSuccess()
         router.refresh()
-      } else {
-        toast.error(result.error || 'Failed to create poll')
       }
     } catch (err: any) {
       toast.error('An unexpected error occurred')

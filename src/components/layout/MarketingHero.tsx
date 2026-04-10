@@ -1,6 +1,8 @@
 "use client";
 
+import React from "react";
 import WavePattern from "./WavePattern";
+import Link from "next/link";
 
 interface MarketingHeroProps {
     /** Small eyebrow label inside the pill — e.g. "The Class Pilot Blog" */
@@ -19,7 +21,7 @@ interface MarketingHeroProps {
     buttonText: string;
 }
 
-export default function MarketingPagesLayout({
+export default function MarketingHero({
     pageIntro,
     headingStart,
     headingHighlight,
@@ -57,24 +59,15 @@ export default function MarketingPagesLayout({
             >
                 {text}
             </p>
-            <div className="cp-hero-4 mt-4">
-                <a href={href}
+            <div className="cp-reveal mt-4">
+                <Link href={href}
                     className="inline-flex items-center gap-2 bg-yellow text-navy font-semibold
                 text-sm px-7 py-3 rounded-lg transition hover:bg-yellow-hover hover:-translate-y-0.5">
                     {buttonText}
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                </a>
-                {/* <a href="/demo"
-                            className="inline-flex items-center gap-2 text-white font-normal text-sm
-                px-5 py-3 border border-white/25 rounded-lg transition hover:border-yellow/60 hover:text-yellow">
-                            Watch 2-min demo
-                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                                <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.1" />
-                                <path d="M5.5 4.5l4 2-4 2v-4z" fill="currentColor" />
-                            </svg>
-                        </a> */}
+                </Link>
             </div>
         </section>
     );

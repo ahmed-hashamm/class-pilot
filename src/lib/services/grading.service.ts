@@ -33,8 +33,8 @@ export const GradingService = {
       throw new Error('Submission not found')
     }
 
-    const assignment = submission.assignments
-    const rubric = assignment?.rubrics
+    const assignment = submission.assignments as any
+    const rubric = (assignment as any)?.rubrics as any
 
     if (!rubric) {
       throw new Error('No rubric attached to assignment')
@@ -48,7 +48,7 @@ export const GradingService = {
       .eq('user_id', teacherId)
       .maybeSingle()
 
-    if (!member || member.role !== 'teacher') {
+    if (!member || (member as any).role !== 'teacher') {
       throw new Error('Forbidden: Teacher access required')
     }
 
@@ -71,12 +71,12 @@ export const GradingService = {
     // 3. Extract text from content and files
     let extractedText = ''
     const files = (submission.files as any[]) || []
-    
+
     if (files.length > 0) {
       try {
         const attachments = files.map((f: any) => {
           let path = f.path;
-          
+
           if (!path && f.url && typeof f.url === 'string') {
             const bucketSegment = '/assignments/';
             const bucketIndex = f.url.indexOf(bucketSegment);
@@ -93,7 +93,7 @@ export const GradingService = {
             type: f.type || extension,
           }
         })
-        
+
         extractedText = await extractTextFromSubmission(supabase, attachments)
       } catch (err) {
         // Silently fail text extraction as per production rules (or use a specialized logger)
@@ -128,8 +128,7 @@ export const GradingService = {
     await redisSafe.set(cacheKey, gradingResult, { ex: 86400 })
 
     // 5. Persist to DB as a draft
-    const { error: updateError } = await supabase
-      .from('submissions')
+    const { error: updateError } = await supabase.from('submissions')
       .update({
         ai_grade: gradingResult.total_score,
         ai_feedback: gradingResult.overall_feedback,
@@ -166,17 +165,16 @@ export const GradingService = {
       .eq('user_id', teacherId)
       .maybeSingle()
 
-    if (!member || member.role !== 'teacher') {
+    if (!member || (member as any).role !== 'teacher') {
       throw new Error('Forbidden: Teacher access required')
     }
 
     // 3. Update grade
-    const { error: updateError } = await supabase
-      .from('submissions')
-      .update({ 
-        final_grade: score, 
+    const { error: updateError } = await supabase.from('submissions')
+      .update({
+        final_grade: score,
         status: 'graded',
-        updated_at: new Date().toISOString() 
+        updated_at: new Date().toISOString()
       })
       .eq('id', submissionId)
 
@@ -208,19 +206,18 @@ export const GradingService = {
       .eq('user_id', teacherId)
       .maybeSingle()
 
-    if (!member || member.role !== 'teacher') {
+    if (!member || (member as any).role !== 'teacher') {
       throw new Error('Forbidden: Teacher access required')
     }
 
     // 3. Update grade
-    const { error: updateError } = await supabase
-      .from('submissions')
-      .update({ 
-        manual_grade: score, 
-        final_grade: score, 
+    const { error: updateError } = await supabase.from('submissions')
+      .update({
+        manual_grade: score,
+        final_grade: score,
         teacher_feedback: feedback,
         status: 'graded',
-        updated_at: new Date().toISOString() 
+        updated_at: new Date().toISOString()
       })
       .eq('id', submissionId)
 

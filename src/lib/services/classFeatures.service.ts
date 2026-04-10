@@ -29,11 +29,11 @@ export const ClassFeaturesService = {
     if (error) throw error
     return record
   },
-
   async markAttendance(data: {
     classId: string
     title: string
     date: string
+    userId: string
     students: { id: string; status: string }[]
   }) {
     const supabase = await createClient()
@@ -43,6 +43,7 @@ export const ClassFeaturesService = {
         class_id: data.classId,
         title: data.title,
         date: data.date,
+        created_by: data.userId,
       })
       .select()
       .maybeSingle()
@@ -123,7 +124,7 @@ export const ClassFeaturesService = {
         deadline: data.deadline,
         created_by: data.userId,
         pinned: data.pinned
-      } as any)
+      })
       .select()
       .maybeSingle()
     if (error) throw error
@@ -148,9 +149,9 @@ export const ClassFeaturesService = {
   async closePoll(pollId: string) {
     const supabase = await createClient()
     const { data: poll } = await supabase.from('polls').select('class_id').eq('id', pollId).maybeSingle()
-    const { error } = await supabase.from('polls').update({ closed_at: new Date().toISOString() } as any).eq('id', pollId)
+    const { error } = await supabase.from('polls').update({ closed_at: new Date().toISOString() }).eq('id', pollId)
     if (error) throw error
-    return (poll as any)?.class_id
+    return poll?.class_id
   },
 
   async deletePoll(pollId: string, userId: string) {
@@ -162,7 +163,7 @@ export const ClassFeaturesService = {
   async getPollResults(pollId: string) {
     const { redisSafe } = await import('@/lib/redis')
     const cacheKey = `poll:results:${pollId}`
-    
+
     // 1. Check cache first (10s window)
     const cached = await redisSafe.get<Record<number, number>>(cacheKey)
     if (cached) return cached
@@ -184,36 +185,33 @@ export const ClassFeaturesService = {
     return counts
   },
 
-  // --- BEHAVIOR ---
-  async addBehaviorPoint(data: {
-    classId: string
-    studentId: string
-    points: number
-    reason: string
-    category: string
-    createdBy: string
+  // --- AI LOGGING ---
+  async logAIUsage(data: {
+    userId: string
+    actionType: string
+    model: string
+    inputTokens: number
+    outputTokens: number
   }) {
     const supabase = await createClient()
-    const { error } = await supabase.from("behavior_logs" as any).insert({
-      class_id: data.classId,
-      student_id: data.studentId,
-      points: data.points,
-      reason: data.reason,
-      category: data.category,
-      created_by: data.createdBy,
-    } as any)
+    const { error } = await supabase.from("ai_usage_logs").insert({
+      user_id: data.userId,
+      action_type: data.actionType,
+      model: data.model,
+      input_tokens: data.inputTokens,
+      output_tokens: data.outputTokens,
+    })
     if (error) throw error
   },
 
-  async getBehaviorLogs(studentId: string, classId: string) {
+  async getAIUsageLogs(userId: string) {
     const supabase = await createClient()
-    const { data, error } = await supabase.from("behavior_logs" as any)
+    const { data, error } = await supabase.from("ai_usage_logs")
       .select("*")
-      .eq("student_id", studentId)
-      .eq("class_id", classId)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
     if (error) throw error
-    return data as any[]
+    return data
   },
 
   async saveRubric(data: {
@@ -224,7 +222,7 @@ export const ClassFeaturesService = {
     created_by: string
   }) {
     const supabase = await createClient()
-    
+
     if (data.id) {
       const { data: rubric, error } = await supabase
         .from('rubrics')

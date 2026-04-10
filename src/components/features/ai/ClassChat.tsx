@@ -40,7 +40,7 @@ export default function ClassChat({ classId, onClose }: ClassChatProps) {
         getClassName(classId),
         fetchChatHistory({ classId })
       ])
-      setClassName(name)
+      if (name.data) setClassName(name.data)
       if (history.data) setMessages(history.data as Message[])
       setInitializing(false)
     }

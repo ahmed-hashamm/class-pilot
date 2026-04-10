@@ -66,10 +66,10 @@ export default function GradeSubmission({
     setIsPublishing(true)
     try {
       const result = await publishAIGrade(submission.id)
-      if (result.success) {
-        router.refresh()
-      } else {
+      if (result.error) {
         console.error("Failed to publish AI grade:", result.error)
+      } else {
+        router.refresh()
       }
     } catch (err) {
       console.error("Error publishing AI grade:", err)

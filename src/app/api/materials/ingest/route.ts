@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Material not found' }, { status: 404 })
   }
 
-  const material = materialRaw as any
+  const material = materialRaw
 
   // 2️⃣ Delete existing chunks (re-ingest safe)
   await supabase
@@ -40,7 +40,12 @@ export async function POST(req: Request) {
     .eq('material_id', materialId)
 
   // 3️⃣ Extract text
-  const text = await extractTextFromMaterial(material as any)
+  const text = await extractTextFromMaterial({
+    id: material.id,
+    class_id: material.class_id,
+    attachment_paths: material.attachment_paths ?? undefined,
+    file_types: material.file_types ?? undefined,
+  })
 
   if (!text.trim()) {
     return NextResponse.json(
@@ -53,7 +58,7 @@ export async function POST(req: Request) {
   const chunks = chunkText(text)
 
   // 5️⃣ Generate embeddings & store
-  const insertPayload = []
+  const insertPayload: any[] = [] // Still using any[] here as we are building a dynamic insert, but the insert itself will satisfy the schema
   for (let i = 0; i < chunks.length; i++) {
     try {
       const embedding = await embedText(chunks[i])
@@ -72,7 +77,7 @@ export async function POST(req: Request) {
   if (insertPayload.length > 0) {
     const { error: insertError } = await supabase
       .from('material_chunks')
-      .insert(insertPayload as any)
+      .insert(insertPayload)
 
     if (insertError) {
       return NextResponse.json({ error: 'Failed to store chunks' }, { status: 500 })
@@ -82,7 +87,7 @@ export async function POST(req: Request) {
   // 6️⃣ Mark material as synced
   await supabase
     .from('materials')
-    .update({ ai_synced: true } as never)
+    .update({ ai_synced: true })
     .eq('id', materialId)
 
   return NextResponse.json({

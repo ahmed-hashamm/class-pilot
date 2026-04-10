@@ -1,7 +1,7 @@
 import { getRubricsList } from '@/lib/db_data_fetching/rubrics'
 import Link from 'next/link'
 import { Plus, FileText, ChevronRight, BookOpen } from 'lucide-react'
-import { Button, PageHeader } from '@/components/ui'
+import { Button, PageHeader, EmptyState } from '@/components/ui'
 
 export default async function RubricsPage() {
   const { rubrics } = await getRubricsList()
@@ -77,26 +77,20 @@ export default async function RubricsPage() {
           ))}
         </div>
       ) : (
-        /* Empty state */
-        <div className="flex flex-col items-center justify-center gap-4
-          py-24 border-2 border-dashed border-border/60 rounded-3xl bg-white/50 text-center">
-          <div className="size-16 rounded-2xl bg-navy/5 border border-navy/10
-            flex items-center justify-center mb-2">
-            <FileText size={28} className="text-navy/20" />
-          </div>
-          <div>
-            <p className="font-black text-[18px] text-navy tracking-tight mb-1">No rubrics yet</p>
-            <p className="text-[14px] text-muted-foreground max-w-xs leading-relaxed font-medium">
-              Create your first grading rubric to simplify your feedback process and ensure consistency.
-            </p>
-          </div>
-          <Link href="/rubrics/create">
-            <Button variant="primary" className="mt-2 gap-2 px-6">
-              <Plus size={16} />
-              <span>Create first rubric</span>
-            </Button>
-          </Link>
-        </div>
+        <EmptyState
+          variant="dashboard"
+          icon={FileText}
+          title="No rubrics yet"
+          description="Create your first grading rubric to simplify your feedback process and ensure consistency."
+          actions={
+            <Link href="/rubrics/create">
+              <Button variant="primary" className="mt-2 gap-2 px-6">
+                <Plus size={16} />
+                <span>Create first rubric</span>
+              </Button>
+            </Link>
+          }
+        />
       )}
     </div>
   )

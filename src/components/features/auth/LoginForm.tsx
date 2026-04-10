@@ -7,9 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LoginSchema, type LoginInput } from '@/lib/validations/auth'
 import { signInAction } from '@/actions/AuthActions'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { FeatureButton } from '@/components/ui/FeatureButton'
+import { Input, PasswordInput, FeatureButton, FormSection } from '@/components/ui'
 import { toast } from 'sonner'
 
 export function LoginForm() {
@@ -44,42 +42,38 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <FormSection
+        label="Email"
+        error={errors.email?.message}
+      >
         <Input
           id="email"
           type="email"
           placeholder="name@example.com"
           {...register('email')}
-          className={errors.email ? 'border-red-500' : ''}
+          error={!!errors.email}
         />
-        {errors.email && (
-          <p className="text-xs text-red-500">{errors.email.message}</p>
-        )}
-      </div>
+      </FormSection>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
-
-        </div>
-        <Input
+      <FormSection
+        label="Password"
+        error={errors.password?.message}
+        labelAction={
+          <Link
+            href="/forgot-password"
+            className="text-[11px] font-bold text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          >
+            Forgot password?
+          </Link>
+        }
+      >
+        <PasswordInput
           id="password"
-          type="password"
           {...register('password')}
-          className={errors.password ? 'border-red-500' : ''}
+          error={!!errors.password}
         />
-        {errors.password && (
-          <p className="text-xs text-red-500">{errors.password.message}</p>
-        )}
-        <Link
-          href="/forgot-password"
-          className="text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-        >
-          Forgot password?
-        </Link>
-      </div>
+      </FormSection>
 
       <FeatureButton
         type="submit"

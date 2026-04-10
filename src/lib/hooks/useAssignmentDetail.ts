@@ -17,7 +17,9 @@ export function useAssignmentDetail(assignment: any, classId: string) {
     setIsDeleting(true);
     try {
       const { data, error } = await deleteAssignment(assignment.id, classId);
-      if (data?.success) {
+      if (error) {
+        toast.error(error || "Failed to delete assignment");
+      } else if (data?.success) {
         // Invalidate both the feed and the assignment lists
         await queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
         await queryClient.invalidateQueries({ queryKey: ["classAssignments", classId] });
@@ -26,8 +28,6 @@ export function useAssignmentDetail(assignment: any, classId: string) {
         toast.success("Assignment deleted successfully");
         router.push(`/classes/${classId}?tab=${fromTab}`);
         router.refresh();
-      } else {
-        toast.error(error || "Failed to delete assignment");
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to delete assignment");

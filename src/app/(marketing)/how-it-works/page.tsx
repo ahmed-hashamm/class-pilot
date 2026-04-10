@@ -1,6 +1,7 @@
 "use client";
 
-import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
+import { MarketingHero } from "@/components/layout";
+import { MarketingCTA } from "@/components/features/marketing";
 import { useReveal } from "@/lib/hooks/useReveal";
 import { STATS } from "@/lib/db_data_fetching/marketingData";
 import {
@@ -15,7 +16,7 @@ export default function HowItWorks() {
 
     return (
         <main className="bg-background text-foreground font-sans overflow-x-hidden">
-            <MarketingPagesLayout
+            <MarketingHero
                 pageIntro="How It Works"
                 href="/login"
                 buttonText="Get started free"
@@ -57,20 +58,13 @@ export default function HowItWorks() {
                 </div>
             </section>
 
-            <section className="bg-secondary py-20 px-6 text-center cp-reveal">
-                <p className="text-[11px] font-bold tracking-[.2em] uppercase text-navy/60 mb-2">Ready to start?</p>
-                <h2 className="font-black text-[clamp(28px,4.5vw,52px)] leading-tight tracking-tight text-primary mb-4">
-                    Your class is live in <span className="italic">under two minutes.</span>
-                </h2>
-                <p className="text-[15px] text-muted-foreground leading-relaxed max-w-md mx-auto mb-9">
-                    Create your class, invite your students, and post your first assignment today. Free to try, no credit card needed.
-                </p>
-                <div className="flex gap-3 justify-center flex-wrap">
-                    <a href="/login" className="inline-flex items-center gap-2 bg-navy text-white font-semibold text-sm px-7 py-3 rounded-lg transition hover:bg-navy/90 hover:-translate-y-0.5">
-                        Create your free class
-                    </a>
-                </div>
-            </section>
+            <MarketingCTA
+                title="Your class is live in under two minutes."
+                description="Create your class, invite your students, and post your first assignment today. Free to try, no credit card needed."
+                primaryButtonText="Create your free class"
+                primaryButtonHref="/login"
+                className="bg-secondary/50"
+            />
         </main>
     );
 }

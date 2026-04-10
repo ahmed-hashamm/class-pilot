@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { gradeSubmission } from '@/lib/ai/grading'
+import { gradeSubmission, RubricCriterion } from '@/lib/ai/grading'
 import { extractTextFromSubmission } from '@/lib/ingestion/extract-text'
 
 export async function POST(
@@ -20,7 +20,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: submission, error: submissionError } = await (supabase as any)
+    const { data: submission, error: submissionError } = await (supabase)
       .from('submissions')
       .select(`
         *,
@@ -59,8 +59,8 @@ export async function POST(
     }
 
     const submissionContent = {
-      text: submission.content || undefined,
-      files: submission.files || [],
+      text: typeof submission.content === 'string' ? submission.content : undefined,
+      files: (Array.isArray(submission.files) ? submission.files : []) as any[],
     }
 
     // Extract text from uploaded files if any
@@ -72,10 +72,10 @@ export async function POST(
           path: f.path || f.name, // Use path or name depending on schema
           type: f.type || (f.path?.split('.').pop() || ''),
         }))
-        
+
         extractedText = await extractTextFromSubmission(supabase, attachments)
       } catch (err) {
-        // We continue with just the typed text if extraction fails
+        //continue with just the typed text if extraction fails
       }
     }
 
@@ -90,7 +90,7 @@ export async function POST(
       {
         id: rubric.id,
         name: rubric.name,
-        criteria: rubric.criteria,
+        criteria: (rubric.criteria as unknown) as RubricCriterion[],
         total_points: rubric.total_points,
       },
       user.id,
@@ -98,12 +98,12 @@ export async function POST(
       assignmentId
     )
 
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await (supabase)
       .from('submissions')
       .update({
         ai_grade: gradingResult.total_score,
         ai_feedback: gradingResult.overall_feedback,
-        grading_status: 'completed',
+        status: 'completed',
         updated_at: new Date().toISOString(),
       })
       .eq('id', submissionId)

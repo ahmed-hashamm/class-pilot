@@ -45,18 +45,20 @@ export default function MaterialUpload({
     try {
       const { createMaterial } = await import('@/actions/ClassActions')
       const result = await createMaterial(formData)
-      if (result.success) {
-        toast.success("Materials uploaded successfully");
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        toast.success("Materials uploaded successfully")
         resetForm()
         onSuccess()
           ; (window as any).refreshFeed?.()
 
-        // Auto-sync for AI in the background
-        if (result.materialId) {
+        const materialId = (result.data as any)?.materialId
+        if (materialId) {
           fetch('/api/materials/ingest', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ materialId: result.materialId }),
+            body: JSON.stringify({ materialId }),
           })
             .then((res) => res.json())
             .then((data) => {

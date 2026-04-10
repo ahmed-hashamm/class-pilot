@@ -1,10 +1,11 @@
 "use client";
 
-import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
+import { MarketingHero } from "@/components/layout";
 import {
   PricingCard,
   FaqSection,
-  RoadmapSection
+  RoadmapSection,
+  MarketingCTA
 } from "@/components/features/marketing";
 import {
   FREE_FEATURES,
@@ -19,7 +20,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header (navy) */}
-      <MarketingPagesLayout
+      <MarketingHero
         pageIntro="Early Access Pricing"
         href="/auth/register"
         buttonText="Get started for free"
@@ -56,30 +57,7 @@ export default function PricingPage() {
       <FaqSection faqs={FAQS} />
 
       {/* Final CTA */}
-      <section className="px-6 py-24 text-center">
-        <div className="cp-reveal max-w-2xl mx-auto bg-navy rounded-3xl p-12 shadow-2xl shadow-navy/20">
-          <h2 className="text-3xl font-black text-white mb-4">
-            Ready to transform your classroom?
-          </h2>
-          <p className="text-white/70 mb-8 max-w-md mx-auto">
-            Join thousands of teachers already using Class Pilot to save time and engage students.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="/auth/register"
-              className="w-full sm:w-auto bg-white text-navy font-bold px-10 py-4 rounded-xl transition-transform hover:-translate-y-1"
-            >
-              Sign up for free
-            </a>
-            <a
-              href="/contact"
-              className="w-full sm:w-auto bg-navy/50 text-white font-bold border border-white/20 px-10 py-4 rounded-xl transition-all hover:bg-navy/70"
-            >
-              Contact support
-            </a>
-          </div>
-        </div>
-      </section>
+      <MarketingCTA />
     </div>
   );
 }

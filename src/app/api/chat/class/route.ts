@@ -29,10 +29,10 @@ export async function POST(req: Request) {
   // --- REDIS INTEGRATION: AI Assistant Rate Limiting ---
   const { checkRateLimit } = await import('@/lib/utils/rate-limit')
   const { success, current, limit } = await checkRateLimit(user.id, 'AI_ASSISTANT')
-  
+
   if (!success) {
-    return NextResponse.json({ 
-      answer: `⚠️ Rate limit exceeded: ${current}/${limit} messages per hour. Please wait a while before asking more questions.` 
+    return NextResponse.json({
+      answer: `⚠️ Rate limit exceeded: ${current}/${limit} messages per hour. Please wait a while before asking more questions.`
     }, { status: 429 })
   }
 
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   const feed = await getStreamFeed(classId)
 
   // Fetch assignment IDs this student has already submitted
-  const { data: userSubmissions } = await (adminClient as any)
+  const { data: userSubmissions } = await (adminClient)
     .from('submissions')
     .select('assignment_id')
     .eq('user_id', user.id)
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     .sort((a, b) => new Date((b as any).created_at).getTime() - new Date((a as any).created_at).getTime())
     .slice(0, 8)
     .map(item => {
-      const a = item as any
+      const a = item
       const isPast = a.due_date && new Date(a.due_date) < now
       const isSubmitted = submittedIds.has(a.id)
       const status = isSubmitted ? '(Submitted)' : isPast ? '(Past Due - Not Submitted)' : '(Upcoming - Not Submitted)'
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     .filter(item => item.type === 'announcement')
     .slice(0, 5)
     .map(item => {
-      const a = item as any
+      const a = item
       const safeTitle = (a.title || 'Class Update').replace(/\n/g, ' ')
       const safeContent = (a.content || '').replace(/\n/g, ' ').slice(0, 100)
       return `[Ann] ${safeTitle}: ${safeContent}...`
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 
   const activePolls = feed
     .filter(item => item.type === 'poll')
-    .map(item => item as any)
+    .map(item => item)
     .filter(p => !p.closed_at && (!p.deadline || new Date(p.deadline) > now))
     .slice(0, 3)
     .map(p => {
@@ -100,11 +100,11 @@ export async function POST(req: Request) {
 
   const activeAttendance = feed
     .filter(item => item.type === 'attendance')
-    .map(item => item as any)
+    .map(item => item)
     .filter(a => !a.closed_at && (!a.deadline || new Date(a.deadline) > now))
     .slice(0, 1)
     .map(a => {
-      const started = new Date(a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      const started = new Date((a as any).created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       return `[Att] ${a.title || 'Attendance Session'} (Started: ${started})`
     })
     .join('\n')
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
     .join('\n')
 
     // 2. Save user message (fire and forget)
-    ; (adminClient as any)
+    ; (adminClient)
       .from('chat_history')
       .insert({ user_id: user.id, class_id: classId, role: 'user', content: question })
       .then(({ error }: any) => { /* Silent failure */ })
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
   const { content: answer, usage } = await chatComplete(prompt)
 
     // 6. Save assistant response (fire and forget)
-    ; (adminClient as any)
+    ; (adminClient)
       .from('chat_history')
       .insert({ user_id: user.id, class_id: classId, role: 'assistant', content: answer || 'No response' })
       .then(({ error }: any) => { /* Silent failure */ })

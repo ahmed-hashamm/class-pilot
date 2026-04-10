@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import ClassCard from './ClassCard'
+import { ClassCard } from '@/components/features/dashboard/ClassCard/index'
 import { STAGGER_CONTAINER, STAGGER_ITEM } from '@/lib/animations'
 
 interface ClassListProps {
@@ -10,7 +10,7 @@ interface ClassListProps {
 
 export default function ClassList({ dashboardData }: ClassListProps) {
   return (
-    <motion.div 
+    <motion.div
       variants={STAGGER_CONTAINER}
       initial="initial"
       animate="animate"

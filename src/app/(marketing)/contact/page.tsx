@@ -1,6 +1,6 @@
 "use client";
 
-import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
+import { MarketingHero } from "@/components/layout";
 import { useReveal } from "@/lib/hooks/useReveal";
 import { ContactForm, ContactSidebar } from "@/components/features/contact";
 
@@ -9,7 +9,7 @@ export default function ContactPage() {
 
     return (
         <main className="bg-background text-foreground font-sans overflow-x-hidden">
-            <MarketingPagesLayout
+            <MarketingHero
                 href="/login"
                 buttonText="Get Started"
                 pageIntro="Contact Us"

@@ -4,6 +4,7 @@ import { Material } from "@/lib/types/schema";
 import { CheckCircle2, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import MaterialActions from "./MaterialActions";
 import MaterialFooter from "./MaterialFooter";
 
@@ -18,6 +19,15 @@ interface MaterialRowProps {
   getDisplayName: (path: string) => string;
 }
 
+/**
+ * Renders a single material item in a list.
+ * 
+ * Features:
+ * - Expandable description with auto-truncation detection (ResizeObserver)
+ * - Dynamic Z-index management to ensure "Actions" dropdown stay on top of subsequent rows
+ * - AI Sync status indicators
+ * - Responsive layout with hover effects
+ */
 export default function MaterialRow({
   material,
   isTeacher,
@@ -29,6 +39,7 @@ export default function MaterialRow({
 }: MaterialRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const isSyncing = syncingId === material.id;
 
@@ -53,8 +64,10 @@ export default function MaterialRow({
   }, [material.description]);
 
   return (
-    <div className="group relative bg-navy/5 hover:bg-white overflow-hidden
-       border rounded-md  hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 border-b-4 border-navy/90 flex flex-col">
+    <div className={cn(
+      "group relative bg-navy/5 hover:bg-white border rounded-md hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 border-b-4 border-navy/90 flex flex-col",
+      isMenuOpen ? "z-50" : "z-10"
+    )}>
 
       {/* Top glow on hover */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -90,6 +103,7 @@ export default function MaterialRow({
                 onSync={onSync}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onOpenChange={setIsMenuOpen}
               />
             )}
           </div>

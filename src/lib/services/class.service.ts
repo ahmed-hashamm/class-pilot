@@ -14,6 +14,8 @@ export interface Note {
   created_at: string
 }
 
+type ClassNoteInsert = Database['public']['Tables']['class_notes']['Insert']
+
 export const ClassService = {
   async getStickyNotes(classId: string, userId: string): Promise<Note[]> {
     const supabase = await createClient()
@@ -23,7 +25,7 @@ export const ClassService = {
       .eq("class_id", classId)
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-    
+
     return (data as Note[]) ?? []
   },
 
@@ -33,7 +35,7 @@ export const ClassService = {
       class_id: classId,
       user_id: userId,
       content,
-    } as any)
+    })
     if (error) throw error
   },
 
@@ -84,10 +86,10 @@ export const ClassService = {
         content: data.content,
         class_id: data.classId,
         created_by: data.userId,
-        attachment_paths: data.attachmentPaths as any,
+        attachment_paths: data.attachmentPaths,
         pinned: data.pinned,
         deadline: data.deadline,
-      } as any)
+      })
 
     if (dbError) throw new Error(`Announcement failed: ${dbError.message}`)
   },
@@ -107,15 +109,15 @@ export const ClassService = {
     const isAuthorized = role === 'teacher'
 
     let query = supabase.from('announcements')
-      .update({ 
-        title: data.title, 
-        content: data.content, 
-        pinned: data.pinned, 
-        attachment_paths: data.allPaths as any,
-        updated_at: new Date().toISOString() 
-      } as any)
+      .update({
+        title: data.title,
+        content: data.content,
+        pinned: data.pinned,
+        attachment_paths: data.allPaths,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', data.id)
-      .eq('class_id', data.classId) 
+      .eq('class_id', data.classId)
 
     if (!isAuthorized) {
       query = query.eq('created_by', data.userId)
@@ -135,14 +137,14 @@ export const ClassService = {
 
     if (!announcement) throw new Error("Announcement not found")
 
-    const role = await this.getUserRole((announcement as any).class_id, userId)
-    const isAuthorized = ((announcement as any).created_by === userId) || (role === 'teacher')
+    const role = await this.getUserRole(announcement.class_id, userId)
+    const isAuthorized = (announcement.created_by === userId) || (role === 'teacher')
 
     if (!isAuthorized) throw new Error("Unauthorized")
 
     const { error } = await supabase.from('announcements').delete().eq('id', id)
     if (error) throw error
-    return (announcement as any).class_id
+    return announcement.class_id
   },
 
   async createMaterial(data: { title: string; description: string | null; classId: string; userId: string; attachmentPaths: string[]; fileTypes: string[]; pinned: boolean }) {
@@ -152,10 +154,10 @@ export const ClassService = {
       description: data.description,
       class_id: data.classId,
       created_by: data.userId,
-      attachment_paths: data.attachmentPaths as any,
-      file_types: data.fileTypes as any,
+      attachment_paths: data.attachmentPaths,
+      file_types: data.fileTypes,
       pinned: data.pinned
-    } as any).select().maybeSingle()
+    }).select().maybeSingle()
     if (error) throw error
     return inserted
   },
@@ -165,10 +167,10 @@ export const ClassService = {
     const { data: inserted, error } = await supabase.from('materials').update({
       title: data.title,
       description: data.description,
-      attachment_paths: data.attachmentPaths as any,
-      file_types: data.fileTypes as any,
+      attachment_paths: data.attachmentPaths,
+      file_types: data.fileTypes,
       pinned: data.pinned
-    } as any).eq('id', data.id).eq('class_id', data.classId).select().maybeSingle()
+    }).eq('id', data.id).eq('class_id', data.classId).select().maybeSingle()
     if (error) throw error
     return inserted
   },
@@ -179,7 +181,7 @@ export const ClassService = {
     if (!material) throw new Error("Material not found")
     const { error } = await supabase.from('materials').delete().eq('id', id)
     if (error) throw error
-    return (material as any).class_id
+    return material.class_id
   },
 
   async createAssignment(data: { title: string; description: string | null; dueDate: string | null; points: number; classId: string; userId: string; submissionType: string; rubricId: string | null; attachmentPaths: string[]; isGroupProject: boolean; pinned: boolean }) {
@@ -193,10 +195,10 @@ export const ClassService = {
       created_by: data.userId,
       submission_type: data.submissionType,
       rubric_id: data.rubricId,
-      attachment_paths: data.attachmentPaths as any,
+      attachment_paths: data.attachmentPaths,
       is_group_project: data.isGroupProject,
       pinned: data.pinned
-    } as any).select().maybeSingle()
+    }).select().maybeSingle()
     if (error) throw error
     return inserted
   },
@@ -211,9 +213,9 @@ export const ClassService = {
       submission_type: data.submissionType,
       rubric_id: data.rubricId,
       is_group_project: data.isGroupProject,
-      attachment_paths: data.allPaths as any,
+      attachment_paths: data.allPaths,
       pinned: data.pinned
-    } as any).eq('id', data.assignmentId).eq('class_id', data.classId).select().maybeSingle()
+    }).eq('id', data.assignmentId).eq('class_id', data.classId).select().maybeSingle()
     if (error) throw error
     return inserted
   },
@@ -224,7 +226,7 @@ export const ClassService = {
     if (!assignment) throw new Error("Not found")
     const { error } = await supabase.from('assignments').delete().eq('id', id)
     if (error) throw error
-    return (assignment as any).class_id
+    return assignment.class_id
   },
 
   async submitAssignment(data: { assignmentId: string; userId: string; groupId?: string | null; content?: string; files?: any; isGroupProject: boolean }) {
@@ -237,7 +239,7 @@ export const ClassService = {
       files: data.files,
       status: 'submitted',
       submitted_at: new Date().toISOString()
-    } as any).select().maybeSingle()
+    }).select().maybeSingle()
     if (error) throw error
     return inserted
   },
@@ -249,13 +251,13 @@ export const ClassService = {
       if (error) throw error
       await supabase.from('project_members').delete().eq('project_id', groupId)
       const members = studentIds.map(sid => ({ project_id: groupId, user_id: sid, role: 'member' }))
-      await supabase.from('project_members').insert(members as any)
+      await supabase.from('project_members').insert(members)
     } else {
-      const { data: project, error } = await supabase.from('group_projects').insert({ class_id: classId, title, created_by: userId } as any).select().maybeSingle()
+      const { data: project, error } = await supabase.from('group_projects').insert({ class_id: classId, title, created_by: userId }).select().maybeSingle()
       if (error) throw error
       if (!project) throw new Error("Failed to create group project")
       const members = studentIds.map(sid => ({ project_id: project.id, user_id: sid, role: 'member' }))
-      await supabase.from('project_members').insert(members as any)
+      await supabase.from('project_members').insert(members)
     }
   },
 
@@ -271,16 +273,16 @@ export const ClassService = {
 
   async deleteClass(classId: string, userId: string) {
     const supabase = await createClient()
-    
+
     // 1. Perform deletion with exact count check
     const { error, count } = await supabase
       .from('classes')
       .delete({ count: 'exact' })
       .eq('id', classId)
       .eq('created_by', userId)
-    
+
     if (error) throw error
-    
+
     // 2. If 0 rows were affected, it means the class doesn't exist OR the user is not the creator
     if (count === 0) {
       throw new Error("Class not found or you don't have permission to delete it.")
@@ -299,8 +301,8 @@ export const ClassService = {
       name: data.name,
       description: data.description,
       settings: data.settings
-    } as any).eq('id', data.classId).eq('created_by', data.userId)
-    
+    }).eq('id', data.classId).eq('created_by', data.userId)
+
     if (error) throw error
 
     // Invalidate cache
@@ -311,18 +313,18 @@ export const ClassService = {
   async getClassName(classId: string) {
     const { redisSafe } = await import('@/lib/redis')
     const cacheKey = `class:name:${classId}`
-    
+
     const cached = await redisSafe.get<string>(cacheKey)
     if (cached) return cached
 
     const supabase = await createClient()
     const { data } = await supabase.from('classes').select('name').eq('id', classId).maybeSingle()
-    const name = (data as any)?.name || 'Class'
-    
+    const name = data?.name || 'Class'
+
     if (data) {
       await redisSafe.set(cacheKey, name, { ex: 1800 }) // 30 mins
     }
-    
+
     return name
   },
 
@@ -334,14 +336,14 @@ export const ClassService = {
     if (cached) return cached
 
     const supabase = await createClient()
-    
+
     // 1. Check if owner (teacher by default)
     const { data: classData } = await supabase
       .from('classes')
       .select('created_by')
       .eq('id', classId)
       .maybeSingle()
-    
+
     if (classData?.created_by === userId) {
       await redisSafe.set(cacheKey, 'teacher', { ex: 600 }) // 10 mins
       return 'teacher'
@@ -355,8 +357,8 @@ export const ClassService = {
       .eq('user_id', userId)
       .maybeSingle()
 
-    const role = (member as any)?.role || null
-    
+    const role = (member?.role as 'teacher' | 'student') || null
+
     if (role) {
       await redisSafe.set(cacheKey, role, { ex: 600 }) // 10 mins
     }
@@ -366,7 +368,52 @@ export const ClassService = {
 
   async togglePin(data: { type: string; id: string; pinned: boolean; userId: string }) {
     const supabase = await createClient()
-    const { error } = await supabase.from(data.type as any).update({ pinned: data.pinned } as any).eq('id', data.id)
+    const { error } = await supabase.from(data.type as any).update({ pinned: data.pinned }).eq('id', data.id)
+    if (error) throw error
+  },
+
+  async leaveClass(classId: string, userId: string) {
+    const supabase = await createClient()
+
+    // 1. Verify user is NOT the creator (creators must delete the class, not leave it)
+    const { data: classData } = await supabase
+      .from('classes')
+      .select('created_by')
+      .eq('id', classId)
+      .maybeSingle()
+
+    if (classData?.created_by === userId) {
+      throw new Error("As the teacher/creator, you cannot leave this class. You must delete it instead.")
+    }
+
+    // 2. Remove from class_members
+    const { error, count } = await supabase
+      .from('class_members')
+      .delete({ count: 'exact' })
+      .eq('class_id', classId)
+      .eq('user_id', userId)
+
+    if (error) throw error
+
+    if (count === 0) {
+      throw new Error("You are not a member of this class.")
+    }
+
+    // 3. Invalidate caches
+    const { redisSafe } = await import('@/lib/redis')
+    await redisSafe.invalidateClassCache(classId)
+    await redisSafe.del(`role:class:${classId}:user:${userId}`)
+  },
+
+  async toggleClassPin(classId: string, userId: string, pinned: boolean) {
+    const supabase = await createClient()
+    const { error } = await supabase
+      .from('class_members')
+      .update({ is_pinned: pinned })
+      .eq('class_id', classId)
+      .eq('user_id', userId)
+
     if (error) throw error
   }
 }
+

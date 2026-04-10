@@ -79,7 +79,7 @@ export const DiscussionService = {
         topic,
         content,
         user_id: userId,
-      } as any)
+      })
       .select('id, content, created_at, user_id, users(full_name, avatar_url)')
       .maybeSingle()
 

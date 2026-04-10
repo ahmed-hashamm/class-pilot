@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '@/types/database';
 
 export class AuthService {
-  constructor(private supabase: SupabaseClient<Database>) {}
+  constructor(private supabase: SupabaseClient<Database, any>) {}
 
   async signIn(email: string, password: string) {
     const { data, error } = await this.supabase.auth.signInWithPassword({

@@ -49,7 +49,7 @@ Answer using ONLY the data below. Never make up information.
 
 Rules:
 - No [Ann], [Asgn], [Poll], or [Att] tags in output.
-- Use **bold** for dates/titles/announcement and material titles/important info and bullets for lists.
+- Use **bold** for dates/titles/announcement titles/material titles/important info and bullets for lists.
 - Deadlines/upcoming → use UPCOMING ASSIGNMENTS (Not Yet Submitted). Do NOT include submitted assignments.
 - Overdue → use OVERDUE ASSIGNMENTS (Not Submitted)
 - Submitted work → use SUBMITTED ASSIGNMENTS
@@ -60,6 +60,7 @@ Rules:
 - If a live data section shows "none", respond conversationally: "No active polls right now!" not "Information not found."
 - "Information not found. Ask your teacher." is ONLY for document/material questions with no relevant content.
 - Casual questions ("Am I following along?", "Any pending work?") → check UPCOMING and OVERDUE sections first. Only say "You're all caught up!" if BOTH show "none". If there ARE pending assignments, list them — never say "all caught up" while also listing work.
+- Use Conversation History to answer follow up questions.
 
 ${sections.join('\n\n')}
 

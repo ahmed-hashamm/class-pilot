@@ -9,6 +9,7 @@ interface FormSectionProps {
   children: ReactNode
   className?: string
   error?: string
+  labelAction?: ReactNode
 }
 
 export function FormSection({
@@ -16,14 +17,18 @@ export function FormSection({
   description,
   children,
   className = '',
-  error
+  error,
+  labelAction
 }: FormSectionProps) {
   return (
     <div className={`space-y-2.5 ${className}`}>
       <div className="flex flex-col gap-0.5">
-        <Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground pl-0.5">
-          {label}
-        </Label>
+        <div className="flex items-center justify-between pr-0.5">
+          <Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground pl-0.5">
+            {label}
+          </Label>
+          {labelAction}
+        </div>
         {description && (
           <p className="text-[12px] text-muted-foreground/60 pl-0.5 leading-relaxed">
             {description}

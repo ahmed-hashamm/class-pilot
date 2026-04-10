@@ -23,6 +23,19 @@ export interface DiscussionMessage {
   } | null
 }
 
+/**
+ * custom hook to manage class discussions with real-time sync.
+ * 
+ * Features:
+ * - Persistent caching via React Query (survives tab switches)
+ * - Real-time INSERT/DELETE sync via Supabase Postgres Changes
+ * - Unique channel naming (via randomId) to prevent subscription collisions during re-renders
+ * - Optimistic UI updates for snappy messaging experience
+ * 
+ * @param classId The ID of the class room
+ * @param topic The specific discussion topic (e.g., 'general', 'homework')
+ * @param userId The ID of the current logged-in user
+ */
 export function useDiscussion(classId: string, topic: DiscussionTopic, userId: string) {
   const queryClient = useQueryClient()
   const mountedRef = useRef(true)
@@ -56,7 +69,8 @@ export function useDiscussion(classId: string, topic: DiscussionTopic, userId: s
     if (!classId || !topic) return
     
     const supabase = createClient()
-    const channelName = `class_discussion_${classId}_${topic}`
+    const randomId = Math.random().toString(36).substring(7)
+    const channelName = `class_discussion_${classId}_${topic}_${randomId}`
     
     const channel = supabase
       .channel(channelName)

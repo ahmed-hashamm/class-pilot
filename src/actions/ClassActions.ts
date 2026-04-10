@@ -25,10 +25,50 @@ import {
   updateClassSettingsSchema,
   getClassNameSchema,
   togglePinSchema,
+  leaveClassSchema,
+  toggleClassPinSchema,
   ALLOWED_FILE_TYPES,
 } from "@/lib/validations/class"
 import { ClassService, Note } from "@/lib/services/class.service"
 import { redisSafe } from "@/lib/redis"
+
+/* ---------------- TOGGLE CLASS PIN ---------------- */
+
+export async function toggleClassPinAction(payload: unknown) {
+  const parsed = toggleClassPinSchema.safeParse(payload)
+  if (!parsed.success) return { data: null, error: "Invalid input" }
+
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: "Unauthorized" }
+
+  try {
+    await ClassService.toggleClassPin(parsed.data.classId, user.id, parsed.data.pinned)
+    revalidatePath('/dashboard')
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to toggle pin" }
+  }
+}
+
+/* ---------------- LEAVE CLASS ---------------- */
+
+export async function leaveClassAction(classId: string) {
+  const parsed = leaveClassSchema.safeParse({ classId })
+  if (!parsed.success) return { data: null, error: "Invalid input" }
+
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: "Unauthorized" }
+
+  try {
+    await ClassService.leaveClass(parsed.data.classId, user.id)
+    revalidatePath('/dashboard')
+    return { data: { success: true }, error: null }
+  } catch (err: any) {
+    return { data: null, error: err.message || "Failed to leave class" }
+  }
+}
 
 /* ---------------- TOGGLE PIN ---------------- */
 
@@ -512,6 +552,8 @@ export async function updateAssignment(formData: FormData) {
       allPaths,
       pinned: parsed.data.pinned,
     })
+
+    if (!result) return { data: null, error: "Failed to update assignment" }
 
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)

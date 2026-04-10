@@ -47,7 +47,9 @@ export default function AnnouncementInput({
 
     try {
       const result = await createAnnouncement(formData)
-      if (result.success) {
+      if (result.error) {
+        toast.error(result.error);
+      } else {
         toast.success("Announcement posted successfully");
         resetForm();
         if (onSuccess) onSuccess();

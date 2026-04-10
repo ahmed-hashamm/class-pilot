@@ -39,8 +39,8 @@ export async function saveRubricAction(payload: unknown) {
       .select('created_by')
       .eq('id', parsed.data.id)
       .maybeSingle()
-      
-    if (existing && existing.created_by !== user.id) {
+
+    if (existing && (existing).created_by !== user.id) {
       return { data: null, error: 'Forbidden' }
     }
   }
@@ -54,7 +54,7 @@ export async function saveRubricAction(payload: unknown) {
       total_points: parsed.data.total_points,
       created_by: user.id
     })
-    
+
     revalidatePath('/classes') // General revalidation
     return { data: result, error: null }
   } catch (err) {
@@ -198,8 +198,10 @@ export async function closePoll(pollId: string) {
 
   try {
     const classId = await ClassFeaturesService.closePoll(parsed.data.pollId)
-    await redisSafe.invalidateFeedCache(classId)
-    revalidatePath(`/classes/${classId}`)
+    if (classId) {
+      await redisSafe.invalidateFeedCache(classId)
+      revalidatePath(`/classes/${classId}`)
+    }
     return { data: { success: true }, error: null }
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Failed to close poll'
@@ -261,14 +263,13 @@ export async function publishAIGrade(submissionId: string) {
       return { data: null, error: 'Submission not found' }
     }
 
-    const typedSubmission = submission as any // narrow slightly if necessary, but at least removed direct (supabase as any)
+    const typedSubmission = submission
 
     if (typedSubmission.ai_grade === null) {
       return { data: null, error: 'No AI grade available to publish' }
     }
 
-    const { error: updateError } = await supabase
-      .from('submissions')
+    const { error: updateError } = await (supabase.from('submissions'))
       .update({
         final_grade: typedSubmission.ai_grade,
         teacher_feedback: typedSubmission.ai_feedback,
@@ -295,9 +296,8 @@ export async function updateGradingStatus(submissionId: string, status: 'pending
   if (!user) return { data: null, error: 'Unauthorized' }
 
   try {
-    const { error } = await supabase
-      .from('submissions')
-      .update({ grading_status: status })
+    const { error } = await (supabase.from('submissions'))
+      .update({ status: status })
       .eq('id', submissionId)
 
     if (error) {
@@ -342,10 +342,10 @@ export async function gradeAssignmentSubmissionAction(assignmentId: string, subm
 
   try {
     const result = await GradingService.performAIGrading(assignmentId, submissionId, user.id)
-    
+
     // Revalidate the assignment detail page
-    revalidatePath(`/classes`) 
-    
+    revalidatePath(`/classes`)
+
     return { data: result, error: null }
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Failed to grade submission'
@@ -369,7 +369,7 @@ export async function setFinalGradeAction(payload: unknown) {
       user.id,
       parsed.data.score
     )
-    
+
     // Fetch submission to get class_id for revalidation
     const { data: sub } = await supabase
       .from('submissions')
@@ -377,8 +377,8 @@ export async function setFinalGradeAction(payload: unknown) {
       .eq('id', parsed.data.submissionId)
       .maybeSingle()
 
-    if ((sub as any)?.assignments?.class_id) {
-      revalidatePath(`/classes/${(sub as any).assignments.class_id}`)
+    if ((sub)?.assignments?.class_id) {
+      revalidatePath(`/classes/${(sub).assignments.class_id}`)
     }
 
     return { data: result, error: null }
@@ -405,7 +405,7 @@ export async function updateManualGradeAction(payload: unknown) {
       parsed.data.score,
       parsed.data.feedback
     )
-    
+
     // Refresh to update UI
     const { data: sub } = await supabase
       .from('submissions')
@@ -413,8 +413,8 @@ export async function updateManualGradeAction(payload: unknown) {
       .eq('id', parsed.data.submissionId)
       .maybeSingle()
 
-    if ((sub as any)?.assignments?.class_id) {
-      revalidatePath(`/classes/${(sub as any).assignments.class_id}`)
+    if ((sub)?.assignments?.class_id) {
+      revalidatePath(`/classes/${(sub).assignments.class_id}`)
     }
 
     return { data: result, error: null }

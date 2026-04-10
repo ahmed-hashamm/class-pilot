@@ -19,12 +19,13 @@ export function useAttendance({ item, userId }: UseAttendanceProps) {
     setLoading(true);
     try {
       const res = await closeAttendance(item.id);
-      if (res.success) { 
+      if (res.error) {
+        toast.error(res.error || "Failed");
+      } else {
         toast.success("Attendance closed"); 
         setShowCloseConfirm(false);
         router.refresh(); 
       }
-      else toast.error(res.error || "Failed");
     } finally { setLoading(false); }
   };
 
@@ -32,11 +33,12 @@ export function useAttendance({ item, userId }: UseAttendanceProps) {
     setLoading(true);
     try {
       const res = await markAttendancePresent(item.id);
-      if (res.success) { 
+      if (res.error) {
+        toast.error(res.error || "Failed");
+      } else {
         toast.success("Marked as present"); 
         router.refresh(); 
       }
-      else toast.error(res.error || "Failed");
     } finally { setLoading(false); }
   };
 

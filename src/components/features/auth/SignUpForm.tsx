@@ -7,9 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SignUpSchema, type SignUpInput } from '@/lib/validations/auth'
 import { signUpAction } from '@/actions/AuthActions'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { FeatureButton } from '@/components/ui/FeatureButton'
+import { Input, PasswordInput, FeatureButton, FormSection } from '@/components/ui'
 import { PasswordRequirements } from './PasswordRequirements'
 import { toast } from 'sonner'
 
@@ -37,8 +35,6 @@ export function SignUpForm() {
         toast.error(result.error)
       } else {
         toast.success('Account created! Please check your email to confirm.')
-        // In dev with auto-confirm, you might redirect to login or dashboard
-        // For now, let's keep it simple as per the email verification flow
       }
     } catch (err) {
       toast.error('An unexpected error occurred')
@@ -48,9 +44,11 @@ export function SignUpForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name</Label>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <FormSection
+        label="Full Name"
+        error={errors.fullName?.message}
+      >
         <Input
           id="fullName"
           type="text"
@@ -58,13 +56,12 @@ export function SignUpForm() {
           {...register('fullName')}
           className={errors.fullName ? 'border-red-500' : ''}
         />
-        {errors.fullName && (
-          <p className="text-xs text-red-500">{errors.fullName.message}</p>
-        )}
-      </div>
+      </FormSection>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+      <FormSection
+        label="Email"
+        error={errors.email?.message}
+      >
         <Input
           id="email"
           type="email"
@@ -72,24 +69,20 @@ export function SignUpForm() {
           {...register('email')}
           className={errors.email ? 'border-red-500' : ''}
         />
-        {errors.email && (
-          <p className="text-xs text-red-500">{errors.email.message}</p>
-        )}
-      </div>
+      </FormSection>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
+      <FormSection
+        label="Password"
+        error={errors.password?.message}
+      >
+        <PasswordInput
           id="password"
-          type="password"
           {...register('password')}
-          className={errors.password ? 'border-red-500' : ''}
+          error={!!errors.password}
         />
-        {errors.password && (
-          <p className="text-xs text-red-500">{errors.password.message}</p>
-        )}
-        <PasswordRequirements password={passwordValue} />
-      </div>
+      </FormSection>
+
+      <PasswordRequirements password={passwordValue} />
 
       <FeatureButton
         type="submit"

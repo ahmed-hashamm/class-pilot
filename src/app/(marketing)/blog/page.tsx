@@ -1,7 +1,7 @@
 "use client";
 
 import BlogsPageClock from "@/components/illustrations/BlogsPageClock";
-import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
+import { MarketingHero } from "@/components/layout";
 import { useReveal } from "@/lib/hooks/useReveal";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -14,7 +14,7 @@ export default function BlogPage() {
         <main className="bg-background text-foreground font-sans overflow-x-hidden ">
 
             {/* ── HERO HEADER (navy) ────────────────────────────────────────────── */}
-            <MarketingPagesLayout
+            <MarketingHero
                 pageIntro="The Class Pilot Blog"
                 href="/login"
                 buttonText="Try Class-Pilot Free"

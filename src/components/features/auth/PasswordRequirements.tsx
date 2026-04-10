@@ -17,7 +17,7 @@ export function PasswordRequirements({ password = '' }: PasswordRequirementsProp
   ]
 
   return (
-    <div className="mt-3 space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+    <div className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
         Password Requirements
       </p>

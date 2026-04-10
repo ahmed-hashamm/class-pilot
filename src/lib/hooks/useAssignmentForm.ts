@@ -45,21 +45,21 @@ export function useAssignmentForm(classId: string, initialData: any) {
         formData.append("assignmentId", initialData.id);
         formData.append("existingAttachments", JSON.stringify(existingFiles));
         const { data, error } = await updateAssignment(formData);
-        if (data?.success) {
+        if (error) {
+          toast.error(error || "Failed to update assignment");
+        } else if (data?.success) {
           toast.success("Assignment updated successfully");
           router.push(`/classes/${classId}/assignments/${data.id}`);
           router.refresh();
-        } else {
-           toast.error(error || "Failed to update assignment");
         }
       } else {
         const { data, error } = await createAssignment(formData);
-        if (data?.success) {
+        if (error) {
+          toast.error(error || "Failed to create assignment");
+        } else if (data?.success) {
           toast.success("Assignment created successfully");
           router.push(`/classes/${classId}/assignments/${data.id}`);
           router.refresh();
-        } else {
-           toast.error(error || "Failed to create assignment");
         }
       }
     } catch (err: any) {

@@ -17,7 +17,7 @@ export function usePoll({ item, userId }: UsePollProps) {
     setClosing(true);
     try {
       const res = await closePoll(item.id);
-      if (!res.success) {
+      if (res.error) {
         toast.error(res.error || "Failed to close poll");
       } else { 
         toast.success("Poll closed successfully"); 
@@ -29,7 +29,7 @@ export function usePoll({ item, userId }: UsePollProps) {
 
   const handleVote = async (idx: number) => {
     const res = await submitPollResponse(item.id, idx);
-    if (!res.success) {
+    if (res.error) {
       toast.error(res.error || "Could not submit vote");
     } else { 
       toast.success("Vote submitted successfully"); 

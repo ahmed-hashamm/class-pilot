@@ -128,3 +128,12 @@ export const togglePinSchema = z.object({
   pinned: z.boolean(),
   type: z.enum(['announcements', 'materials', 'assignments', 'polls', 'attendances']),
 })
+
+export const leaveClassSchema = z.object({
+  classId: z.string().min(1),
+})
+
+export const toggleClassPinSchema = z.object({
+  classId: z.string().min(1),
+  pinned: z.boolean(),
+})

@@ -38,15 +38,15 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
         isPinned
       )
 
-      if (result.success) {
+      if (result.error) {
+        toast.error(result.error || 'Failed to create attendance')
+      } else {
         toast.success('Attendance session created')
         setTitle('')
         setDeadline('')
         setIsPinned(false)
         if (onSuccess) onSuccess()
         router.refresh()
-      } else {
-        toast.error(result.error || 'Failed to create attendance')
       }
     } catch (err: any) {
       toast.error('An unexpected error occurred')

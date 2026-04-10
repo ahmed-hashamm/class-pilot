@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import MarketingPagesLayout from "@/components/layout/MarketingPagesHero";
+import { MarketingHero } from "@/components/layout";
 import { useReveal } from "@/lib/hooks/useReveal";
 import { ARTICLES, CATEGORIES, CategoryId } from "@/lib/db_data_fetching/supportData";
 import { ArticleItem, CategoryGrid, HelpContactCards } from "@/components/features/help";
@@ -32,7 +32,7 @@ export default function HelpCenterPage() {
 
     return (
         <main className="bg-background text-foreground font-sans overflow-x-hidden ">
-            <MarketingPagesLayout
+            <MarketingHero
                 href="/login"
                 buttonText="Get Started"
                 pageIntro="Help Center"
