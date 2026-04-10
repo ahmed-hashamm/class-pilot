@@ -1,21 +1,21 @@
 import { Suspense } from 'react'
 import { AuthLayout } from '@/components/features/auth/AuthLayout'
-import { LoginForm } from '@/components/features/auth/LoginForm'
+import { SignUpForm } from '@/components/features/auth/SignUpForm'
 import { SocialAuth } from '@/components/features/auth/SocialAuth'
 
 export const metadata = {
-  title: 'Sign In | Class Pilot',
-  description: 'Sign in to your Class Pilot account to manage your classes and assignments.',
+  title: 'Create an account | Class Pilot',
+  description: 'Join Class Pilot to manage your classroom with AI-powered tools.',
 }
 
-export default function LoginPage() {
+export default function SignUpPage() {
   return (
     <AuthLayout 
-      title="Welcome back" 
-      description="Enter your email and password to sign in"
+      title="Create an account" 
+      description="Enter your information to get started"
     >
       <Suspense fallback={<div className="h-64 flex items-center justify-center">Loading...</div>}>
-        <LoginForm />
+        <SignUpForm />
         <SocialAuth />
       </Suspense>
     </AuthLayout>

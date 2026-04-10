@@ -25,6 +25,12 @@ export const SignUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters long'),
 });
 
+export const LoginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
 export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
 export type UpdatePasswordInput = z.infer<typeof UpdatePasswordSchema>;
 export type SignUpInput = z.infer<typeof SignUpSchema>;
+export type LoginInput = z.infer<typeof LoginSchema>;

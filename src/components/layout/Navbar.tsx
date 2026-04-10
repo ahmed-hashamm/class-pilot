@@ -51,12 +51,20 @@ const Navbar = () => {
         {/* Right Section */}
         <div className="flex items-center gap-4 relative">
           {!isAuthenticated ? (
-            <Link
-              href="/login"
-              className="bg-yellow text-navy font-semibold px-5 py-2 rounded-md hover:bg-accent transition-colors"
-            >
-              Sign in to Class Pilot
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/login"
+                className="text-white hover:text-accent transition-colors font-medium text-sm"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="bg-yellow text-navy font-semibold px-5 py-2 rounded-md hover:bg-accent transition-colors text-sm"
+              >
+                Get Started
+              </Link>
+            </div>
           ) : (
             <div ref={profileRef} className="relative">
               {/* Profile Button with Avatar */}
