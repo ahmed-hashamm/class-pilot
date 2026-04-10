@@ -79,8 +79,8 @@ function LoginContent() {
             full_name: fullName,
             avatar_url: null, // 👈 important for consistency
           } as any,
-        ] as any)
-              
+          ] as any)
+
 
           if (profileError) {
             console.error('Profile creation error:', profileError)
@@ -110,18 +110,18 @@ function LoginContent() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-             {/* Logo */}
-        <Link href="/" className="flex items-center justify-center  group">
-          <div className="relative w-32 h-32"> {/* Added a wrapper with specific dimensions */}
-            <Image
-              src="/logo.png"
-              alt="Class Pilot"
-              fill
-              className="object-contain" // object-contain ensures the logo isn't cropped
-              priority
-            />
-          </div>
-        </Link>
+          {/* Logo */}
+          <Link href="/" className="flex items-center justify-center  group">
+            <div className="relative w-24 h-24"> {/* Added a wrapper with specific dimensions */}
+              <Image
+                src="/logo.png"
+                alt="Class Pilot"
+                fill
+                className="object-contain" // object-contain ensures the logo isn't cropped
+                priority
+              />
+            </div>
+          </Link>
           <CardTitle className="text-2xl font-bold text-center">
             {isSignup ? 'Create an account' : 'Welcome back'}
           </CardTitle>
@@ -147,7 +147,7 @@ function LoginContent() {
                 />
               </div>
             )}
-        
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -162,14 +162,6 @@ function LoginContent() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                {!isSignup && (
-                  <Link 
-                    href="/forgot-password" 
-                    className="text-xs text-blue-600 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                )}
               </div>
               <Input
                 id="password"
@@ -179,6 +171,14 @@ function LoginContent() {
                 required
                 minLength={8}
               />
+              {!isSignup && (
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  Forgot your password?
+                </Link>
+              )}
               {isSignup && <PasswordRequirements password={password} />}
             </div>
             {error && (
@@ -188,8 +188,8 @@ function LoginContent() {
               <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">{message}</div>
             )}
             <FeatureButton
-              type="submit" 
-              className="w-full" 
+              type="submit"
+              className="w-full"
               loading={loading}
               label={isSignup ? 'Sign Up' : 'Sign In'}
             />
@@ -202,8 +202,8 @@ function LoginContent() {
               <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
-  {/* Google Sign-In Button */}
-  <Button
+          {/* Google Sign-In Button */}
+          <Button
             type="button"
             variant="outline"
             className="w-full mb-4"

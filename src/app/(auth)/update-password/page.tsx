@@ -38,7 +38,7 @@ export default function UpdatePasswordPage() {
     } else {
       setMessage(result.data)
       setTimeout(() => {
-        router.push('/dashboard')
+        router.push('/login')
       }, 2000)
     }
     setLoading(false)
@@ -96,7 +96,7 @@ export default function UpdatePasswordPage() {
             )}
             {message && (
               <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">
-                {message}. Redirecting to dashboard...
+                {message}. Redirecting to login...
               </div>
             )}
             <FeatureButton

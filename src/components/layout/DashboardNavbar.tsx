@@ -69,9 +69,14 @@ const DashboardNavbar = () => {
           {isAuthenticated ? (
             <UserProfileDropdown profile={profile} onSignOut={signOut} />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-              <User className="text-white/60" size={20} />
-            </div>
+            <button 
+              onClick={signOut}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 text-white/80 text-sm border border-white/20 transition-all"
+              title="Click to Logout if profile is not loading"
+            >
+              <User size={18} className="text-white/60" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
           )}
         </div>
       </div>

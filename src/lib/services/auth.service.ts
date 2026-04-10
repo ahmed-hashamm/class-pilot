@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '@/types/database';
 
 export class AuthService {
-  constructor(private supabase: SupabaseClient<Database>) {}
+  constructor(private supabase: SupabaseClient<any, any, any>) {}
 
   async requestPasswordReset(email: string, redirectTo: string) {
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {

@@ -35,75 +35,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } = await supabase.auth.getUser()
 
       if (user) {
+        // Essential: Set authenticated true immediately since we have a valid Supabase user
         setIsAuthenticated(true)
         
-        // Get avatar from user metadata (Google provides this)
+        // Get fallback info from user metadata (Google/OAuth or Signup)
         const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || null
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || null
         
         // Fetch or create user profile
         let profileData = null
-        const { data: existingProfile } = await supabase
-          .from('users')
-          .select('full_name, email, avatar_url')
-          .eq('id', user.id)
-          .maybeSingle()
+        try {
+          const { data: existingProfile, error: fetchError } = await supabase
+            .from('users')
+            .select('full_name, email, avatar_url')
+            .eq('id', user.id)
+            .maybeSingle()
 
-        if (existingProfile) {
-          profileData = existingProfile
-          // Update avatar if it's from Google and different
-          if (avatarUrl && (existingProfile as { avatar_url: string | null }).avatar_url !== avatarUrl) {
-            const { data: updatedProfile } = await (supabase as any)
+          if (fetchError) {
+            console.error('Error fetching profile, using metadata fallback:', fetchError)
+          }
+
+          if (existingProfile) {
+            profileData = existingProfile
+            // Update avatar if it's different in metadata (e.g. Google updated)
+            if (avatarUrl && (existingProfile as any).avatar_url !== avatarUrl) {
+              const { data: updatedProfile } = await (supabase as any)
+                .from('users')
+                .update({ avatar_url: avatarUrl } as any)
+                .eq('id', user.id)
+                .select()
+                .maybeSingle()
+              if (updatedProfile) {
+                profileData = updatedProfile
+              }
+            }
+          } else {
+            // Create profile if missing
+            const { data: newProfile, error: insertError } = await (supabase as any)
               .from('users')
-              .update({ avatar_url: avatarUrl } as any)
-              .eq('id', user.id)
+              .insert({
+                id: user.id,
+                email: user.email!,
+                full_name: fullName || user.email?.split('@')[0] || 'User',
+                avatar_url: avatarUrl,
+              } as any)
               .select()
               .maybeSingle()
-            if (updatedProfile) {
-              profileData = updatedProfile
+            
+            if (insertError) {
+              console.error('Failed to create profile, using metadata fallback:', insertError)
+            } else if (newProfile) {
+              profileData = newProfile
             }
           }
-        } else {
-          // Create new profile for OAuth users
-          const { data: newProfile } = await (supabase as any)
-            .from('users')
-            .insert({
-              id: user.id,
-              email: user.email!,
-              full_name: fullName || user.email?.split('@')[0] || 'User',
-              avatar_url: avatarUrl,
-            } as any)
-            .select()
-            .maybeSingle()
-          
-          if (newProfile) {
-            profileData = newProfile
-          }
+        } catch (err) {
+          console.error('Profile sync logic failed:', err)
         }
 
-        if (profileData) {
-          setProfile({
-            name: (profileData as { full_name: string }).full_name || user.email || 'User',
-            email: (profileData as { email: string }).email,
-            role: 'user',
-            avatar_url: (profileData as { avatar_url: string }).avatar_url || avatarUrl,
-          })
-        } else {
-          setProfile({
-            name: fullName || user.email || 'User',
-            email: user.email || '',
-            role: 'user',
-            avatar_url: avatarUrl,
-          })
-        }
+        // Apply profile data with full metadata fallback
+        setProfile({
+          name: (profileData as any)?.full_name || fullName || user.email?.split('@')[0] || 'User',
+          email: (profileData as any)?.email || user.email || '',
+          role: 'user',
+          avatar_url: (profileData as any)?.avatar_url || avatarUrl,
+        })
       } else {
         setIsAuthenticated(false)
         setProfile(null)
       }
     } catch (error) {
-      console.error('Auth check error:', error)
-      setIsAuthenticated(false)
-      setProfile(null)
+      console.error('Auth check main error:', error)
+      // Only set to false if we explicitly failed to get a user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setIsAuthenticated(false)
+        setProfile(null)
+      }
     } finally {
       setLoading(false)
     }
