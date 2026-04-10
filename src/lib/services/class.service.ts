@@ -271,8 +271,26 @@ export const ClassService = {
 
   async deleteClass(classId: string, userId: string) {
     const supabase = (await createClient() as unknown) as SupabaseClient<Database>
-    const { error } = await supabase.from('classes').delete().eq('id', classId).eq('created_by', userId)
+    
+    // 1. Perform deletion with exact count check
+    const { error, count } = await supabase
+      .from('classes')
+      .delete({ count: 'exact' })
+      .eq('id', classId)
+      .eq('created_by', userId)
+    
     if (error) throw error
+    
+    // 2. If 0 rows were affected, it means the class doesn't exist OR the user is not the creator
+    if (count === 0) {
+      throw new Error("Class not found or you don't have permission to delete it.")
+    }
+
+    // 3. Invalidate Redis cache so the dashboard updates immediately
+    const { redisSafe } = await import('@/lib/redis')
+    await redisSafe.invalidateClassCache(classId)
+    // Also invalidate the class name cache if it exists
+    await redisSafe.del(`class:name:${classId}`)
   },
 
   async updateClassSettings(data: { classId: string; name: string; description: string; settings: any; userId: string }) {
