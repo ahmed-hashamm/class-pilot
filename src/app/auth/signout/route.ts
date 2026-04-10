@@ -14,5 +14,8 @@ export async function GET(request: Request) {
     status: 302,
   })
   
+  // Explicitly clear cache and ensure the browser knows the session is gone
+  response.headers.set('Cache-Control', 'no-store, max-age=0')
+  
   return response
 }

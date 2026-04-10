@@ -140,21 +140,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      // 1. Immediately clear local state for instant UI feedback
+      // 1. Clear local state for instant UI update
       setIsAuthenticated(false)
       setProfile(null)
-      setLoading(false)
+      
+      // 2. Remove any local Supabase keys to prevent SDK from auto-recovering session
+      if (typeof window !== 'undefined') {
+        const keysToRemove = Object.keys(localStorage).filter(key => key.startsWith('sb-'))
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+      }
 
-      // 2. Clear global session
-      await supabase.auth.signOut()
+      // 3. Redirect to the server-side signout route to clear cookies
+      window.location.href = '/auth/signout'
     } catch (error) {
-      console.error('Sign out error:', error)
-    } finally {
-      // 3. Force a complete page reload to a clean state on the login page
-      // Use window.location for the most reliable "panic" redirect
+      console.error('Sign out navigation error:', error)
       window.location.href = '/login'
     }
-  }, [supabase])
+  }, [])
 
   return (
     <AuthContext.Provider
