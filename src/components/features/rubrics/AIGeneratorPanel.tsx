@@ -78,7 +78,7 @@ export function AIGeneratorPanel({ onSuccess, isGenerating, setIsGenerating }: A
         className="w-full flex items-center justify-between p-4 bg-white hover:bg-navy/5 transition group cursor-pointer"
       >
         <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-navy/10 flex items-center justify-center text-navy">
+          <div className="size-10 shrink-0 rounded-xl bg-navy/10 flex items-center justify-center text-navy">
             <Sparkles size={18} />
           </div>
           <div className="text-left">
@@ -86,7 +86,7 @@ export function AIGeneratorPanel({ onSuccess, isGenerating, setIsGenerating }: A
             <p className="text-[11px] text-muted-foreground">Generate criteria automatically from your assignment details</p>
           </div>
         </div>
-        <div className={`px-4 py-2 rounded-xl text-[12px] font-bold transition-all ${isAiPanelOpen ? 'bg-navy text-white' : 'bg-navy/10 text-navy group-hover:bg-navy group-hover:text-white'}`}>
+        <div className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${isAiPanelOpen ? 'bg-navy text-white' : 'bg-navy/10 text-navy group-hover:bg-navy group-hover:text-white'}`}>
           {isAiPanelOpen ? 'Close' : 'Try it'}
         </div>
       </div>

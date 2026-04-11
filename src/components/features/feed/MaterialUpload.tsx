@@ -117,8 +117,8 @@ export default function MaterialUpload({
         </FormSection>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border/40 pt-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-t border-border/40 pt-6">
+        <div className="flex items-center justify-between w-full lg:w-auto gap-3">
           <PinToggle
             pinned={isPinned}
             onToggle={setIsPinned}
@@ -128,6 +128,7 @@ export default function MaterialUpload({
               variant="outline"
               label="Clear"
               onClick={resetForm}
+              className="px-4"
             />
           )}
         </div>
@@ -137,7 +138,7 @@ export default function MaterialUpload({
           loading={loading}
           disabled={files.length === 0}
           onClick={handleUpload}
-          className="min-w-[150px] shadow-md"
+          className="w-full lg:w-fit shadow-md !py-4"
         />
       </div>
     </div>

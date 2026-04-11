@@ -128,8 +128,8 @@ export default function AnnouncementInput({
         </div>
       </FormSection>
 
-      <div className="flex items-center justify-between border-t border-border/40 pt-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-t border-border/40 pt-6">
+        <div className="flex items-center justify-between w-full lg:w-auto gap-3">
           <PinToggle
             pinned={isPinned}
             onToggle={setIsPinned}
@@ -139,6 +139,7 @@ export default function AnnouncementInput({
               label="Clear"
               variant="outline"
               onClick={resetForm}
+              className="px-4"
             />
           )}
         </div>
@@ -148,8 +149,7 @@ export default function AnnouncementInput({
           loading={loading}
           disabled={!hasContent}
           onClick={handlePost}
-
-
+          className="w-full lg:w-fit shadow-md !py-4"
         />
       </div>
     </div>

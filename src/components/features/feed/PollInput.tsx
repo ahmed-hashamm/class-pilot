@@ -132,8 +132,8 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         </FormSection>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border/40 pt-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-t border-border/40 pt-6">
+        <div className="flex items-center justify-between w-full lg:w-auto gap-3">
           <PinToggle
             pinned={isPinned}
             onToggle={setIsPinned}
@@ -148,6 +148,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
                 setDeadline('')
                 setIsPinned(false)
               }}
+              className="px-4"
             />
           )}
         </div>
@@ -157,7 +158,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
           loading={loading}
           disabled={!question.trim() || options.filter(o => o.trim()).length < 2}
           onClick={handleCreate}
-
+          className="w-full lg:w-fit shadow-md !py-4"
         />
       </div>
     </div>
