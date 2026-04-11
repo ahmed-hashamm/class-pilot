@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Database } from "@/types/database"
 import { SupabaseClient } from "@supabase/supabase-js"
+import { NotificationService } from "@/lib/services/notification.service"
 
 type Announcement = Database['public']['Tables']['announcements']['Row']
 type Material = Database['public']['Tables']['materials']['Row']
@@ -92,6 +93,20 @@ export const ClassService = {
       })
 
     if (dbError) throw new Error(`Announcement failed: ${dbError.message}`)
+
+    try {
+      const className = await this.getClassName(data.classId)
+      // Fire and forget, but await to ensure Next.js Edge doesn't kill it prematurely if needed.
+      // We swallow the error so it doesn't fail the user interaction if email fails.
+      await NotificationService.notifyNewAnnouncement({
+        classId: data.classId,
+        className,
+        title: data.title,
+        content: data.content,
+      })
+    } catch (notificationError) {
+      console.error('[ClassService] Failed to send announcement notification', notificationError)
+    }
   },
 
   async updateAnnouncement(data: {
@@ -200,6 +215,23 @@ export const ClassService = {
       pinned: data.pinned
     }).select().maybeSingle()
     if (error) throw error
+
+    try {
+      if (inserted) {
+        const className = await this.getClassName(data.classId)
+        await NotificationService.notifyNewAssignment({
+          classId: data.classId,
+          className,
+          assignmentId: inserted.id,
+          title: data.title,
+          dueDate: data.dueDate,
+          points: data.points,
+        })
+      }
+    } catch (notificationError) {
+      console.error('[ClassService] Failed to send assignment notification', notificationError)
+    }
+
     return inserted
   },
 

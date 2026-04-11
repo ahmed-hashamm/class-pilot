@@ -17,6 +17,15 @@ interface SubmissionItemProps {
   isLast?: boolean
 }
 
+/**
+ * Displays a single student's (or group's) assignment submission.
+ * 
+ * Features:
+ * - Dynamic badge rendering for "Draft", "Graded", and "Team" states
+ * - Intelligent score display supporting both final and AI-suggested grades
+ * - Collaborative view for group projects showing all contributing members
+ * - Real-time "AI Grading..." pulse indicator for pending evaluations
+ */
 export function SubmissionItem({
   submission,
   assignment,

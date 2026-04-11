@@ -30,6 +30,7 @@ import {
   ALLOWED_FILE_TYPES,
 } from "@/lib/validations/class"
 import { ClassService, Note } from "@/lib/services/class.service"
+import { NotificationService } from "@/lib/services/notification.service"
 import { redisSafe } from "@/lib/redis"
 
 /* ---------------- TOGGLE CLASS PIN ---------------- */
@@ -352,6 +353,16 @@ export async function createMaterial(formData: FormData) {
     })
 
     if (!result) return { data: null, error: 'Failed to create material' }
+
+    const { data: clazz } = await supabase.from('classes').select('name').eq('id', parsed.data.classId).maybeSingle()
+    if (clazz) {
+      // Intentionally not awaiting so it doesn't block the response
+      NotificationService.notifyNewMaterial({
+        classId: parsed.data.classId,
+        className: clazz.name,
+        title: parsed.data.title || 'Class Material'
+      }).catch(console.error);
+    }
 
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)

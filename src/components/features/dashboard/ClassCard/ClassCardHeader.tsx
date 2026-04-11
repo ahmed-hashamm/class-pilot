@@ -5,17 +5,28 @@ import Image from 'next/image'
 import { Users } from 'lucide-react'
 import { useState } from 'react'
 
+/**
+ * Displays the class name, current user role, student count, and teacher avatar.
+ */
 interface ClassCardHeaderProps {
+  /** The unique ID of the class */
   classId: string
+  /** Display name of the class */
   name: string
+  /** User's role (Teacher/Student) for specific badge styling */
   role: string
+  /** Number of enrolled students */
   studentCount: number
+  /** Teacher profile for the avatar/initials */
   teacher: {
     full_name: string
     avatar_url: string | null
   }
 }
 
+/**
+ * Displays the class name, current user role, student count, and teacher avatar.
+ */
 export function ClassCardHeader({
   classId,
   name,

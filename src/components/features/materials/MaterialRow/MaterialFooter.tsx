@@ -43,6 +43,7 @@ export default function MaterialFooter({ material, getDisplayName }: MaterialFoo
               src={teacher.avatar_url.startsWith('http') ? teacher.avatar_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${teacher.avatar_url}`}
               alt={teacher.full_name || "Teacher"}
               fill
+              sizes="24px"
               className="object-cover"
               onError={() => setImgError(true)}
             />

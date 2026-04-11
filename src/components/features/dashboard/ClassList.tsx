@@ -4,7 +4,12 @@ import { motion } from 'framer-motion'
 import { ClassCard } from '@/components/features/dashboard/ClassCard/index'
 import { STAGGER_CONTAINER, STAGGER_ITEM } from '@/lib/animations'
 
+/**
+ * Renders a responsive grid of ClassCards.
+ * Uses Framer Motion for a smooth, staggered entrance animation.
+ */
 interface ClassListProps {
+  /** Array of joined class objects from the dashboard feed */
   dashboardData: any[]
 }
 

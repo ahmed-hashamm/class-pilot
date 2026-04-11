@@ -16,6 +16,15 @@ import { toast } from 'sonner'
 import { FileUploadArea } from '@/components/ui/FileUploadArea'
 import { FeatureButton } from '@/components/ui/FeatureButton'
 import { Button } from '@/components/ui/button'
+/**
+ * The primary student interaction portal for turning in work.
+ * 
+ * Workflows:
+ * 1. Initial State: Checks if a submission already exists for the user/group.
+ * 2. Submission: Handles multi-file uploads to Supabase storage and text content persistence.
+ * 3. Review: Displays grades, AI feedback, and points earned in a high-impact dashboard.
+ * 4. Constraints: Enforces assignment deadlines and group-specific submission rules.
+ */
 export default function SubmissionForm({ assignment, classId, onClose, onSuccess }: any) {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)

@@ -4,6 +4,16 @@ import AssignmentsTab from "./contentTabs/AssignmentsTab";
 import MaterialsTab from "./contentTabs/MaterialsTab";
 import GroupsTab from "./contentTabs/GroupsTab";
 
+/**
+ * Main feature dispatcher for the classroom.
+ * 
+ * Based on the `activeTab` prop, it renders the corresponding view:
+ * - "stream": Real-time announcements and discussion
+ * - "work": Assignment management and lists
+ * - "materials": Document and file resource tab
+ * - "people": Student and Teacher rosters
+ * - "groups": Team/Student grouping logic
+ */
 export default function TabContent({
   activeTab,
   classId,

@@ -19,7 +19,16 @@ import {
 } from "@/lib/data/feed";
 import { ConfirmModal } from "@/components/ui";
 
-interface FeedCardProps {
+/**
+ * The essential polymorphic building block of the Classroom Stream.
+ * 
+ * Logic Highlights:
+ * 1. Variant Orchestration: Handles Announcements, Assignments, Materials, Polls, and Attendance.
+ * 2. Theme Mapping: Dynamically resolves iconography and color palettes from the FEED_ITEM_THEMES registry.
+ * 3. Action Hub: Centralizes 'Pin', 'Delete', and 'Edit' operations for all feed archetypes.
+ * 4. Content Adaptation: Renders attachments, due dates, and teacher metadata in a responsive, high-impact layout.
+ */
+export interface FeedCardProps {
   item: any;
   classId: string;
   userId: string;

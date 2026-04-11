@@ -91,7 +91,7 @@ export default function HelpCenterPage() {
                                 <p className="text-[14px] text-muted-foreground mb-6">
                                     Try different keywords, or contact us directly.
                                 </p>
-                                <a href="mailto:classpilot.edu@gmail.com"
+                                <a href="mailto:support@theclasspilot.com"
                                     className="inline-flex items-center gap-2 bg-navy text-white
                                         font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-navy/90 transition">
                                     Email support

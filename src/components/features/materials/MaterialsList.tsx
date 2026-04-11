@@ -18,7 +18,16 @@ import {
 import { MaterialUpload } from "@/components/features/feed";
 import EditMaterialModal from "./EditMaterialModal";
 
-interface MaterialsListProps {
+/**
+ * The primary viewer for classroom documents and resources.
+ * 
+ * Features:
+ * - React Query integration for performant list management and caching
+ * - Integrated AI ingestion pipeline via the /api/materials/ingest endpoint
+ * - Role-based permissions (Teachers can upload/sync, Students only view)
+ * - Integrated confirmation workflows for material deletion
+ */
+export interface MaterialsListProps {
   classId: string;
   isTeacher: boolean;
   userId: string;

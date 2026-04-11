@@ -14,14 +14,14 @@ import { RubricCriteriaList } from './RubricCriteriaList'
 import { FeatureButton } from '@/components/ui/FeatureButton'
 import { Button } from '@/components/ui/button'
 
-interface Criterion {
+export interface Criterion {
   id: string
   name: string
   description: string
   points: number
 }
 
-interface RubricFormProps {
+export interface RubricFormProps {
   userId: string
   initialData?: {
     id: string

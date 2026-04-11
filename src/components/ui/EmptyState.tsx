@@ -16,8 +16,13 @@ interface EmptyStateProps {
 }
 
 /**
- * EmptyState is used when a list or view has no data.
- * It follows the Class Pilot design system with navy accents and rounded corners.
+ * A professional placeholder for views with no data.
+ * 
+ * Features:
+ * - Two distinct layout modes: 'standard' (inline) and 'dashboard' (hero)
+ * - Flexible action support (single CTA button or custom multi-button clusters)
+ * - Accessible icon support with consistent navy-themed aesthetics
+ * - Built-in hover animations for the 'dashboard' variant to increase engagement
  */
 export function EmptyState({ 
   icon: Icon, 

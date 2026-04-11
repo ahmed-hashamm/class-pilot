@@ -23,6 +23,15 @@ const badgeVariants = cva(
   }
 )
 
+/**
+ * A semantic utility for categorizing content and highlighting status.
+ * 
+ * Variants:
+ * - Default: Standard primary accent
+ * - Secondary: Subtle gray background for low-priority labels
+ * - Destructive: High-visibility red for errors or urgent alerts
+ * - Outline: Minimalist bordered style for supplementary metadata
+ */
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}

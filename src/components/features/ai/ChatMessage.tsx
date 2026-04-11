@@ -7,6 +7,15 @@ interface ChatMessageProps {
   content: string
 }
 
+/**
+ * Renders an individual message within a conversation.
+ * 
+ * Features:
+ * - Differentiates layout (User: Right/Navy, AI: Left/White)
+ * - Integrates ReactMarkdown with GFM support for tabular and code rendering
+ * - Uses a custom scoped Tailwind prose layer for AI-specific typography
+ * - High-impact Sparkles branding for assistant-generated responses
+ */
 export default function ChatMessage({ role, content }: ChatMessageProps) {
   const isUser = role === 'user'
 

@@ -18,6 +18,7 @@ import {
 } from '@/lib/validations/classFeatures'
 import { ClassFeaturesService } from '@/lib/services/classFeatures.service'
 import { GradingService } from '@/lib/services/grading.service'
+import { NotificationService } from '@/lib/services/notification.service'
 import { redisSafe } from '@/lib/redis'
 import { generateRubricFromAssignment } from '@/lib/ai/grading'
 
@@ -80,6 +81,16 @@ export async function createAttendance(classId: string, date: string, title?: st
       userId: user.id,
       pinned: parsed.data.pinned
     })
+
+    const { data: clazz } = await supabase.from('classes').select('name').eq('id', parsed.data.classId).maybeSingle()
+    if (clazz) {
+      // Intentionally not awaiting so it doesn't block the response
+      NotificationService.notifyNewAttendance({
+        classId: parsed.data.classId,
+        className: clazz.name
+      }).catch(console.error);
+    }
+
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { data: result, error: null }
@@ -154,6 +165,17 @@ export async function createPoll(classId: string, question: string, options: str
       userId: user.id,
       pinned: parsed.data.pinned
     })
+
+    const { data: clazz } = await supabase.from('classes').select('name').eq('id', parsed.data.classId).maybeSingle()
+    if (clazz) {
+      // Intentionally not awaiting so it doesn't block the response
+      NotificationService.notifyNewPoll({
+        classId: parsed.data.classId,
+        className: clazz.name,
+        question: parsed.data.question
+      }).catch(console.error);
+    }
+
     await redisSafe.invalidateFeedCache(parsed.data.classId)
     revalidatePath(`/classes/${parsed.data.classId}`)
     return { data: result, error: null }

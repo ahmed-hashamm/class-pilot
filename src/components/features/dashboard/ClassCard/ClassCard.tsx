@@ -7,8 +7,19 @@ import { ClassCardHeader } from './ClassCardHeader'
 import { ClassCardAssignments } from './ClassCardAssignments'
 import { ClassCardFooter } from './ClassCardFooter'
 
+/**
+ * The main container for a class in the dashboard grid.
+ * 
+ * Responsibilities:
+ * - Displays high-level class metadata (name, teacher, student count).
+ * - Previews upcoming assignments.
+ * - Manages class-level actions (pinning, leaving, deleting) via server actions.
+ * - Handles deletion and leaving confirmation workflows.
+ */
 interface ClassCardProps {
+  /** unique identifier for the class */
   classId: string
+  /** object containing basic class info and owner profile */
   classData: {
     name: string
     owner_profile: {
@@ -16,9 +27,13 @@ interface ClassCardProps {
       avatar_url: string | null
     }
   }
+  /** the current user's role in this class (e.g., 'Teacher', 'Student') */
   role: string
+  /** number of students currently enrolled */
   studentCount: number
+  /** list of assignment objects for previewing deadlines */
   assignments: any[]
+  /** whether the class is currently pinned to the user's dashboard */
   isPinned: boolean
 }
 

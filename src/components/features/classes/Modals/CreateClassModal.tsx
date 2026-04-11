@@ -19,10 +19,19 @@ const createClassSchema = z.object({
 
 type CreateClassFormData = z.infer<typeof createClassSchema>
 
-interface CreateClassModalProps {
-  userId: string
-  onClose: () => void
-  onSuccess?: () => void
+/**
+ * The primary interface for teachers to initialize a new classroom.
+ * 
+ * Features:
+ * - Robust Zod-driven client-side validation for class metadata
+ * - Automated generation of a unique 6-character classroom invite code
+ * - Atomic persistence workflow: Creates the class record then enrolls the creator as 'teacher'
+ * - Integrated navigation orchestration to the newly created classroom
+ */
+export interface CreateClassModalProps {
+  userId: string;
+  onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateClassModal({ userId, onClose, onSuccess }: CreateClassModalProps) {

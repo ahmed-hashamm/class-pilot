@@ -22,6 +22,15 @@ interface ChatMessageListProps {
   messagesEndRef: React.RefObject<HTMLDivElement | null>
 }
 
+/**
+ * Manages the scrolling container and conditional UI states for the chat.
+ * 
+ * Features:
+ * - Custom 'cp-bounce' animation for initializing and typing indicators
+ * - Empty state with context-aware prompts (mentions current class name)
+ * - Integrated auto-scroll management via messagesEndRef association
+ * - Visual feedback for background operations like history clearing
+ */
 export function ChatMessageList({
   messages,
   initializing,

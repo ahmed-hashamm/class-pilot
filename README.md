@@ -1,154 +1,118 @@
-# E-Classroom Platform
+# Class Pilot
+![Class Pilot](public/og-image.png)
 
-A comprehensive e-classroom platform built with Next.js, TypeScript, Tailwind CSS, and Supabase. Features include AI-powered automated grading, real-time updates, group projects, and more.
+**Class Pilot** is a comprehensive, next-generation e-classroom platform built with Next.js 14, TypeScript, Tailwind CSS, and Supabase. It revolutionizes classroom management by integrating AI-powered automated grading, real-time collaboration, and an intuitive, beautiful interface for both teachers and students.
 
-## Features
+## ✨ Features
 
-- **Authentication**: Secure user authentication with Supabase Auth
-- **Classes Management**: Create and join classes with unique class codes
-- **Assignments**: Create assignments with due dates, points, and file attachments
-- **AI-Powered Grading**: Automated grading using OpenAI GPT-4 with detailed rubrics
-- **Rubrics System**: Create and manage grading rubrics with multiple criteria
-- **Submissions**: Students can submit assignments with text and/or file uploads
-- **Announcements**: Create and pin announcements for classes
-- **Materials**: Upload and organize class materials
-- **Group Projects**: Manage group projects and collaborations
-- **Calendar View**: View assignments and deadlines in a calendar format
-- **Real-time Updates**: Supabase Realtime for instant notifications and updates
+- **Automated AI Grading**: GPT-4 powered grading system that reads student submissions, compares them to custom rubrics, and provides instant, detailed feedback.
+- **Real-Time Discussions**: Live class feeds and chat powered by Supabase Realtime and Upstash Redis.
+- **Complete Class Management**: Join via unique codes, manage members, and organize cohorts securely.
+- **Advanced Rubric Builder**: Create highly structured grading rubrics tailored for specific assignments.
+- **Dynamic Materials & Assignments**: Seamless file uploads, due date tracking, and rich text instructions.
+- **Secure Authentication**: Built on Supabase Auth, keeping student and teacher data isolated and secure.
+- **Responsive & Accessible UI**: A dark-mode first, glassmorphic design that works perfectly on desktop and mobile.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14+ (App Router) with TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Supabase (PostgreSQL, Auth, Storage, Realtime)
-- **AI Integration**: OpenAI API for automated grading
-- **State Management**: React Hooks + Zustand (optional)
+- **Framework**: Next.js 14+ (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + Shadcn UI components
+- **Database & Auth**: Supabase (PostgreSQL, Storage, Realtime, RLS)
+- **AI Engine**: OpenAI API (GPT-4o-mini)
+- **Realtime / Cache**: Upstash Redis
+- **Emails / Auth Links**: Resend
+- **Deployment**: Optimized for Vercel
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
 - Node.js 18+ and npm
-- Supabase account
-- OpenAI API key
+- [Supabase](https://supabase.com/) account
+- [OpenAI](https://openai.com/) API key
+- [Upstash Redis](https://upstash.com/) Database
+- [Resend](https://resend.com/) API key
 
-### Installation
+### Local Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
 ```bash
 git clone <repository-url>
 cd fyp
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-3. Set up environment variables:
+3. **Set up local environment variables:**
 Create a `.env.local` file in the root directory:
 ```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# OpenAI
 OPENAI_API_KEY=your_openai_api_key
+
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=your_upstash_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
+
+# Resend
+RESEND_API_KEY=your_resend_api_key
+RESEND_FROM_EMAIL=updates@theclasspilot.com
+
+# Core App URL
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-4. Set up Supabase:
-   - Create a new Supabase project
-   - Run the migration file: `supabase/migrations/001_initial_schema.sql` in your Supabase SQL editor
-   - Create storage buckets:
-     - `assignments` (for assignment file uploads)
-     - `materials` (for class materials)
+4. **Initialize Supabase (Optional for Local DB) / Link to Cloud:**
+   - Either run supabase locally `supabase start` or link to your cloud project.
+   - Run the initial migrations found in `supabase/migrations`.
+   - Ensure you create storage buckets for `assignments`, `materials`, and `avatars`.
 
-5. Run the development server:
+5. **Start the Development Server:**
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+## 🌐 Production Deployment
 
-## Project Structure
+Class Pilot is optimized for deployment on Vercel. 
 
-```
-fyp/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (auth)/            # Auth routes (login, signup)
-│   │   ├── (dashboard)/       # Protected dashboard routes
-│   │   ├── api/               # API routes
-│   │   └── layout.tsx
-│   ├── components/            # Reusable components
-│   │   ├── ui/               # Base UI components
-│   │   ├── class/            # Class-related components
-│   │   ├── assignment/       # Assignment components
-│   │   ├── grading/          # Grading components
-│   │   └── calendar/         # Calendar components
-│   ├── lib/                  # Utilities and helpers
-│   │   ├── supabase/         # Supabase client & helpers
-│   │   ├── ai/               # AI grading logic
-│   │   └── utils/            # General utilities
-│   ├── hooks/                # Custom React hooks
-│   ├── types/                # TypeScript types
-│   └── store/                # State management
-├── supabase/
-│   └── migrations/           # Database migrations
-└── public/                   # Static assets
+1. Push your code to GitHub.
+2. Import the repository into Vercel.
+3. Supply **all** environment variables exactly as they appear in `.env.local`. Set `NEXT_PUBLIC_APP_URL` to your production domain (e.g., `https://theclasspilot.com`).
+4. Ensure your Supabase Dashboard "Redirect URLs" accept your new Vercel domain.
+5. If using Cloudflare for DNS, remember to use **DNS Only (Grey Cloud)** for the Vercel `A` and `CNAME` records to let Vercel handle SSL certificates.
+
+## 🏛️ Project Structure
+
+```text
+src/
+├── actions/            # Validated Next.js Server Actions 
+├── app/                # Next.js App Router (Pages, API Routes)
+├── components/         # Reusable UI parts
+│   ├── features/       # Domain specific (classes, grading, rubrics)
+│   ├── layout/         # Shell components (Navbars, Footers)
+│   └── ui/             # Generic, unstyled primitive components
+├── contexts/           # Global React Contexts (Auth)
+├── lib/                # Core business logic layer
+│   ├── services/       # Database queries and Supabase wrappers
+│   ├── validations/    # Zod Schemas for data integrity
+│   └── hooks/          # Custom React hooks
 ```
 
-## Database Schema
+## 🔒 Security Principles
 
-The application uses the following main tables:
-- `users` - User profiles
-- `classes` - Class information
-- `class_members` - Class membership
-- `assignments` - Assignments
-- `submissions` - Student submissions
-- `rubrics` - Grading rubrics
-- `announcements` - Class announcements
-- `materials` - Class materials
-- `group_projects` - Group projects
-- `notifications` - User notifications
+- **Server-Side Verification**: Authentication heavily utilizes `@supabase/ssr` server checks.
+- **Row Level Security (RLS)**: Users can only read/mutate data belonging to classes they are a confirmed member of.
+- **Zod Validation**: Every server action validates requests against strict schemas before touching the DB.
 
-See `supabase/migrations/001_initial_schema.sql` for the complete schema.
+## 📄 License & Contact
 
-## Key Features Implementation
-
-### AI Grading
-
-The AI grading system uses OpenAI GPT-4 to analyze student submissions against rubric criteria. The grading process:
-
-1. Takes the submission content and attached rubric
-2. Sends to OpenAI with a detailed prompt
-3. Receives scores per criterion and overall feedback
-4. Stores results in the database
-5. Allows teachers to review and override AI grades
-
-### Real-time Features
-
-Supabase Realtime is used for:
-- New announcements
-- Assignment submissions
-- Grades posted
-- New class members
-
-## Development
-
-### Running Tests
-```bash
-npm run test
-```
-
-### Building for Production
-```bash
-npm run build
-npm start
-```
-
-## License
-
-This project is for educational purposes (Final Year Project).
-
-## Contributing
-
-This is a final year project. Contributions and suggestions are welcome!
+Developed as an advanced classroom management solution (Final Year Project). For queries, please open an issue or reach out via our contact page.

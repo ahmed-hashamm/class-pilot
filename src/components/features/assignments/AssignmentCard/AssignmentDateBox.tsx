@@ -6,6 +6,14 @@ interface AssignmentDateBoxProps {
   muted?: boolean;
 }
 
+/**
+ * A visual calendar-style component for displaying assignment due dates.
+ * 
+ * Features:
+ * - Large day number with month and weekday labels
+ * - Specific time display in an accented pill
+ * - Adaptive styling for "muted" states (used for past/completed tasks)
+ */
 export default function AssignmentDateBox({ dueDate, muted }: AssignmentDateBoxProps) {
   return (
     <div className={`w-20 sm:w-24 shrink-0 flex flex-col items-center justify-center border-r-2 border-border/80 transition-colors

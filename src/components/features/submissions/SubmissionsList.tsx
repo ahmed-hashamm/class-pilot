@@ -10,6 +10,14 @@ interface SubmissionsListProps {
   gradingIds?: string[]
 }
 
+/**
+ * Renders a list of all submissions for a given assignment.
+ * 
+ * Features:
+ * - Maps over submission objects to render SubmissionItem components
+ * - Helper for resolving Supabase Storage avatar URLs
+ * - Conditional rendering for the "No submissions yet" empty state
+ */
 export default function SubmissionsList({
   submissions,
   assignment,

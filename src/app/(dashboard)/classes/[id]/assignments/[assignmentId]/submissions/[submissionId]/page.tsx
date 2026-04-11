@@ -1,5 +1,5 @@
 import { getSubmissionGradingData } from '@/lib/db_data_fetching/assignments'
-import GradeSubmission from '@/components/features/grading/GradeSubmission'
+import GradeSubmission, { GradingSubmissionProps } from '@/components/features/grading/GradeSubmission'
 
 export default async function SubmissionGradingPage({
   params,
@@ -11,7 +11,7 @@ export default async function SubmissionGradingPage({
 
   return (
     <div className="mx-auto ">
-      <GradeSubmission submission={submission} classId={id} />
+      <GradeSubmission submission={(submission as unknown) as GradingSubmissionProps} classId={id} />
     </div>
   )
 }

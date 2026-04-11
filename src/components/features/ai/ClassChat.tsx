@@ -23,6 +23,15 @@ interface Message {
 }
 
 
+/**
+ * The main orchestrator for the AI Classroom Assistant.
+ * 
+ * Features:
+ * - Fetches and manages class-specific chat history via Server Actions
+ * - Implements a sliding window history (6 messages) for token efficiency
+ * - Integrates real-time "AI Assistant" streaming via the /api/chat/class endpoint
+ * - Handles interactive history clearing and automated auto-scroll on reply
+ */
 export default function ClassChat({ classId, onClose }: ClassChatProps) {
   const [className, setClassName] = useState('Class')
   const [messages, setMessages] = useState<Message[]>([])

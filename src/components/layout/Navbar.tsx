@@ -10,6 +10,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { MARKETING_NAV_LINKS } from "@/lib/data/navigation";
 import { DROPDOWN_VARIANTS } from "@/lib/animations";
 
+/**
+ * Global navigation bar for the public marketing site.
+ * 
+ * Features:
+ * - Responsive navigation with marketing-centric links
+ * - Authentication-aware action buttons (Sign In / Signup vs Profile)
+ * - Animated profile dropdown with Framer Motion integration
+ * - Interactive outside-click detection for dropdown auto-close
+ */
 const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -33,34 +42,34 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 h-14 bg-navy text-primary-foreground mb-[1px]">
-      <div className="w-full max-w-[1600px] mx-auto h-full flex items-center justify-between px-8 md:px-12 lg:px-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center group text-white decoration-0 no-underline">
-          <div className="relative w-12 h-12">
+      <div className="w-full max-w-[1600px] mx-auto h-full flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-16 gap-2 sm:gap-4">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group text-white decoration-0 no-underline shrink-0">
+          <div className="relative w-8 h-8 sm:w-12 sm:h-12 shrink-0">
             <Image
               src="/logo.png"
               alt="Class Pilot"
               fill
+              sizes="(max-width: 640px) 32px, 48px"
               className="object-contain"
               priority
             />
           </div>
-          <p className="text-xl font-bold tracking-tight">Class <span className="text-navy-light">Pilot</span></p>
+          <p className="text-base sm:text-xl font-bold tracking-tight whitespace-nowrap hidden min-[350px]:block">Class <span className="text-navy-light">Pilot</span></p>
         </Link>
 
         {/* Right Section */}
-        <div className="flex items-center gap-4 relative">
+        <div className="flex items-center gap-2 sm:gap-4 relative shrink-0">
           {!isAuthenticated ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <Link
                 href="/login"
-                className="text-white hover:text-accent transition-colors font-medium text-sm"
+                className="text-white hover:text-accent transition-colors font-medium text-xs sm:text-sm whitespace-nowrap"
               >
                 Sign In
               </Link>
               <Link
                 href="/signup"
-                className="bg-yellow text-navy font-semibold px-5 py-2 rounded-md hover:bg-accent transition-colors text-sm"
+                className="bg-yellow text-navy font-semibold px-3 py-1.5 sm:px-5 sm:py-2 rounded-md hover:bg-accent transition-colors text-xs sm:text-sm whitespace-nowrap"
               >
                 Get Started
               </Link>

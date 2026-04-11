@@ -5,13 +5,28 @@ import { Plus, Pin, Trash2, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+/**
+ * Interactive bottom section of the ClassCard.
+ * 
+ * Features:
+ * - Pin/Unpin action toggles
+ * - Create Assignment shortcut (Teachers only)
+ * - Delete Class (Teachers only) or Leave Class (Students only) workflows
+ */
 interface ClassCardFooterProps {
+  /** The specific class ID for routing and actions */
   classId: string
+  /** Whether the user is the teacher of this class */
   isTeacher: boolean
+  /** Current pin status */
   isPinned: boolean
+  /** Loading state for the pin toggle animation */
   isPinning: boolean
+  /** Callback for the pin toggle button */
   onTogglePin: (e: React.MouseEvent) => void
+  /** Trigger for the delete confirmation modal */
   onDelete: () => void
+  /** Trigger for the leave confirmation modal */
   onLeave: () => void
 }
 

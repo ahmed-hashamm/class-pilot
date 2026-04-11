@@ -107,7 +107,7 @@ export default function CookiePolicyPage() {
               </P>
               <P>
                 If you have any questions about our use of cookies, please contact us at{" "}
-                <A href="mailto:classpilot.edu@gmail.com">classpilot.edu@gmail.com</A>.
+                <A href="mailto:support@theclasspilot.com">support@theclasspilot.com</A>.
               </P>
             </>
           ),

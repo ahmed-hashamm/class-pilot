@@ -1,15 +1,23 @@
 import Image from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
 
-interface AvatarSectionProps {
-  displayAvatar: string | null
-  fullName: string
-  initials: string
-  file: File | null
-  uploading: boolean
-  setFile: (file: File | null) => void
-  clearFile: () => void
-  handleAvatarUpload: () => Promise<void>
+/**
+ * The identity management hub for user profiles.
+ * 
+ * Logic Highlights:
+ * 1. Multi-State Rendering: Handles empty states (Initials) and populated states (Images).
+ * 2. Upload Pipeline: Manages file selection, persistence to storage, and loading state orchestration.
+ * 3. Branding: Enforces a consistent rounded-2xl aesthetic for user identification across the platform.
+ */
+export interface AvatarSectionProps {
+  displayAvatar: string | null;
+  fullName: string | null;
+  initials: string;
+  file: File | null;
+  uploading: boolean;
+  setFile: (file: File | null) => void;
+  clearFile: () => void;
+  handleAvatarUpload: () => Promise<void>;
 }
 
 export function AvatarSection({
@@ -34,7 +42,7 @@ export function AvatarSection({
           <div className="size-20 rounded-2xl overflow-hidden border-2 border-border
             bg-secondary flex items-center justify-center relative">
             {displayAvatar ? (
-              <Image src={displayAvatar} alt={fullName} fill
+              <Image src={displayAvatar} alt={fullName || 'Profile Avatar'} fill
                 className="object-cover" />
             ) : (
               <span className="text-[26px] font-black text-navy">{initials}</span>

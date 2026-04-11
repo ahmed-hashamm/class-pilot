@@ -61,7 +61,7 @@ export default function HowItWorks() {
             <MarketingCTA
                 title="Your class is live in under two minutes."
                 description="Create your class, invite your students, and post your first assignment today. Free to try, no credit card needed."
-                primaryButtonText="Create your free class"
+                primaryButtonText="Get started free"
                 primaryButtonHref="/login"
                 className="bg-secondary/50"
             />

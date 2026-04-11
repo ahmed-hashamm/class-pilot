@@ -8,8 +8,12 @@ interface SkeletonLoaderProps {
 }
 
 /**
- * SkeletonLoader provides a premium loading state for the Class Pilot dashboard.
- * Use variants to match the expected content type.
+ * Provides high-fidelity "shimmer" loading placeholders.
+ * 
+ * Features:
+ * - Six specialized variants (card, list, text, form, header, chat)
+ * - Support for staggered repetition via the 'count' prop
+ * - Perfectly mirrors the dimensions and spacing of the final rendered components
  */
 export function SkeletonLoader({ variant = 'card', count = 1 }: SkeletonLoaderProps) {
   const items = Array.from({ length: count })

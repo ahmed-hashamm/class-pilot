@@ -20,6 +20,15 @@ interface AssignmentsListProps {
   hideHeader?: boolean;
 }
 
+/**
+ * Main viewer for all assignments within a class.
+ * 
+ * Features:
+ * - React Query integration for cached, optimistic data fetching
+ * - Automated categorization into "Upcoming" and "Past" groups
+ * - Role-based authorization handles (Teachers can see "Create" buttons)
+ * - Comprehensive Loading, Error, and Empty states based on project standards
+ */
 export default function AssignmentsList({ classId, isTeacher, hideHeader = false }: AssignmentsListProps) {
   const { data: assignments = [], isLoading, error, refetch } = useQuery({
     queryKey: ["classAssignments", classId],

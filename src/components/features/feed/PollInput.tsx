@@ -10,9 +10,18 @@ import { Button } from '@/components/ui/button'
 import { FeatureButton, FormSection } from '@/components/ui'
 import { PinToggle } from './PinToggle'
 
-interface PollInputProps {
-  classId: string
-  onSuccess?: () => void
+/**
+ * An interactive form for creating classroom polls.
+ * 
+ * Features:
+ * - Dynamic addition and removal of poll choices (min: 2 options)
+ * - Optional deadline enforcement with datetime-local validation
+ * - Integrated 'Pin' functionality for high-priority classroom engagement
+ * - Comprehensive error handling for incomplete queries or insufficient options
+ */
+export interface PollInputProps {
+  classId: string;
+  onSuccess?: () => void;
 }
 
 export default function PollInput({ classId, onSuccess }: PollInputProps) {

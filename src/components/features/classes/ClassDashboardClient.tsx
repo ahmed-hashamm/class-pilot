@@ -6,6 +6,15 @@ import TabContent from "./TabContent";
 import ClassChatModal from "@/components/features/ai/ClassChatModal";
 import ClassHero from "./ClassHero";
 
+/**
+ * Orchestrator for the classroom view.
+ * 
+ * Responsibilities:
+ * - Manages the active tab state (Stream, Classwork, People, etc.)
+ * - Synchronizes tab state with the URL search parameters for link sharing
+ * - Hosts the persistent AI Chat modal for the classroom
+ * - Composes the ClassHero and TabContent layouts
+ */
 export default function ClassDashboardClient({
   classId,
   isTeacher,

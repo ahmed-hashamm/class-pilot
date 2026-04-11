@@ -20,13 +20,13 @@ interface MaterialRowProps {
 }
 
 /**
- * Renders a single material item in a list.
+ * A highly interactive presentation of a single classroom resource.
  * 
- * Features:
- * - Expandable description with auto-truncation detection (ResizeObserver)
- * - Dynamic Z-index management to ensure "Actions" dropdown stay on top of subsequent rows
- * - AI Sync status indicators
- * - Responsive layout with hover effects
+ * Logic Highlights:
+ * 1. Truncation Hub: Uses ResizeObserver to detect if descriptions overflow a single line.
+ * 2. Z-Index Orchestration: Dynamically elevates the row's stacking context when the action menu is open.
+ * 3. Status Visualization: Renders AI sync badges and posting timestamps.
+ * 4. Expandable Layout: Allows users to toggle full descriptions for long content.
  */
 export default function MaterialRow({
   material,

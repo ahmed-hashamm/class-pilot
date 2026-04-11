@@ -1,6 +1,14 @@
 import Image from "next/image";
 import ActionButton from "./ActionButton";
 
+/**
+ * The primary value proposition and entry point for the Class Pilot landing page.
+ * 
+ * Features:
+ * - High-impact typography and branded SVG background decorations.
+ * - Performance Optimized: Uses 'priority' image loading for Largest Contentful Paint (LCP) optimization.
+ * - Responsive Grid: Fluidly transitions from a single-column mobile layout to a dual-column desktop hero area.
+ */
 const HeroSection = () => {
   return (
     <section className="bg-navy h-full text-primary-foreground relative overflow-hidden">

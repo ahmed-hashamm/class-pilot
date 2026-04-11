@@ -13,6 +13,15 @@ interface ClassHeroProps {
   classSettings: any;
 }
 
+/**
+ * The visual header for a specific class room.
+ * 
+ * Features:
+ * - High-impact title and description display
+ * - Dynamic "Teacher" or "Student" role badge with themed colors
+ * - Animated WavePattern background
+ * - Integrates the ClassTabs navigation component
+ */
 export default function ClassHero({
   className,
   classDescription,

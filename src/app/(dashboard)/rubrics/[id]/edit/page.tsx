@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Pencil } from 'lucide-react'
-import RubricForm from '@/components/features/rubrics/CreateRubricForm'
+import RubricForm, { Criterion } from '@/components/features/rubrics/CreateRubricForm'
 
 export default async function EditRubricPage({
   params,
@@ -44,7 +44,7 @@ export default async function EditRubricPage({
         </div>
       </div>
 
-      <RubricForm userId={user.id} initialData={rubric} />
+      <RubricForm userId={user.id} initialData={(rubric as unknown) as { id: string; name: string; criteria: Criterion[] }} />
     </div>
   )
 }

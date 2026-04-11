@@ -128,6 +128,6 @@ export const PRIVACY_SECTIONS = [
       "Object to or restrict certain types of processing",
       "Data portability — receive your data in a machine-readable format",
     ],
-    footer: "To exercise any of these rights, contact us at classpilot.edu@gmail.com. We will respond within 30 days.",
+    footer: "To exercise any of these rights, contact us at support@theclasspilot.com. We will respond within 30 days.",
   },
 ];

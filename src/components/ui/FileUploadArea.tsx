@@ -16,6 +16,15 @@ interface FileUploadAreaProps {
   onValidate?: (file: File) => boolean;
 }
 
+/**
+ * The primary file ingestion interface for assignments and materials.
+ * 
+ * Features:
+ * - Two distinct visual modes: 'sm' (linear pill) and 'lg' (hero dropzone)
+ * - Multi-file selection with individual removal capability
+ * - Pluggable validation layer for enforcing file types or size limits
+ * - Intelligent hover states and visual feedback for active drop zones
+ */
 export function FileUploadArea({
   files,
   onFilesChange,

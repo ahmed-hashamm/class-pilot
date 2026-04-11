@@ -3,6 +3,8 @@ import { gradeSubmission } from '@/lib/ai/grading'
 import { extractTextFromSubmission } from '@/lib/ingestion/extract-text'
 import { Database } from '@/types/database'
 import { SupabaseClient } from '@supabase/supabase-js'
+import { NotificationService } from '@/lib/services/notification.service'
+import { ClassService } from '@/lib/services/class.service'
 
 export const GradingService = {
   /**
@@ -148,10 +150,10 @@ export const GradingService = {
   async updateFinalGrade(submissionId: string, teacherId: string, score: number) {
     const supabase = await createClient()
 
-    // 1. Fetch submission to get class_id
+    // 1. Fetch submission to get class_id and details for notification
     const { data: submission, error: subError } = await supabase
       .from('submissions')
-      .select('*, assignments(class_id)')
+      .select('*, assignments(class_id, title, points)')
       .eq('id', submissionId)
       .maybeSingle()
 
@@ -180,6 +182,24 @@ export const GradingService = {
 
     if (updateError) throw updateError
 
+    try {
+      const assignment = submission.assignments;
+      if (assignment) {
+        const className = await ClassService.getClassName(assignment.class_id);
+        await NotificationService.notifyGradeUpdate({
+          studentId: submission.user_id!,
+          classId: assignment.class_id!,
+          className: className || 'Your Class',
+          assignmentTitle: assignment.title || 'Assignment',
+          grade: score,
+          totalPoints: assignment.points || 100,
+          feedback: submission.ai_feedback || null,
+        });
+      }
+    } catch (notifErr) {
+      console.error('[GradingService] notifyGradeUpdate failed:', notifErr);
+    }
+
     return { success: true }
   },
 
@@ -189,10 +209,10 @@ export const GradingService = {
   async updateManualGrade(submissionId: string, teacherId: string, score: number, feedback: string) {
     const supabase = await createClient()
 
-    // 1. Fetch submission to get class_id
+    // 1. Fetch submission to get class_id and details for notification
     const { data: submission, error: subError } = await supabase
       .from('submissions')
-      .select('*, assignments(class_id)')
+      .select('*, assignments(class_id, title, points)')
       .eq('id', submissionId)
       .maybeSingle()
 
@@ -202,11 +222,11 @@ export const GradingService = {
     const { data: member } = await supabase
       .from('class_members')
       .select('role')
-      .eq('class_id', (submission as any).assignments?.class_id)
+      .eq('class_id', (submission).assignments?.class_id)
       .eq('user_id', teacherId)
       .maybeSingle()
 
-    if (!member || (member as any).role !== 'teacher') {
+    if (!member || member.role !== 'teacher') {
       throw new Error('Forbidden: Teacher access required')
     }
 
@@ -222,6 +242,24 @@ export const GradingService = {
       .eq('id', submissionId)
 
     if (updateError) throw updateError
+
+    try {
+      const assignment = submission.assignments;
+      if (assignment) {
+        const className = await ClassService.getClassName(assignment.class_id);
+        await NotificationService.notifyGradeUpdate({
+          studentId: submission.user_id!,
+          classId: assignment.class_id!,
+          className: className || 'Your Class',
+          assignmentTitle: assignment.title || 'Assignment',
+          grade: score,
+          totalPoints: assignment.points || 100,
+          feedback: feedback || submission.ai_feedback || null,
+        });
+      }
+    } catch (notifErr) {
+      console.error('[GradingService] notifyGradeUpdate failed:', notifErr);
+    }
 
     return { success: true }
   }

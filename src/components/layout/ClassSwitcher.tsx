@@ -74,7 +74,7 @@ export default function ClassSwitcher() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ type: "spring", duration: 0.3, bounce: 0.3 }}
-            className="absolute  sm:right-0 mt-3 w-[calc(100vw-4rem)] sm:w-72 bg-white border border-border shadow-[0_40px_80px_rgba(0,0,0,0.25)] rounded-2xl overflow-hidden z-[9999]"
+            className="absolute right-0 mt-3 w-[calc(100vw-4rem)] max-w-sm sm:w-72 bg-white border border-border shadow-[0_40px_80px_rgba(0,0,0,0.25)] rounded-2xl overflow-hidden z-[9999]"
           >
             <div className="px-4 py-3 border-b border-border bg-gray-50/50">
               <span className="text-[10px] font-black uppercase tracking-[0.15em] text-navy/40">Switch Class</span>

@@ -6,6 +6,15 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   size?: 'sm' | 'md' | 'lg'
 }
 
+/**
+ * The core interaction primitive for Class Pilot.
+ * 
+ * Features:
+ * - Seven semantic variants (primary, secondary, outline, ghost, danger, yellow)
+ * - Three strict sizing tiers (sm, md, lg)
+ * - Full ARIA support via native button inheritance
+ * - Centrally enforced transition and focus styling
+ */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
     return (

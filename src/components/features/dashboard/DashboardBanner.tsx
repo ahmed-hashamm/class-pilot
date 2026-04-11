@@ -27,9 +27,20 @@
 import WavePattern from "@/components/layout/WavePattern";
 import DashboardButtons from "./DashboardButtons";
 
+/**
+ * A bold, visual header for the user's dashboard.
+ * 
+ * Features:
+ * - Dynamic time-of-day greeting (Morning/Afternoon/Evening)
+ * - Decorative WavePattern SVG with glassmorphism backgrounds
+ * - Personalized name extraction (displays first name only)
+ * - Quick action buttons (Join Class, Create Class)
+ */
 export default function DashboardBanner({ userName, userId, role }: any) {
+  /* ── Extraction helper for first name only ── */
   const firstName = userName?.split(" ")[0] || userName;
 
+  /* ── Time-based greeting logic based on user's system clock ── */
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" :

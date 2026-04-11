@@ -1,7 +1,6 @@
 // 
 
-import { Twitter, Facebook, Linkedin, GraduationCap } from "lucide-react";
-
+import { Linkedin, Github, GraduationCap } from "lucide-react";
 
 // ── Footer Component ──────────────────────────────────────────────────────────
 const NAV_LINKS = [
@@ -19,17 +18,12 @@ const LEGAL_LINKS = [
 
 const SOCIAL_LINKS = [
   {
-    href: "https://facebook.com/classpilot",
-    label: "Facebook",
-    icon: <Facebook size={17} />,
+    href: "https://github.com/ahmed-hashamm",
+    label: "GitHub",
+    icon: <Github size={17} />,
   },
   {
-    href: "https://twitter.com/classpilot",
-    label: "Twitter / X",
-    icon: <Twitter size={17} />,
-  },
-  {
-    href: "https://linkedin.com/company/classpilot",
+    href: "https://www.linkedin.com/in/hasham-ahmed-dev",
     label: "LinkedIn",
     icon: <Linkedin size={17} />,
   },
@@ -41,11 +35,11 @@ const Footer = () => {
   return (
     <footer className="bg-navy text-primary-foreground">
       {/* ── Top section ── */}
-      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-20 lg:py-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 py-10 lg:py-20  lg:pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 mb-8">
 
           {/* Brand */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 col-span-2">
             <a href="/" className="flex items-center gap-2 text-primary-foreground font-semibold text-lg">
               <GraduationCap size={22} className="text-accent" />
               Class Pilot
@@ -71,16 +65,32 @@ const Footer = () => {
             ))}
           </div>
 
-          {/* Contact / Social */}
+          {/* Legal links */}
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary-foreground/40 mb-1">
+              Legal
+            </p>
+            {LEGAL_LINKS.map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm text-primary-foreground/70 hover:text-accent transition-colors w-fit"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+
+          {/* Contact */}
           <div className="flex flex-col gap-2">
             <p className="text-xs font-semibold uppercase tracking-widest text-primary-foreground/40 mb-1">
               Connect
             </p>
             <a
-              href="mailto:classpilot.edu@gmail.com"
+              href="mailto:support@theclasspilot.com"
               className="text-sm text-primary-foreground/70 hover:text-accent transition-colors w-fit"
             >
-              classpilot.edu@gmail.com
+              support@theclasspilot.com
             </a>
             <a
               href="/contact"
@@ -88,22 +98,6 @@ const Footer = () => {
             >
               Contact Us
             </a>
-
-            {/* Social icons */}
-            <div className="flex items-center gap-3 mt-2">
-              {SOCIAL_LINKS.map(({ href, label, icon }) => (
-                <a
-                  key={href}
-                  href={href}
-                  aria-label={label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-foreground/60 hover:text-accent transition-colors"
-                >
-                  {icon}
-                </a>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -116,14 +110,17 @@ const Footer = () => {
             © {year} Class Pilot. All rights reserved.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {LEGAL_LINKS.map(({ label, href }) => (
+          <div className="flex items-center gap-4">
+            {SOCIAL_LINKS.map(({ href, label, icon }) => (
               <a
                 key={href}
                 href={href}
-                className="text-xs text-primary-foreground/50 hover:text-accent transition-colors"
+                aria-label={label}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground/50 hover:text-accent transition-colors"
               >
-                {label}
+                {icon}
               </a>
             ))}
           </div>

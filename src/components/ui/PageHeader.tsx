@@ -12,7 +12,13 @@ interface PageHeaderProps {
 }
 
 /**
- * PageHeader is the standardized header for all dashboard pages.
+ * The architectural anchor for every dashboard view.
+ * 
+ * Features:
+ * - Consistent Breadcrumb Support: Integrated back-navigation with customizable labels.
+ * - Iconography: Branded Lucide icons for immediate visual category recognition.
+ * - Contextual Action Layer: Slot-based support for primary actions (Buttons, Modals, etc).
+ * - Responsive Layout: Fluidly adapts from stacked mobile headers to spread-out desktop views.
  */
 export function PageHeader({ title, description, icon: Icon, action, children, backHref, backLabel }: PageHeaderProps) {
   return (

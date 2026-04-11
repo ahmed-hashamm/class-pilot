@@ -21,6 +21,15 @@ interface UserProfileDropdownProps {
   onSignOut: () => void;
 }
 
+/**
+ * A sophisticated, interactive user menu for the authenticated header.
+ * 
+ * Features:
+ * - Dynamic avatar resolution with fallback to letter-based UI
+ * - Accessible dropdown state management with outside-click detection
+ * - Standardized navigation links to Dashboard and Profile settings
+ * - Integrated session termination via the onSignOut callback
+ */
 export function UserProfileDropdown({ profile, onSignOut }: UserProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

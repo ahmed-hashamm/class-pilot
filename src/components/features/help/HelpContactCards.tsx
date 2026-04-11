@@ -16,10 +16,10 @@ export function HelpContactCards() {
           <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed">
             Can't find your answer? We usually reply within a few hours.
           </p>
-          <a href="mailto:classpilot.edu@gmail.com"
+          <a href="mailto:support@theclasspilot.com"
             className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-navy
               hover:gap-2.5 transition-all duration-200">
-            classpilot.edu@gmail.com
+            support@theclasspilot.com
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

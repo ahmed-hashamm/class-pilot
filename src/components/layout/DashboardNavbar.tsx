@@ -15,6 +15,15 @@ import { createClient } from "@/lib/supabase/client";
 import CreateClassModal from "@/components/features/classes/modals/CreateClassModal";
 import { UserProfileDropdown } from "@/components/ui/UserProfileDropdown";
 
+/**
+ * Specialized navigation bar for the authenticated Dashboard.
+ * 
+ * Features:
+ * - Persistent branding with quick return-to-home functionality
+ * - Integrated Class Switcher for seamless classroom hopping
+ * - Global "Create Class" modal orchestration
+ * - Standardized UserProfileDropdown for profile and session management
+ */
 const DashboardNavbar = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const router = useRouter();
@@ -31,6 +40,7 @@ const DashboardNavbar = () => {
               src="/logo.png"
               alt="Class Pilot"
               fill
+              sizes="56px"
               className="object-contain"
               priority
             />

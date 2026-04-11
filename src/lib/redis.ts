@@ -5,14 +5,24 @@ import { Redis } from '@upstash/redis'
  * Uses REST-based communication via Upstash for zero-latency connection management.
  */
 
-if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-  // Redis features will be disabled.
+const hasRedis = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+
+if (!hasRedis) {
+  console.warn("⚠️  Redis configuration missing in .env. Upstash Redis caching will be disabled safely.");
 }
 
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-})
+export const redis = hasRedis 
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : ({
+      get: async () => null,
+      set: async () => "OK",
+      del: async () => 1,
+      incr: async () => null,
+      expire: async () => 1,
+    } as unknown as Redis);
 
 /**
  * Safe Redis Wrapper

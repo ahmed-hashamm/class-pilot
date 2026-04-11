@@ -2,7 +2,11 @@
 
 import { format, isAfter, startOfDay } from 'date-fns'
 
+/**
+ * Renders a compact list of the top 3 upcoming assignments.
+ */
 interface ClassCardAssignmentsProps {
+  /** Raw assignment records from Supabase */
   assignments: any[]
 }
 

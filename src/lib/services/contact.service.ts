@@ -1,4 +1,5 @@
-import { resend, EMAIL_FROM, ADMIN_EMAIL } from "@/lib/resend";
+import { sendEmail, ADMIN_EMAIL } from "@/lib/resend";
+import { EmailTemplates } from "@/lib/emails/templates";
 
 export interface ContactFormData {
   name: string;
@@ -10,55 +11,33 @@ export interface ContactFormData {
 
 export const ContactService = {
   async sendContactForm(data: ContactFormData) {
-    // 1. Notification email to the ADMIN (You)
-    await resend.emails.send({
-      from: `Class Pilot <${EMAIL_FROM}>`,
+    const combinedSubject = `[${data.type}] ${data.subject || "New message"}`;
+
+    // 1. Notification email to the ADMIN
+    const { error: adminError } = await sendEmail({
       to: ADMIN_EMAIL,
-      replyTo: data.email,
-      subject: `[${data.type}] ${data.subject || "New message"} — from ${data.name}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          <h2 style="color: #043873;">New Contact Form Submission</h2>
-          <hr style="border: 0; border-top: 1px solid #eee;" />
-          <p><strong>Name:</strong> ${data.name}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          <p><strong>Type:</strong> ${data.type}</p>
-          <p><strong>Subject:</strong> ${data.subject || "No Subject"}</p>
-          <p><strong>Message:</strong></p>
-          <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; line-height: 1.5;">
-            ${data.body}
-          </div>
-          <p style="font-size: 12px; color: #666; margin-top: 20px;">
-            Reply to this email directly to respond to the user.
-          </p>
-        </div>
-      `,
+      subject: `${combinedSubject} — from ${data.name}`,
+      html: EmailTemplates.ContactAlertAdmin({
+        name: data.name,
+        email: data.email,
+        subject: combinedSubject,
+        message: data.body
+      }),
+      // We can't easily pass 'replyTo' through our sendEmail wrapper yet, 
+      // but the HTML template includes a mailto link button for easy replies.
     });
 
-    // 2. Confirmation email to the USER (Sender)
-    // Note: If using onboarding@resend.dev, this may not deliver to the user 
-    // unless they are the account owner, but we implement it for production readiness.
-    try {
-      await resend.emails.send({
-        from: `Class Pilot <${EMAIL_FROM}>`,
-        to: data.email,
-        subject: "We received your message — Class Pilot",
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-            <h2 style="color: #043873;">Hello ${data.name.split(" ")[0]},</h2>
-            <p>Thanks for reaching out to Class Pilot. We've received your message regarding <strong>${data.subject || data.type}</strong> and our team will get back to you shortly.</p>
-            
-            <p>For your records, here is a copy of your message:</p>
-            <div style="border-left: 4px solid #FFE492; padding-left: 15px; margin: 20px 0; font-style: italic; color: #555;">
-              ${data.body}
-            </div>
-            
-            <p>Best regards,<br/>The Class Pilot Team</p>
-          </div>
-        `,
-      });
-    } catch (error) {
-      // Silent failure for confirmation email — primary admin notification already sent.
+    if (adminError) {
+      console.error('[ContactService] Failed to send admin notification', adminError);
+      throw new Error("Failed to send message to support");
     }
+
+    // 2. Confirmation email to the USER
+    // We do not throw if this fails, to not fail the user's action
+    await sendEmail({
+      to: data.email,
+      subject: "We've received your message — Class Pilot",
+      html: EmailTemplates.ContactConfirmationUser(data.name.split(" ")[0]),
+    });
   }
 };

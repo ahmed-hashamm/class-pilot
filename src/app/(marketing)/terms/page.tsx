@@ -75,7 +75,7 @@ export default function TermsAndPrivacyPage() {
                 If you have any questions or concerns about these policies, please contact us:
               </P>
               <UL>
-                <LI>Email: <A href="mailto:classpilot.edu@gmail.com">classpilot.edu@gmail.com</A></LI>
+                <LI>Email: <A href="mailto:support@theclasspilot.com">support@theclasspilot.com</A></LI>
                 <LI>Contact form: <A href="/contact">classpilot.edu/contact</A></LI>
               </UL>
               <P>

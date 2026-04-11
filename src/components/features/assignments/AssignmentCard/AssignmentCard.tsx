@@ -18,6 +18,14 @@ interface AssignmentCardProps {
   muted?: boolean;
 }
 
+/**
+ * A preview card for an assignment in a list.
+ * 
+ * Features:
+ * - Dynamic status calculation (Graded, Submitted, Missing, Assigned)
+ * - Visual indicators for overdue or "due today" tasks
+ * - Composes sub-components for header metadata and action footer
+ */
 export default function AssignmentCard({
   assignment,
   classId,

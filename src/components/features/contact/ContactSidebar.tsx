@@ -15,9 +15,9 @@ export function ContactSidebar() {
         <p className="text-[13px] text-muted-foreground mb-3 leading-relaxed">
           Prefer to write your own email? We're at:
         </p>
-        <a href="mailto:classpilot.edu@gmail.com"
+        <a href="mailto:support@theclasspilot.com"
           className="text-[13px] font-semibold text-navy hover:underline">
-          classpilot.edu@gmail.com
+          support@theclasspilot.com
         </a>
       </div>
 
