@@ -15,6 +15,9 @@ const COLORS = {
   border: '#e2e8f0',
 };
 
+const APP_URL = 'https://theclasspilot.com';
+const LOGO_URL = `${APP_URL}/logo.png`;
+
 /**
  * Base layout wrapper for all emails. Ensures consistent branding.
  */
@@ -28,31 +31,37 @@ function BaseLayout(title: string, content: string) {
         <title>${title}</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: ${COLORS.bgLight}; margin: 0; padding: 0; line-height: 1.6; color: ${COLORS.textMain}; }
-          .container { max-width: 600px; margin: 0 auto; background-color: ${COLORS.white}; border-radius: 8px; overflow: hidden; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid ${COLORS.border}; }
-          .header { background-color: ${COLORS.navyDark}; color: ${COLORS.white}; padding: 30px 40px; text-align: center; border-bottom: 4px solid ${COLORS.yellow}; }
-          .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+          .container { max-width: 600px; margin: 0 auto; background-color: ${COLORS.white}; border-radius: 8px; overflow: hidden; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid ${COLORS.border}; }
+          .header { background-color: ${COLORS.navyDark}; color: ${COLORS.white}; padding: 32px 40px; text-align: center; border-bottom: 4px solid ${COLORS.yellow}; }
+          .header-title { margin: 12px 0 0 0; font-size: 24px; font-weight: 800; letter-spacing: -0.05em; color: ${COLORS.white}; }
           .content { padding: 40px; }
-          .footer { background-color: ${COLORS.bgLight}; color: ${COLORS.textMuted}; padding: 20px 40px; text-align: center; font-size: 13px; border-top: 1px solid ${COLORS.border}; }
-          .btn { display: inline-block; background-color: ${COLORS.navyDark}; color: ${COLORS.white}; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 6px; margin-top: 20px; font-size: 15px; }
-          .box { background-color: ${COLORS.bgLight}; border: 1px solid ${COLORS.border}; padding: 20px; border-radius: 6px; margin: 20px 0; }
-          .metric { display: inline-block; margin-right: 20px; }
-          .metric-label { font-size: 12px; color: ${COLORS.textMuted}; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-          .metric-value { font-size: 18px; font-weight: 700; color: ${COLORS.navyDark}; }
+          .footer { background-color: ${COLORS.white}; color: ${COLORS.textMuted}; padding: 24px 40px; text-align: center; font-size: 13px; border-top: 1px solid ${COLORS.border}; }
+          .btn { display: inline-block; background-color: ${COLORS.navyDark}; color: ${COLORS.white} !important; font-weight: 700; text-decoration: none; padding: 14px 28px; border-radius: 8px; margin-top: 24px; font-size: 16px; transition: all 0.2s ease; }
+          .box { background-color: #F1F5F9; border: 1px solid ${COLORS.border}; padding: 24px; border-radius: 12px; margin: 24px 0; }
+          .metric { display: inline-block; margin-right: 32px; }
+          .metric-label { font-size: 11px; color: ${COLORS.textMuted}; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 4px; }
+          .metric-value { font-size: 20px; font-weight: 800; color: ${COLORS.navyDark}; }
           .text-muted { color: ${COLORS.textMuted}; font-size: 14px; }
+          .logo { height: 48px; width: auto; display: block; margin: 0 auto; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <img src="https://theclasspilot.com/logo.png" alt="Class Pilot Logo" height="50" style="display: inline-block; margin-bottom: 10px;" />
-            <h1>Class Pilot</h1>
+            <a href="${APP_URL}" target="_blank" style="text-decoration: none;">
+              <img src="${LOGO_URL}" alt="Class Pilot" class="logo" />
+              <div class="header-title">Class Pilot</div>
+            </a>
           </div>
           <div class="content">
             ${content}
           </div>
           <div class="footer">
-            <p>You received this email because you are enrolled in a class on Class Pilot.</p>
-            <p>&copy; ${new Date().getFullYear()} Class Pilot. All rights reserved.</p>
+            <p style="margin-top: 0;">You're receiving this because you're enrolled in a classroom on <strong>Class Pilot</strong>.</p>
+            <p>&copy; ${new Date().getFullYear()} Class Pilot Education. All rights reserved.</p>
+            <div style="margin-top: 16px;">
+              <a href="${APP_URL}" style="color: ${COLORS.navyLight}; text-decoration: none; font-weight: 600;">Visit Dashboard</a>
+            </div>
           </div>
         </div>
       </body>

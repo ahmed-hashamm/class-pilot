@@ -50,21 +50,6 @@ const DashboardNavbar = () => {
 
         {/* Right Section: Actions & Profile */}
         <div className="flex items-center gap-2 sm:gap-6">
-
-          {/* Class Switcher */}
-          <div className="hidden md:flex items-center transition-all">
-            {/* <ClassSwitcher /> */}
-          </div>
-
-          {/* Quick Action: Create Class */}
-          {/* <button
-            onClick={() => setShowCreateModal(true)}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
-            title="Create Class"
-          >
-            <Plus size={22} />
-          </button> */}
-
           {isAuthenticated ? (
             <UserProfileDropdown profile={profile} onSignOut={signOut} />
           ) : (
@@ -80,7 +65,7 @@ const DashboardNavbar = () => {
         </div>
       </div>
 
-      {/* Modal - The full-width logic is usually handled inside CreateClassModal via Tailwind 'w-full max-w-md' etc. */}
+
       {showCreateModal && profile && (
         <CreateClassModal
           userId={profile.id}
