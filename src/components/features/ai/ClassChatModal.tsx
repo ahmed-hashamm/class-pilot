@@ -52,6 +52,7 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
               initial="initial"
               animate="animate"
               exit="exit"
+              transition={{ duration: 0.25 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
@@ -62,7 +63,10 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={SPRING_TRANSITION}
+              transition={{
+                duration: 0.35,
+                ease: [0.4, 0, 0.2, 1]
+              }}
               className="relative w-full sm:max-w-lg h-[85vh]
                 bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl
                 flex flex-col overflow-hidden"

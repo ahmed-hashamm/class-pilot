@@ -30,22 +30,22 @@ const DashboardNavbar = () => {
   const { profile, signOut, isAuthenticated } = useAuth();
 
   return (
-    <nav className="border-b border-gray-200 bg-navy text-primary-foreground sticky top-0 z-50">
-      <div className="w-full max-w-[1600px] mx-auto flex h-16 items-center justify-between px-8 md:px-12 lg:px-16">
+    <nav className="sticky top-0 z-50 h-14 bg-navy text-primary-foreground mb-[1px]">
+      <div className="w-full max-w-[1600px] mx-auto h-full flex items-center justify-between px-4 sm:px-8 md:px-12 lg:px-16 gap-2 sm:gap-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center group shrink-0">
-          <div className="relative w-14 h-14">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group text-white decoration-0 no-underline shrink-0">
+          <div className="relative w-8 h-8 sm:w-12 sm:h-12 shrink-0">
             <Image
               src="/logo.png"
               alt="Class Pilot"
               fill
-              sizes="56px"
+              sizes="(max-width: 640px) 32px, 48px"
               className="object-contain"
               priority
             />
           </div>
-          <p className="text-xl font-bold tracking-tight">Class <span className="text-navy-light">Pilot</span></p>
+          <p className="text-base sm:text-xl font-bold tracking-tight whitespace-nowrap hidden min-[350px]:block">Class <span className="text-navy-light">Pilot</span></p>
         </Link>
 
         {/* Right Section: Actions & Profile */}
@@ -68,7 +68,7 @@ const DashboardNavbar = () => {
           {isAuthenticated ? (
             <UserProfileDropdown profile={profile} onSignOut={signOut} />
           ) : (
-            <button 
+            <button
               onClick={signOut}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 text-white/80 text-sm border border-white/20 transition-all"
               title="Click to Logout if profile is not loading"

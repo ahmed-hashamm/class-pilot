@@ -44,21 +44,23 @@ export default function StreamSidebarMobile({
 
           return (
             <React.Fragment key={box.id}>
-              <Button
-                variant="ghost"
-                onClick={() => setActiveBox(isActive ? null : box.id)}
-                className={`flex-1 py-4 h-auto text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 relative rounded-none
-                  ${isActive ? 'text-navy' : 'text-navy/45 hover:text-navy/60'}`}
-              >
-                {box.label}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute bottom-0 left-0 right-0 h-[3px] bg-navy"
-                    transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-                  />
-                )}
-              </Button>
+              <motion.div className="flex-1" whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setActiveBox(isActive ? null : box.id)}
+                  className={`w-full py-4 h-auto text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 relative rounded-none
+                    ${isActive ? 'text-navy' : 'text-navy/45 hover:text-navy/60'}`}
+                >
+                  {box.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-[3px] bg-navy"
+                      transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                    />
+                  )}
+                </Button>
+              </motion.div>
 
               {/* Consistent, sharp separator lines */}
               {i < boxes.length - 1 && (
@@ -95,15 +97,6 @@ export default function StreamSidebarMobile({
                 <StickyNotes classId={classId} />
               )}
             </div>
-
-            {/* Minimal Dismissal handle */}
-            <Button
-              variant="ghost"
-              onClick={() => setActiveBox(null)}
-              className="w-full h-8 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity p-0"
-            >
-              <div className="w-8 h-1 rounded-full bg-navy/40" />
-            </Button>
           </motion.div>
         )}
       </AnimatePresence>

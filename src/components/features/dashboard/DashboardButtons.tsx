@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Plus, Link as LinkIcon } from "lucide-react";
 import CreateClassModal from "@/components/features/classes/modals/CreateClassModal";
@@ -27,28 +28,34 @@ export default function DashboardButtons({
   return (
     <>
       <div className="flex flex-wrap gap-2.5">
-        <Button 
-          variant="yellow"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <Plus size={15} />
-          Create class
-        </Button>
+        <motion.div whileTap={{ scale: 0.97 }}>
+          <Button 
+            variant="yellow"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <Plus size={15} />
+            Create class
+          </Button>
+        </motion.div>
 
-        <Button 
-          variant="yellow"
-          onClick={() => setShowJoinModal(true)}
-        >
-          <LinkIcon size={15} />
-          Join class
-        </Button>
+        <motion.div whileTap={{ scale: 0.97 }}>
+          <Button 
+            variant="yellow"
+            onClick={() => setShowJoinModal(true)}
+          >
+            <LinkIcon size={15} />
+            Join class
+          </Button>
+        </motion.div>
 
         {DASHBOARD_NAV_LINKS.map((link) => (
           <Link key={link.href} href={link.href} className="inline-flex">
-            <Button variant="ghost" className="bg-white/10 border border-white/20 text-white/80 hover:bg-white/15 hover:text-white px-3.5">
-              {link.icon && <link.icon size={15} />}
-              {link.label}
-            </Button>
+            <motion.div whileTap={{ scale: 0.97 }}>
+              <Button variant="ghost" className="bg-white/10 border border-white/20 text-white/80 hover:bg-white/15 hover:text-white px-3.5">
+                {link.icon && <link.icon size={15} />}
+                {link.label}
+              </Button>
+            </motion.div>
           </Link>
         ))}
       </div>

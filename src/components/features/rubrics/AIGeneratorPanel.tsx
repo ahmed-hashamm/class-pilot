@@ -83,10 +83,10 @@ export function AIGeneratorPanel({ onSuccess, isGenerating, setIsGenerating }: A
           </div>
           <div className="text-left">
             <h3 className="font-black text-[14px] text-foreground">AI Rubric Generator</h3>
-            <p className="text-[11px] text-muted-foreground">Generate criteria automatically from your assignment details</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Generate criteria automatically from your assignment details</p>
           </div>
         </div>
-        <div className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${isAiPanelOpen ? 'bg-navy text-white' : 'bg-navy/10 text-navy group-hover:bg-navy group-hover:text-white'}`}>
+        <div className={`p-3 rounded-xl text-xs sm:text-sm whitespace-nowrap font-bold transition-all ${isAiPanelOpen ? 'bg-navy text-white' : 'bg-navy/10 text-navy group-hover:bg-navy group-hover:text-white'}`}>
           {isAiPanelOpen ? 'Close' : 'Try it'}
         </div>
       </div>

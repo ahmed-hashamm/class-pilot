@@ -7,6 +7,7 @@ import { DiscussionTopic } from '@/lib/validations/discussion'
 import { useDiscussion } from '@/lib/hooks/useDiscussion'
 import DiscussionPanel from './DiscussionPanel'
 import { cn } from '@/lib/utils'
+import { HEIGHT_TRANSITION } from '@/lib/animations'
 
 interface DiscussionDrawerProps {
   classId: string
@@ -57,10 +58,10 @@ export default function DiscussionDrawer({ classId, topic, userId, isTeacher }: 
         <AnimatePresence initial={false}>
           {isOpen && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              variants={HEIGHT_TRANSITION}
+              initial="initial"
+              animate="animate"
+              exit="exit"
               className="overflow-hidden px-2"
             >
               <div className="pt-2">

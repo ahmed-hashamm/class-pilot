@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { toggleClassPinAction, leaveClassAction, deleteClass } from '@/actions/ClassActions'
 import { ConfirmModal } from '@/components/ui'
 import { ClassCardHeader } from './ClassCardHeader'
@@ -123,10 +124,13 @@ export default function ClassCard({
         isLoading={isDeleting}
       />
 
-      <div className={`group relative flex flex-col bg-white border border-border rounded-2xl
-      overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5
-      ${(isLeaving || isDeleting) ? 'opacity-50 pointer-events-none' : ''}`}>
-
+      <motion.div 
+        whileTap={{ scale: 0.985 }}
+        transition={{ duration: 0.1 }}
+        className={`group relative flex flex-col bg-white border border-border rounded-2xl
+        overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5
+        ${(isLeaving || isDeleting) ? 'opacity-50 pointer-events-none' : ''}`}
+      >
         {/* ── Top colour stripe — navy for teacher, navy-light for student ── */}
         <div className={`h-1.5 w-full shrink-0 ${isTeacher ? 'bg-navy' : 'bg-navy-light'}`} />
 
@@ -153,7 +157,7 @@ export default function ClassCard({
             onLeave={() => setShowLeaveConfirm(true)}
           />
         </div>
-      </div>
+      </motion.div>
     </>
   )
 }
