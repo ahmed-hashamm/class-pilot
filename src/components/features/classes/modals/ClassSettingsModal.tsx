@@ -153,7 +153,7 @@ export default function ClassSettingsModal({ isOpen, onClose, classData }: Modal
               disabled={isDeleting || !name.trim()}
               label={isSaving ? "Updating..." : "Save Changes"}
               variant="primary"
-              icon={Save}
+              icon={<Save size={18} className="shrink-0" />}
               className="w-full sm:flex-1 py-3 rounded-xl shadow-md"
             />
           </div>

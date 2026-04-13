@@ -82,7 +82,7 @@ export default function AIGradingButton({
         variant="yellow"
         className="w-full py-3.5 shadow-md hover:-translate-y-0.5 transition-all"
         label={loading ? "Analyzing Submission…" : alreadyGraded ? "Re-run AI Grading" : "Start AI Evaluation"}
-        icon={loading ? Loader2 : alreadyGraded ? RefreshCw : Sparkles}
+        icon={loading ? <Loader2 size={18} className="animate-spin" /> : alreadyGraded ? <RefreshCw size={18} /> : <Sparkles size={18} />}
       />
 
       {/* Error */}

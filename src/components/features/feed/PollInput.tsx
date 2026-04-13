@@ -154,7 +154,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         </div>
         <FeatureButton
           label="Create Poll"
-          icon={SendHorizontal}
+          icon={<SendHorizontal size={18} className="shrink-0" />}
           loading={loading}
           disabled={!question.trim() || options.filter(o => o.trim()).length < 2}
           onClick={handleCreate}

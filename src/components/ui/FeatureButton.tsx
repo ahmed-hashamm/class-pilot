@@ -1,12 +1,10 @@
-'use client'
-
-import React from 'react'
-import { LucideIcon, Loader2 } from 'lucide-react'
+import React, { ReactNode } from 'react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface FeatureButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string
-  icon?: LucideIcon
+  icon?: ReactNode
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'yellow' | 'ghost'
   loading?: boolean
   loadingLabel?: string
@@ -18,7 +16,7 @@ interface FeatureButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  */
 export function FeatureButton({
   label,
-  icon: Icon,
+  icon,
   variant = 'primary',
   loading = false,
   loadingLabel,
@@ -45,8 +43,8 @@ export function FeatureButton({
     >
       {loading ? (
         <Loader2 size={18} className="animate-spin shrink-0" />
-      ) : Icon ? (
-        <Icon size={18} className="shrink-0" />
+      ) : icon ? (
+        icon
       ) : null}
       <span className="text-[14px] uppercase tracking-wider">{loading && loadingLabel ? loadingLabel : label}</span>
     </button>

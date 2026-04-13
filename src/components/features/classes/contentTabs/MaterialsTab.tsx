@@ -18,7 +18,7 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   const HeaderAction = isTeacher ? (
     <FeatureButton
       label={isUploading ? "Close" : "Upload material"}
-      icon={isUploading ? X : Plus}
+      icon={isUploading ? <X size={18} className="shrink-0" /> : <Plus size={18} className="shrink-0" />}
       variant={isUploading ? "outline" : "primary"}
       onClick={() => setIsUploading(!isUploading)}
       className={isUploading ? "bg-muted" : ""}
@@ -28,7 +28,7 @@ export default function MaterialsTab({ classId, isTeacher, userId }: MaterialsTa
   return (
     <div className="flex flex-col">
       <PageHeader
-        icon={Database}
+        icon={<Database size={24} className="text-navy" />}
         title="Class Materials"
         description="Lecture notes, slides, and shared references."
         action={HeaderAction}

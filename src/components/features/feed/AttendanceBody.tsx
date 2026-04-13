@@ -84,7 +84,7 @@ export default function AttendanceBody({
         loading={loading}
         disabled={!isActive}
         label={isActive ? (alreadyPresent ? "Marked Present" : "I'm Present") : "Session Closed"}
-        icon={isActive && alreadyPresent ? Check : undefined}
+        icon={isActive && alreadyPresent ? <Check size={18} className="shrink-0" /> : undefined}
         className="w-full py-2.5"
       >
         {isActive && remaining !== Infinity && (

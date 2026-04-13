@@ -14,7 +14,7 @@ export default async function CalendarPage() {
       <PageHeader
         title="Calendar"
         description="Schedule and upcoming deadlines"
-        icon={CalendarIcon}
+        icon={<CalendarIcon className="text-navy" size={24} />}
         backHref="/dashboard"
         backLabel="Dashboard"
         action={

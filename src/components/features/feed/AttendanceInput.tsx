@@ -118,7 +118,7 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
         </div>
         <FeatureButton
           label="Create Session"
-          icon={SendHorizontal}
+          icon={<SendHorizontal size={18} className="shrink-0" />}
           loading={loading}
           disabled={!isFormValid || loading}
           onClick={handleCreate}

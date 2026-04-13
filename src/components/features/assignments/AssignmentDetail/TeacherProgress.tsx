@@ -88,7 +88,7 @@ export default function TeacherProgress({ submissions, assignment, classId }: Te
           disabled={pendingSubmissions.length === 0}
           loading={isProcessing}
           variant="outline"
-          icon={Sparkles}
+          icon={<Sparkles size={18} className="shrink-0" />}
           label="Grade All"
           loadingLabel={`Grading ${pendingSubmissions.length - gradingIds.length}/${pendingSubmissions.length}...`}
           className="border-2 font-black text-[11px] hover:bg-navy hover:text-white px-4 py-2"

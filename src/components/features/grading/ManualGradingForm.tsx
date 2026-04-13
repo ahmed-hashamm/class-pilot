@@ -123,7 +123,7 @@ export default function ManualGradingForm({ submission, rubric, assignment, onCa
           loadingLabel="Saving Grade…"
           className="w-full py-3.5"
           label="Confirm Evaluation"
-          icon={CheckCheck}
+          icon={<CheckCheck size={18} className="shrink-0" />}
         />
         <Button
           type="button"

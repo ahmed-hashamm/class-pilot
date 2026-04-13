@@ -27,7 +27,7 @@ export function AssignmentsHeader({
         <Link href={`/classes/${classId}/assignments/create`}>
           <FeatureButton
             label="Create assignment"
-            icon={Plus}
+            icon={<Plus size={18} className="shrink-0" />}
           />
         </Link>
       )}
@@ -53,7 +53,7 @@ export function AssignmentsEmptyState({ isTeacher, classId }: { isTeacher: boole
         <Link href={`/classes/${classId}/assignments/create`}>
           <FeatureButton
             label="Create first assignment"
-            icon={Plus}
+            icon={<Plus size={18} className="shrink-0" />}
             className="mt-2"
           />
         </Link>

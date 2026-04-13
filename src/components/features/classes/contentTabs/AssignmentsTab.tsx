@@ -17,7 +17,7 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
     <Link href={`/classes/${classId}/assignments/create`}>
       <FeatureButton
         label="Create assignment"
-        icon={Plus}
+        icon={<Plus size={18} className="shrink-0" />}
       />
     </Link>
   ) : null;
@@ -25,7 +25,7 @@ export default function AssignmentsTab({ classId, isTeacher, userId }: Assignmen
   return (
     <div className="flex flex-col">
       <PageHeader
-        icon={ClipboardList}
+        icon={<ClipboardList size={24} className="text-navy" />}
         title="Assignments"
         description="Coursework, projects, and evaluative materials."
         action={HeaderAction}

@@ -47,7 +47,7 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
     <Link href={`/classes/${classId}/assignments/create`}>
       <FeatureButton 
         label="Create assignment" 
-        icon={Plus}
+        icon={<Plus size={18} className="shrink-0" />}
       />
     </Link>
   ) : null;
@@ -66,7 +66,7 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
       <div className="flex flex-col gap-6 py-6">
         {!hideHeader && (
           <PageHeader 
-            icon={ClipboardList} 
+            icon={<ClipboardList size={24} className="text-navy" />} 
             title="Assignments" 
             description="Manage and track class assignments."
             action={HeaderAction}
@@ -90,14 +90,14 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
       <div className="flex flex-col gap-6 py-6">
         {!hideHeader && (
           <PageHeader 
-            icon={ClipboardList} 
+            icon={<ClipboardList size={24} className="text-navy" />} 
             title="Assignments" 
             description="Manage and track class assignments."
             action={HeaderAction}
           />
         )}
         <EmptyState
-          icon={ClipboardList}
+          icon={<ClipboardList size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
           title="No assignments yet"
           description={isTeacher 
             ? "Create your first assignment to start tracking student progress." 
@@ -113,7 +113,7 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
     <div className="flex flex-col gap-10 py-6">
       {!hideHeader && (
         <PageHeader 
-          icon={ClipboardList} 
+          icon={<ClipboardList size={24} className="text-navy" />} 
           title="Assignments" 
           description="Manage and track class assignments."
           action={HeaderAction}

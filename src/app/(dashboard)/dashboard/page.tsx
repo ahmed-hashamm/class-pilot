@@ -25,7 +25,7 @@ export default async function DashboardPage() {
         {isEmpty ? (
           <EmptyState
             variant="dashboard"
-            icon={BookOpen}
+            icon={<BookOpen size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
             title="Ready to start?"
             description="Create your first premium classroom or join an existing one using a code from your teacher."
             actions={

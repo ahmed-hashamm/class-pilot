@@ -145,7 +145,7 @@ export default function AnnouncementInput({
         </div>
         <FeatureButton
           label="Post Announcement"
-          icon={SendHorizontal}
+          icon={<SendHorizontal size={18} className="shrink-0" />}
           loading={loading}
           disabled={!hasContent}
           onClick={handlePost}

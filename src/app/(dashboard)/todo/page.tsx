@@ -13,7 +13,7 @@ export default async function TodoPage() {
       <PageHeader
         title="My Assignments"
         description="Track your individual and team progress"
-        icon={CheckCircle2}
+        icon={<CheckCircle2 className="text-navy" size={24} />}
         backHref="/dashboard"
         backLabel="Back to dashboard"
       />

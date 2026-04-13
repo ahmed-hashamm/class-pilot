@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
-import { LucideIcon } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 
 interface EmptyStateProps {
-  icon: LucideIcon
+  icon: React.ReactNode
   title: string
   description: string
   actionLabel?: string
@@ -25,7 +25,7 @@ interface EmptyStateProps {
  * - Built-in hover animations for the 'dashboard' variant to increase engagement
  */
 export function EmptyState({ 
-  icon: Icon, 
+  icon, 
   title, 
   description, 
   actionLabel, 
@@ -50,13 +50,7 @@ export function EmptyState({
           ? "size-20 rounded-[28px] bg-navy/5 border border-navy/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl group-hover:bg-navy group-hover:text-white" 
           : "size-16 bg-secondary/50 flex items-center justify-center mb-6",
       )}>
-        <Icon 
-          size={isDashboard ? 32 : 28} 
-          className={cn(
-            "text-navy transition-colors duration-500", 
-            isDashboard && "group-hover:text-white"
-          )} 
-        />
+        {icon}
       </div>
       
       <h3 className={cn(

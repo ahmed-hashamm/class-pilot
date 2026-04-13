@@ -34,7 +34,7 @@ export default function StudentList({ classId, isTeacher }: StudentListProps) {
     return (
       <div className="max-w-3xl mx-auto py-6">
         <EmptyState 
-          icon={RefreshCw}
+          icon={<RefreshCw size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
           title="Error loading members"
           description="We couldn't load the members for this class. Please try again."
           actionLabel="Retry"
@@ -66,7 +66,7 @@ export default function StudentList({ classId, isTeacher }: StudentListProps) {
         <MemberSectionHeader role="student" count={students.length} />
         {students.length === 0 ? (
           <EmptyState 
-            icon={Users}
+            icon={<Users size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
             title="No students yet"
             description={isTeacher ? "Share the class code to invite students." : "Your teacher has not added any students yet."}
           />

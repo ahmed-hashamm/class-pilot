@@ -134,7 +134,7 @@ export default function MaterialUpload({
         </div>
         <FeatureButton
           label="Upload Materials"
-          icon={SendHorizontal}
+          icon={<SendHorizontal size={18} className="shrink-0" />}
           loading={loading}
           disabled={files.length === 0}
           onClick={handleUpload}

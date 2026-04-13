@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { ChevronLeft, LucideIcon } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 
 interface PageHeaderProps {
   title: string
   description?: string
-  icon?: LucideIcon
+  icon?: React.ReactNode
   action?: React.ReactNode
   children?: React.ReactNode
   backHref?: string
@@ -20,7 +20,7 @@ interface PageHeaderProps {
  * - Contextual Action Layer: Slot-based support for primary actions (Buttons, Modals, etc).
  * - Responsive Layout: Fluidly adapts from stacked mobile headers to spread-out desktop views.
  */
-export function PageHeader({ title, description, icon: Icon, action, children, backHref, backLabel }: PageHeaderProps) {
+export function PageHeader({ title, description, icon, action, children, backHref, backLabel }: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-8 mb-8">
       {backHref && (
@@ -34,7 +34,7 @@ export function PageHeader({ title, description, icon: Icon, action, children, b
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            {Icon && <Icon className="text-navy" size={24} />}
+            {icon}
             <h1 className="text-[28px] font-black tracking-tight text-navy leading-none">
               {title}
             </h1>

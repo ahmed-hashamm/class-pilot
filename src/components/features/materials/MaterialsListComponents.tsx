@@ -31,7 +31,7 @@ export function MaterialsHeader({
           variant={isUploading ? "secondary" : "primary"}
           className="px-5 py-2.5"
           label={isUploading ? "Close" : "Upload material"}
-          icon={isUploading ? X : Plus}
+          icon={isUploading ? <X size={18} className="shrink-0" /> : <Plus size={18} className="shrink-0" />}
         />
       )}
     </div>
@@ -63,7 +63,7 @@ export function MaterialsEmptyState({
           onClick={onToggleUpload}
           className="mt-2 px-5 py-2.5"
           label="Upload first material"
-          icon={Plus}
+          icon={<Plus size={18} className="shrink-0" />}
         />
       )}
     </div>

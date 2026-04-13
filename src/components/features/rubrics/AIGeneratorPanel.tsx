@@ -120,7 +120,7 @@ export function AIGeneratorPanel({ onSuccess, isGenerating, setIsGenerating }: A
               loading={isGenerating}
               loadingLabel="Generating..."
               label="Generate Grading Criteria"
-              icon={Wand2}
+              icon={<Wand2 size={18} className="shrink-0" />}
               className="px-6 py-3"
             />
           </div>

@@ -23,7 +23,7 @@ export function GroupHeader({
         <FeatureButton
           onClick={onNewGroup}
           label="New group"
-          icon={Plus}
+          icon={<Plus size={18} className="shrink-0" />}
           className="px-5 py-2.5"
         />
       )}
@@ -55,7 +55,7 @@ export function GroupEmptyState({
         <FeatureButton
           onClick={onNewGroup}
           label="Create first group"
-          icon={Plus}
+          icon={<Plus size={18} className="shrink-0" />}
           className="mt-2 px-5 py-2.5"
         />
       )}

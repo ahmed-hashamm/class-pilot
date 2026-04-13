@@ -26,7 +26,7 @@ export function GroupGrid({
     return (
       <div className="mt-4">
         <EmptyState
-          icon={Users2}
+          icon={<Users2 size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
           title="No groups yet"
           description={isTeacher
             ? "Create a group and assign students to collaborate on projects."

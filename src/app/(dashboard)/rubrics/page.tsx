@@ -11,7 +11,7 @@ export default async function RubricsPage() {
       <PageHeader
         title="Rubrics"
         description="Manage your evaluation standards"
-        icon={BookOpen}
+        icon={<BookOpen className="text-navy" size={24} />}
         backHref="/dashboard"
         backLabel="Back to dashboard"
         action={
@@ -79,7 +79,7 @@ export default async function RubricsPage() {
       ) : (
         <EmptyState
           variant="dashboard"
-          icon={FileText}
+          icon={<FileText size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
           title="No rubrics yet"
           description="Create your first grading rubric to simplify your feedback process and ensure consistency."
           actions={

@@ -34,7 +34,7 @@ export default function StudentStatus({ isTurnedIn, isGraded, isPastDeadline, on
       variant={"primary"}
       className="w-full font-black text-[13px] py-3.5 rounded-xl border-2 shadow-md shadow-navy/10"
       label={isTurnedIn ? "Edit Submission" : "Add Submission"}
-      icon={BookOpen}
+      icon={<BookOpen size={18} className="shrink-0" />}
     />
   );
 }

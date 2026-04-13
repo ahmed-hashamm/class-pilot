@@ -101,7 +101,7 @@ export default function MaterialsList({ classId, isTeacher, userId, hideHeader =
   const HeaderAction = isTeacher ? (
     <FeatureButton
       label={isUploading ? "Close" : "Upload material"}
-      icon={isUploading ? X : Plus}
+      icon={isUploading ? <X size={18} className="shrink-0" /> : <Plus size={18} className="shrink-0" />}
       variant={isUploading ? "outline" : "primary"}
       onClick={toggleUpload}
       className={isUploading ? "bg-muted" : ""}
@@ -122,14 +122,14 @@ export default function MaterialsList({ classId, isTeacher, userId, hideHeader =
       <div className="flex flex-col gap-6 py-6">
         {!hideHeader && (
           <PageHeader
-            icon={Database}
+            icon={<Database size={24} className="text-navy" />}
             title="Class Materials"
             description="Shared documents and resources"
             action={HeaderAction}
           />
         )}
         <EmptyState
-          icon={RefreshCw}
+          icon={<RefreshCw size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
           title="Error loading materials"
           description="We couldn't load the materials for this class. Please try again."
           actionLabel="Retry"
@@ -143,7 +143,7 @@ export default function MaterialsList({ classId, isTeacher, userId, hideHeader =
     <div className="flex flex-col gap-10 py-8">
       {!hideHeader && (
         <PageHeader
-          icon={Database}
+          icon={<Database size={24} className="text-navy" />}
           title="Class Materials"
           description="Access lecture notes, project resources, and shared documents."
           action={HeaderAction}
@@ -163,7 +163,7 @@ export default function MaterialsList({ classId, isTeacher, userId, hideHeader =
       {materials.length === 0 && !isUploading ? (
         <div className="mt-4">
           <EmptyState
-            icon={Database}
+            icon={<Database size={32} className="text-navy transition-colors duration-500 group-hover:text-white" />}
             title="No materials yet"
             description={isTeacher
               ? "Upload documents, slides, or files for your students to access."

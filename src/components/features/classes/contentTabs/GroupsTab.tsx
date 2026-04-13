@@ -18,13 +18,13 @@ export default function GroupsTab({ classId, isTeacher, userId }: GroupsTabProps
   return (
     <div className="flex flex-col ">
       <PageHeader
-        icon={Users2}
+        icon={<Users2 size={24} className="text-navy" />}
         title="Student Groups"
         description="Organize students into collaborative teams."
         action={isTeacher ? (
           <FeatureButton
             label="New group"
-            icon={Plus}
+            icon={<Plus size={18} className="shrink-0" />}
             onClick={() => setShowGroupModal(true)}
           />
         ) : null}
