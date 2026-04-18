@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://theclasspilot.com"),
+  metadataBase: new URL("https://theclasspilot.com"),
   title: {
     default: "Class Pilot - AI-Powered Classroom Management",
     template: "%s | Class Pilot",

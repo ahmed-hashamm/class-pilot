@@ -93,7 +93,7 @@ export const ClassFeaturesService = {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from("attendances")
-      .select("*")
+      .select("id, title, date, deadline, created_by, pinned, closed_at")
       .eq("class_id", classId)
       .order("date", { ascending: false })
     if (error) throw error
@@ -207,7 +207,7 @@ export const ClassFeaturesService = {
   async getAIUsageLogs(userId: string) {
     const supabase = await createClient()
     const { data, error } = await supabase.from("ai_usage_logs")
-      .select("*")
+      .select("id, action_type, model, input_tokens, output_tokens, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
     if (error) throw error

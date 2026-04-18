@@ -1,7 +1,32 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "@/lib/redis";
+
+// Create a new ratelimiter, that allows 10 requests per 10 seconds
+const ratelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(10, "10 s"),
+  analytics: true,
+  prefix: "@upstash/ratelimit",
+});
 
 export async function middleware(request: NextRequest) {
+  // 1. Rate Limiting for sensitive routes
+  const ip = request.ip ?? "127.0.0.1";
+  const path = request.nextUrl.pathname;
+  
+  if (path.startsWith('/login') || path.startsWith('/signup') || path.startsWith('/api')) {
+    try {
+      const { success } = await ratelimit.limit(ip);
+      if (!success) {
+        return new NextResponse("Too many requests", { status: 429 });
+      }
+    } catch (e) {
+      // Fail open if Redis is down
+    }
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
