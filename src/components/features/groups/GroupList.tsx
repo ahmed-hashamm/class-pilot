@@ -32,22 +32,37 @@ export default function GroupList({ classId, isTeacher, hideHeader = false, exte
   const [localError, setLocalError] = useState<string | null>(null)
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null)
 
-  const { data: groups = [], isLoading: loadingGroups, error: errorGroups, refetch: refetchGroups } = useQuery({
+  const {
+    data: groups = [],
+    isLoading: loadingGroups,
+    isFetching: fetchingGroups,
+    error: errorGroups,
+    refetch: refetchGroups,
+  } = useQuery({
     queryKey: ["groups", classId],
     queryFn: async () => {
       const { groups: data, error } = await getGroupsWithMembers(classId)
       if (error) throw new Error(error)
       return (data || []) as Group[]
     },
+    retry: 2,
+    staleTime: 30 * 1000,
   })
 
-  const { data: allMembers = [], isLoading: loadingMembers } = useQuery({
+  const {
+    data: allMembers = [],
+    isLoading: loadingMembers,
+    error: errorMembers,
+    refetch: refetchMembers,
+  } = useQuery({
     queryKey: ["allClassMembers", classId],
     queryFn: async () => {
       const { members: data, error } = await getAllClassMembers(classId)
       if (error) throw new Error(error)
       return (data || []) as any[]
     },
+    retry: 2,
+    staleTime: 30 * 1000,
   })
 
   const onSave = async (title: string, selectedIds: string[]) => {
@@ -78,15 +93,31 @@ export default function GroupList({ classId, isTeacher, hideHeader = false, exte
     } catch { toast.error("Failed to remove member") }
   }
 
+  // Show loading skeleton only on initial load, not on background refetch
   if (loadingGroups || loadingMembers) {
     return (
       <div className="flex flex-col gap-10 py-8">
-        <SkeletonLoader variant="header" /><SkeletonLoader variant="card" count={4} />
+        <SkeletonLoader variant="header" />
+        <SkeletonLoader variant="card" count={4} />
       </div>
     )
   }
 
-  if (errorGroups) return <ErrorState message="Failed to load groups." onRetry={() => refetchGroups()} />
+  // Handle errors for both queries with retry
+  if (errorGroups || errorMembers) {
+    const message = errorGroups
+      ? "Failed to load groups."
+      : "Failed to load class members."
+    return (
+      <ErrorState
+        message={message}
+        onRetry={() => {
+          if (errorGroups) refetchGroups()
+          if (errorMembers) refetchMembers()
+        }}
+      />
+    )
+  }
 
   return (
     <div className="flex flex-col gap-10 py-8">

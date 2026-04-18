@@ -1,35 +1,100 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+
+/** Max time (ms) the progress bar can stay visible before auto-resetting. */
+const PROGRESS_BAR_TIMEOUT_MS = 8000;
 
 /**
  * Custom High-Fidelity Progress Bar
  * Reliably intercept navigation events in Next.js 16/React 19.
+ *
+ * Safety features:
+ * - Auto-resets after PROGRESS_BAR_TIMEOUT_MS to prevent stuck states
+ * - Ignores replaceState calls that don't actually change the URL
+ * - Only triggers for genuine cross-page navigations
  */
 function ProgressBarInner() {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reset when path or search params change
+  /** Clear any existing safety timeout */
+  const clearSafetyTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
+  /** Start navigation with a safety timeout fallback */
+  const startNavigation = useCallback(() => {
+    // Defer state update to avoid "useInsertionEffect must not schedule updates"
+    // which happens when Next.js calls pushState during a forbidden phase.
+    setTimeout(() => {
+      setIsNavigating(true);
+      clearSafetyTimeout();
+      timeoutRef.current = setTimeout(() => {
+        setIsNavigating(false);
+      }, PROGRESS_BAR_TIMEOUT_MS);
+    }, 0);
+  }, [clearSafetyTimeout]);
+
+  /** Stop navigation and clear timeout */
+  const stopNavigation = useCallback(() => {
+    // Defer state update for consistency and safety
+    setTimeout(() => {
+      setIsNavigating(false);
+      clearSafetyTimeout();
+    }, 0);
+  }, [clearSafetyTimeout]);
+
+  // Reset when path or search params change (navigation completed)
   useEffect(() => {
-    setIsNavigating(false);
-  }, [pathname, searchParams]);
+    stopNavigation();
+  }, [pathname, searchParams, stopNavigation]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => clearSafetyTimeout();
+  }, [clearSafetyTimeout]);
 
   useEffect(() => {
-    // Intercept programmatic navigation (router.push, router.replace)
     const originalPushState = window.history.pushState;
     const originalReplaceState = window.history.replaceState;
 
+    /**
+     * Check if the target URL from a history state call is actually
+     * different from the current URL. Prevents false triggers from
+     * router.replace() calls that just update search params in-place
+     * (e.g. tab switching within the same classroom page).
+     */
+    const isActualNavigation = (url: unknown): boolean => {
+      if (!url || typeof url !== 'string') return false;
+      try {
+        const target = new URL(url, window.location.origin);
+        return target.pathname !== window.location.pathname;
+      } catch {
+        return false;
+      }
+    };
+
     window.history.pushState = function (...args) {
-      setIsNavigating(true);
+      const [, , url] = args;
+      if (isActualNavigation(url)) {
+        startNavigation();
+      }
       return originalPushState.apply(window.history, args);
     };
 
     window.history.replaceState = function (...args) {
-      setIsNavigating(true);
+      const [, , url] = args;
+      if (isActualNavigation(url)) {
+        startNavigation();
+      }
       return originalReplaceState.apply(window.history, args);
     };
 
@@ -45,9 +110,9 @@ function ProgressBarInner() {
         !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey
       ) {
         const url = new URL(anchor.href);
-        // Trigger if navigating to a DIFFERENT internal URL
-        if (url.pathname !== window.location.pathname || url.search !== window.location.search) {
-          setIsNavigating(true);
+        // Only trigger for genuinely different pages (not just query/hash changes)
+        if (url.pathname !== window.location.pathname) {
+          startNavigation();
         }
       }
     };
@@ -58,7 +123,7 @@ function ProgressBarInner() {
       window.history.pushState = originalPushState;
       window.history.replaceState = originalReplaceState;
     };
-  }, []);
+  }, [startNavigation]);
 
   return (
     <AnimatePresence>

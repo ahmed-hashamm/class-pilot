@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -28,20 +28,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
   const router = useRouter()
+  // Prevent concurrent checkAuth calls from racing
+  const checkInProgress = useRef(false)
 
   const checkAuth = useCallback(async () => {
+    // Guard against concurrent calls (e.g. onAuthStateChange firing during initial check)
+    if (checkInProgress.current) return
+    checkInProgress.current = true
+
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser()
 
       if (user) {
-        // Essential: Set authenticated true immediately since we have a valid Supabase user
-        setIsAuthenticated(true)
-        
         // Get fallback info from user metadata (Google/OAuth or Signup)
         const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || null
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || null
+
+        // Build profile from metadata first as an immediate fallback
+        const metadataProfile: UserProfile = {
+          id: user.id,
+          name: fullName || user.email?.split('@')[0] || 'User',
+          email: user.email || '',
+          role: 'user',
+          avatar_url: avatarUrl,
+        }
         
         // Fetch or create user profile
         let profileData = null
@@ -93,27 +105,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           /* Silent failure */
         }
 
-        // Apply profile data with full metadata fallback
-        setProfile({
-          id: user.id,
-          name: (profileData as any)?.full_name || fullName || user.email?.split('@')[0] || 'User',
-          email: (profileData as any)?.email || user.email || '',
-          role: 'user',
-          avatar_url: (profileData as any)?.avatar_url || avatarUrl,
-        })
+        // Build the final resolved profile
+        const resolvedProfile: UserProfile = profileData
+          ? {
+              id: user.id,
+              name: (profileData as any)?.full_name || metadataProfile.name,
+              email: (profileData as any)?.email || metadataProfile.email,
+              role: 'user',
+              avatar_url: (profileData as any)?.avatar_url || metadataProfile.avatar_url,
+            }
+          : metadataProfile
+
+        // Set both states together so UI never sees "authenticated but no profile"
+        setProfile(resolvedProfile)
+        setIsAuthenticated(true)
       } else {
         setIsAuthenticated(false)
         setProfile(null)
       }
     } catch (error) {
-      // Only set to false if we explicitly failed to get a user
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      // On error, try one more time to check if user exists
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          setIsAuthenticated(false)
+          setProfile(null)
+        }
+      } catch {
+        // Complete failure — clear auth state
         setIsAuthenticated(false)
         setProfile(null)
       }
     } finally {
       setLoading(false)
+      checkInProgress.current = false
     }
   }, [supabase])
 
@@ -178,4 +203,3 @@ export function useAuth() {
   }
   return context
 }
-
