@@ -12,8 +12,8 @@ const ratelimit = new Ratelimit({
 });
 
 export async function middleware(request: NextRequest) {
-  // 1. Rate Limiting for sensitive routes
-  const ip = request.ip ?? "127.0.0.1";
+  // 1. Rate Limiting for sensitive routes (Cloudflare/Vercel standard)
+  const ip = request.headers.get("x-forwarded-for")?.split(',')[0] ?? "127.0.0.1";
   const path = request.nextUrl.pathname;
   
   if (path.startsWith('/login') || path.startsWith('/signup') || path.startsWith('/api')) {
