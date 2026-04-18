@@ -44,7 +44,7 @@ export function SignUpForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <FormSection
         label="Full Name"
         error={errors.fullName?.message}

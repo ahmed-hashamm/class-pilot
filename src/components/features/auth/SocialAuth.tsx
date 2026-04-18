@@ -26,7 +26,7 @@ export function SocialAuth() {
 
   return (
     <div className="space-y-2">
-      <div className="relative my-6">
+      <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-gray-200" />
         </div>
@@ -38,7 +38,7 @@ export function SocialAuth() {
       <Button
         type="button"
         variant="outline"
-        className="w-full py-6 text-base border-gray-200 hover:bg-gray-50 transition-colors gap-3"
+        className="w-full py-4 text-base border-gray-200 hover:bg-gray-50 transition-colors gap-3"
         onClick={handleGoogleSignIn}
         disabled={loading}
       >

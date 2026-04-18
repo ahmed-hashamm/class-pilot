@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 import { useAuth } from '@/contexts/AuthContext'
+import { toast } from 'sonner'
 
-type UserRow = Database['public']['Tables']['users']['Row']
 type UserUpdate = Database['public']['Tables']['users']['Update']
 
 interface ProfileState {
   loading: boolean
+  passwordLoading: boolean
   uploading: boolean
   initialLoading: boolean
   userId: string | null
@@ -18,14 +19,11 @@ interface ProfileState {
   avatarUrl: string | null
   file: File | null
   preview: string | null
-  // Password updates
-  newPassword?: string
-  confirmPassword?: string
-  status: { type: 'success' | 'error'; message: string } | null
 }
 
 /**
  * Custom hook that manages all profile page logic.
+ * Dedicated states for each async operation prevent cross-contamination.
  */
 export function useProfile() {
   const supabase = createClient()
@@ -34,6 +32,7 @@ export function useProfile() {
 
   const [state, setState] = useState<ProfileState>({
     loading: false,
+    passwordLoading: false,
     uploading: false,
     initialLoading: true,
     userId: null,
@@ -41,9 +40,6 @@ export function useProfile() {
     avatarUrl: null,
     file: null,
     preview: null,
-    newPassword: '',
-    confirmPassword: '',
-    status: null,
   })
 
   // Sync with AuthContext on mount or when authProfile changes
@@ -72,17 +68,17 @@ export function useProfile() {
   }, [state.file])
 
   const setFullName = (name: string) =>
-    setState((s) => ({ ...s, fullName: name, status: null }))
+    setState((s) => ({ ...s, fullName: name }))
 
   const setFile = (file: File | null) =>
-    setState((s) => ({ ...s, file, status: null }))
+    setState((s) => ({ ...s, file }))
 
   const clearFile = () =>
     setState((s) => ({ ...s, file: null, preview: null }))
 
   const handleAvatarUpload = async () => {
     if (!state.file || !state.userId) return
-    setState((s) => ({ ...s, uploading: true, status: null }))
+    setState((s) => ({ ...s, uploading: true }))
     try {
       const fileExt = state.file.name.split('.').pop()
       const filePath = `${state.userId}-${Math.random()}.${fileExt}`
@@ -93,23 +89,23 @@ export function useProfile() {
       if (uploadError) throw uploadError
 
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
-      const { error: updateError } = await (supabase
-        .from('users') as any)
+      const { error: updateError } = await (supabase.from('users') as any)
         .update({ avatar_url: data.publicUrl } as UserUpdate)
         .eq('id', state.userId)
       if (updateError) throw updateError
 
-      await checkAuth() // Refresh global state
-
+      // Show toast immediately before background refresh
+      toast.success('Profile photo updated.')
       setState((s) => ({
         ...s,
         avatarUrl: data.publicUrl,
         file: null,
         preview: null,
-        status: { type: 'success', message: 'Profile photo updated.' },
       }))
+
+      checkAuth() // fire-and-forget background refresh
     } catch {
-      setState((s) => ({ ...s, status: { type: 'error', message: 'Failed to upload image.' } }))
+      toast.error('Failed to upload image.')
     } finally {
       setState((s) => ({ ...s, uploading: false }))
     }
@@ -117,46 +113,42 @@ export function useProfile() {
 
   const handleSaveProfile = async () => {
     if (!state.userId) return
-    setState((s) => ({ ...s, loading: true, status: null }))
+    setState((s) => ({ ...s, loading: true }))
     try {
-      const { error } = await (supabase
-        .from('users') as any)
+      const { error } = await (supabase.from('users') as any)
         .update({ full_name: state.fullName } as UserUpdate)
         .eq('id', state.userId)
       if (error) throw error
 
-      await checkAuth() // Refresh global state
-
-      setState((s) => ({
-        ...s,
-        loading: false,
-        status: { type: 'success', message: 'Profile updated successfully!' },
-      }))
+      // Show toast immediately before background refresh
+      toast.success('Profile updated successfully!')
+      checkAuth() // fire-and-forget background refresh
     } catch {
-      setState((s) => ({
-        ...s,
-        loading: false,
-        status: { type: 'error', message: 'Could not save changes.' },
-      }))
+      toast.error('Could not save changes.')
+    } finally {
+      setState((s) => ({ ...s, loading: false }))
     }
   }
 
-  const handleUpdatePassword = async (password: string) => {
-    setState(s => ({ ...s, loading: true, status: null }))
+  /**
+   * Dedicated password update — uses its own isolated passwordLoading state
+   * so it never interferes with the save profile loading state.
+   */
+  const handleUpdatePassword = async (password: string): Promise<{ error: string | null }> => {
+    setState((s) => ({ ...s, passwordLoading: true }))
     try {
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
 
-      setState(s => ({
-        ...s,
-        loading: false,
-        status: { type: 'success', message: 'Password updated successfully!' }
-      }))
+      // Fire toast immediately — don't await anything after this
+      toast.success('Password updated successfully!')
       return { error: null }
     } catch (err: any) {
       const msg = err.message || 'Failed to update password.'
-      setState(s => ({ ...s, loading: false, status: { type: 'error', message: msg } }))
+      toast.error(msg)
       return { error: msg }
+    } finally {
+      setState((s) => ({ ...s, passwordLoading: false }))
     }
   }
 

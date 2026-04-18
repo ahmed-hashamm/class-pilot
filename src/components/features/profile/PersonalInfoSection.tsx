@@ -1,4 +1,5 @@
-import { ShieldCheck, Loader2 } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
+import { FeatureButton } from '@/components/ui/FeatureButton'
 
 interface PersonalInfoSectionProps {
   fullName: string
@@ -37,14 +38,13 @@ export function PersonalInfoSection({
               transition"
           />
         </div>
-        <button
+        <FeatureButton
+          label="Update Personal Info"
+          loadingLabel="Saving..."
+          loading={loading}
           onClick={handleSaveProfile}
-          disabled={loading}
-          className="inline-flex items-center justify-center gap-2
-            bg-navy text-white font-semibold text-[13px] px-6 py-2.5 rounded-lg
-            hover:bg-navy/90 transition-all disabled:opacity-60 cursor-pointer border-none">
-          {loading ? <Loader2 size={14} className="animate-spin" /> : 'Update Personal Info'}
-        </button>
+          className="w-full md:w-auto"
+        />
       </div>
     </div>
   )

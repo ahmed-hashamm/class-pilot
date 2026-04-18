@@ -1,14 +1,7 @@
 import Image from 'next/image'
-import { Camera, Loader2 } from 'lucide-react'
+import { Camera } from 'lucide-react'
+import { FeatureButton } from '@/components/ui/FeatureButton'
 
-/**
- * The identity management hub for user profiles.
- * 
- * Logic Highlights:
- * 1. Multi-State Rendering: Handles empty states (Initials) and populated states (Images).
- * 2. Upload Pipeline: Manages file selection, persistence to storage, and loading state orchestration.
- * 3. Branding: Enforces a consistent rounded-2xl aesthetic for user identification across the platform.
- */
 export interface AvatarSectionProps {
   displayAvatar: string | null;
   fullName: string | null;
@@ -69,25 +62,20 @@ export function AvatarSection({
               <p className="text-[13px] font-semibold text-foreground truncate">
                 {file.name}
               </p>
-              <div className="flex gap-2">
-                <button
+              <div className="flex gap-2 items-center">
+                <FeatureButton
+                  label="Save photo"
+                  loadingLabel="Uploading..."
+                  loading={uploading}
                   onClick={handleAvatarUpload}
-                  disabled={uploading}
-                  className="inline-flex items-center gap-2 bg-navy text-white
-                    font-semibold text-[13px] px-4 py-2 rounded-lg
-                    hover:bg-navy/90 transition disabled:opacity-60
-                    cursor-pointer border-none">
-                  {uploading
-                    ? <><Loader2 size={13} className="animate-spin" />Uploading...</>
-                    : 'Save photo'}
-                </button>
-                <button
+                  className="px-4 py-2 text-[13px]"
+                />
+                <FeatureButton
+                  variant="ghost"
+                  label="Cancel"
                   onClick={clearFile}
-                  className="text-[13px] font-semibold text-muted-foreground
-                    hover:text-foreground transition cursor-pointer
-                    bg-transparent border-none">
-                  Cancel
-                </button>
+                  className="text-[13px] px-2"
+                />
               </div>
             </div>
           ) : (

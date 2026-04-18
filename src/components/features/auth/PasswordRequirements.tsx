@@ -17,11 +17,11 @@ export function PasswordRequirements({ password = '' }: PasswordRequirementsProp
   ]
 
   return (
-    <div className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+    <div className="space-y-1.5 p-2 bg-gray-50 rounded-lg border border-gray-100">
       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
         Password Requirements
       </p>
-      <div className="grid grid-cols-1 gap-1.5">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
         {requirements.map((req, index) => {
           const isMet = req.test(password)
           return (

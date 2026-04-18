@@ -149,10 +149,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        // Force a refresh when user signs in
+      // Only refresh on sign-in and token refresh events.
+      // Ignore USER_UPDATED — it fires during updateUser() and would
+      // cause a deadlock (updateUser → onAuthStateChange → checkAuth → getUser → onAuthStateChange…)
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         await checkAuth()
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false)
         setProfile(null)
         setLoading(false)

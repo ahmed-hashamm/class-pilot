@@ -12,12 +12,12 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, description }: AuthLayoutProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-4">
       <Card className="w-full max-w-md shadow-xl border-none">
         <CardHeader className="space-y-1">
           {/* Logo */}
-          <Link href="/" className="flex items-center justify-center group mb-2">
-            <div className="relative w-24 h-24 transition-transform group-hover:scale-105">
+          <Link href="/" className="flex items-center justify-center group mb-1">
+            <div className="relative w-16 h-16 transition-transform group-hover:scale-105">
               <Image
                 src="/logo.png"
                 alt="Class Pilot Logo"

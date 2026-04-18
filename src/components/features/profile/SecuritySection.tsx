@@ -1,21 +1,22 @@
 'use client'
 
-import { Lock, Loader2 } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UpdatePasswordSchema, type UpdatePasswordInput } from '@/lib/validations/auth'
 import { PasswordInput } from '@/components/ui/PasswordInput'
 import { Label } from '@/components/ui/label'
 import { PasswordRequirements } from '@/components/features/auth/PasswordRequirements'
+import { FeatureButton } from '@/components/ui/FeatureButton'
 
 interface SecuritySectionProps {
   handleUpdatePassword: (password: string) => Promise<{ error: string | null }>
-  loading: boolean
+  passwordLoading: boolean
 }
 
 export function SecuritySection({
   handleUpdatePassword,
-  loading,
+  passwordLoading,
 }: SecuritySectionProps) {
   const {
     register,
@@ -25,10 +26,7 @@ export function SecuritySection({
     formState: { errors, isSubmitting },
   } = useForm<UpdatePasswordInput>({
     resolver: zodResolver(UpdatePasswordSchema),
-    defaultValues: {
-      password: '',
-      confirmPassword: '',
-    }
+    defaultValues: { password: '', confirmPassword: '' },
   })
 
   const passwordValue = watch('password', '')
@@ -50,9 +48,9 @@ export function SecuritySection({
       <form onSubmit={handleSubmit(onPasswordSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">New password</Label>
+            <Label htmlFor="sec-password">New password</Label>
             <PasswordInput
-              id="password"
+              id="sec-password"
               {...register('password')}
               placeholder="••••••••"
               error={!!errors.password}
@@ -66,9 +64,9 @@ export function SecuritySection({
             <PasswordRequirements password={passwordValue} />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="confirmPassword">Confirm new password</Label>
+            <Label htmlFor="sec-confirm-password">Confirm new password</Label>
             <PasswordInput
-              id="confirmPassword"
+              id="sec-confirm-password"
               {...register('confirmPassword')}
               placeholder="••••••••"
               error={!!errors.confirmPassword}
@@ -86,14 +84,13 @@ export function SecuritySection({
           <p className="text-[12px] text-muted-foreground">
             Changing your password will update your login credentials immediately.
           </p>
-          <button
+          <FeatureButton
             type="submit"
-            disabled={loading || isSubmitting}
-            className="inline-flex items-center justify-center gap-2
-              bg-navy text-white font-semibold text-[13px] px-6 py-2.5 rounded-lg
-              hover:bg-navy/90 transition-all disabled:opacity-60 cursor-pointer border-none w-full md:w-auto">
-            {loading || isSubmitting ? <Loader2 size={14} className="animate-spin" /> : 'Update Password'}
-          </button>
+            loading={passwordLoading || isSubmitting}
+            label="Update Password"
+            loadingLabel="Updating..."
+            className="w-full md:w-auto"
+          />
         </div>
       </form>
     </div>

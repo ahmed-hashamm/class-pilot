@@ -43,7 +43,7 @@ export async function updatePassword(payload: unknown) {
 
   try {
     await authService.updatePassword(parsed.data.password)
-    revalidatePath('/', 'layout')
+    revalidatePath('/dashboard')
     return { data: 'Password updated successfully', error: null }
   } catch (error: any) {
     return { data: null, error: error.message || 'Failed to update password' }
