@@ -5,14 +5,19 @@ import { redirect } from 'next/navigation'
 
 import { isPast, isFuture } from 'date-fns'
 
+export interface CalendarSubmission {
+  status: string;
+  user_id: string;
+  group_id: string | null;
+}
+
 export interface CalendarAssignment {
   id: string;
   title: string;
   due_date: string;
   points: number;
-  is_group_project: boolean;
   classes: { name: string; id: string } | null;
-  submissions?: CalendarSubmission[];
+  isDone: boolean;
 }
 
 export async function getCalendarPageData() {
@@ -59,7 +64,7 @@ export async function getCalendarPageData() {
         .not('due_date', 'is', null)
     : { data: [] }
 
-  const processAssignments = (data: any[]) => (data || []).map((a) => {
+  const processAssignments = (data: any[]): CalendarAssignment[] => (data || []).map((a) => {
     const hasSubmission = a.submissions?.some((s: any) =>
       s.user_id === user.id || (a.is_group_project && myGroupIds.includes(s.group_id as string))
     )
