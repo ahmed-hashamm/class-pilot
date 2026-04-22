@@ -7,6 +7,7 @@ interface AssignmentGroupProps {
   label: string;
   assignments: Assignment[];
   classId: string;
+  isTeacher: boolean;
   muted?: boolean;
 }
 
@@ -14,6 +15,7 @@ export default function AssignmentGroup({
   label,
   assignments,
   classId,
+  isTeacher,
   muted = false,
 }: AssignmentGroupProps) {
   if (assignments.length === 0) return null;
@@ -39,6 +41,7 @@ export default function AssignmentGroup({
             key={assignment.id}
             assignment={assignment}
             classId={classId}
+            isTeacher={isTeacher}
             muted={muted}
           />
         ))}

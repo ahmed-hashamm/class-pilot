@@ -126,6 +126,7 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
             label="Upcoming"
             assignments={upcoming}
             classId={classId}
+            isTeacher={isTeacher}
           />
         )}
         {past.length > 0 && (
@@ -133,6 +134,7 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
             label="Past"
             assignments={past}
             classId={classId}
+            isTeacher={isTeacher}
             muted
           />
         )}

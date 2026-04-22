@@ -9,6 +9,7 @@ interface AssignmentHeaderProps {
     icon: LucideIcon;
     color: string;
   };
+  isTeacher?: boolean;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -18,7 +19,7 @@ const STATUS_STYLES: Record<string, string> = {
   navy: 'bg-navy/5 text-navy/60 border-navy/10',
 };
 
-export default function AssignmentHeader({ assignment, status }: AssignmentHeaderProps) {
+export default function AssignmentHeader({ assignment, status, isTeacher = false }: AssignmentHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -42,11 +43,13 @@ export default function AssignmentHeader({ assignment, status }: AssignmentHeade
         </div>
 
         {/* Status badge */}
-        <div className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
-          border ${STATUS_STYLES[status.color]}`}>
-          <status.icon size={10} className="shrink-0" />
-          <span>{status.label}</span>
-        </div>
+        {!isTeacher && (
+          <div className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
+            border ${STATUS_STYLES[status.color]}`}>
+            <status.icon size={10} className="shrink-0" />
+            <span>{status.label}</span>
+          </div>
+        )}
       </div>
     </div>
   );

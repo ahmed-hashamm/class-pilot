@@ -15,6 +15,7 @@ import AssignmentFooter from "./AssignmentFooter";
 interface AssignmentCardProps {
   assignment: Assignment;
   classId: string;
+  isTeacher?: boolean;
   muted?: boolean;
 }
 
@@ -29,6 +30,7 @@ interface AssignmentCardProps {
 export default function AssignmentCard({
   assignment,
   classId,
+  isTeacher = false,
   muted = false,
 }: AssignmentCardProps) {
   const dueDate = assignment.due_date ? new Date(assignment.due_date) : null;
@@ -62,7 +64,7 @@ export default function AssignmentCard({
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full gap-3">
-        <AssignmentHeader assignment={assignment} status={status} />
+        <AssignmentHeader assignment={assignment} status={status} isTeacher={isTeacher} />
 
         {assignment.description && (
           <p className="text-[13px] leading-relaxed text-muted-foreground/50 line-clamp-2 max-w-[90%]">
