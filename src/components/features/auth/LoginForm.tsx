@@ -42,7 +42,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <FormSection
         label="Email"
         error={errors.email?.message}
@@ -78,15 +78,15 @@ export function LoginForm() {
       <FeatureButton
         type="submit"
         variant='primary'
-        className="w-full text-base font-semibold"
+        className="w-full text-base font-bold rounded-xl shadow-lg shadow-navy/10 hover:shadow-navy/20 transition-all duration-300"
         loading={loading}
         label="Sign In"
       />
 
-      <div className="text-center text-sm text-gray-600">
-        Don't have an account?{' '}
-        <Link href="/signup" className="text-blue-600 font-medium hover:underline">
-          Sign up
+      <div className="text-center text-[13px] text-slate-500 pt-1">
+        New to Class Pilot?{' '}
+        <Link href="/signup" className="text-navy font-bold hover:underline underline-offset-4 decoration-2">
+          Create an account
         </Link>
       </div>
     </form>

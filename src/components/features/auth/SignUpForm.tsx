@@ -45,8 +45,10 @@ export function SignUpForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+
       <FormSection
         label="Full Name"
+
         error={errors.fullName?.message}
       >
         <Input
@@ -60,6 +62,7 @@ export function SignUpForm() {
 
       <FormSection
         label="Email"
+
         error={errors.email?.message}
       >
         <Input
@@ -71,8 +74,10 @@ export function SignUpForm() {
         />
       </FormSection>
 
+
       <FormSection
         label="Password"
+
         error={errors.password?.message}
       >
         <PasswordInput
@@ -87,14 +92,14 @@ export function SignUpForm() {
       <FeatureButton
         type="submit"
         variant='primary'
-        className="w-full text-base font-semibold"
+        className="w-full text-base font-bold rounded-xl shadow-lg shadow-navy/10 hover:shadow-navy/20 transition-all duration-300"
         loading={loading}
-        label="Create Account"
+        label="Create Your Account"
       />
 
-      <div className="text-center text-sm text-gray-600">
-        Already have an account?{' '}
-        <Link href="/login" className="text-blue-600 font-medium hover:underline">
+      <div className="text-center text-[13px] text-slate-500">
+        Already a member?{' '}
+        <Link href="/login" className="text-navy font-bold hover:underline underline-offset-4 decoration-2">
           Sign In
         </Link>
       </div>

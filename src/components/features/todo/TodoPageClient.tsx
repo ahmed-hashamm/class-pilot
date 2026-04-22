@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import {
-  CheckCircle2, Inbox, Clock, AlertCircle,
-  BookOpen, GraduationCap, XCircle,
+  CheckCircle2, Inbox, Clock, AlertCircle, XCircle,
 } from "lucide-react";
 import { TodoSection, SummaryPill } from "@/components/features/todo";
 import { TeacherTodoItem } from "@/components/features/todo/TeacherTodoItem";
 import { TodoAssignment } from "@/lib/db_data_fetching/todo";
+import { RoleSwitcher, RoleTabKey } from "@/components/ui";
 
 interface TodoPageClientProps {
   done: TodoAssignment[];
@@ -20,13 +20,6 @@ interface TodoPageClientProps {
   hasTeacherClasses: boolean;
 }
 
-const TABS = [
-  { key: "student", label: "My Work", icon: BookOpen },
-  { key: "teacher", label: "My Classes", icon: GraduationCap },
-] as const;
-
-type TabKey = typeof TABS[number]["key"];
-
 export default function TodoPageClient({
   done,
   missing,
@@ -37,45 +30,39 @@ export default function TodoPageClient({
   teacherEnded,
   hasTeacherClasses,
 }: TodoPageClientProps) {
-  const [activeTab, setActiveTab] = useState<TabKey>("student");
+  const [activeTab, setActiveTab] = useState<RoleTabKey>("student");
 
   return (
-    <>
-      {/* Tab switcher — only show if user has teacher classes */}
-      {hasTeacherClasses && (
-        <div className="flex gap-1 p-1 bg-navy/[0.04] rounded-xl border border-navy/[0.06] w-fit">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold
-                  transition-all duration-300
-                  ${isActive
-                    ? "bg-navy text-white shadow-md"
-                    : "text-navy/50 hover:text-navy hover:bg-navy/5"
-                  }`}
-              >
-                <tab.icon size={15} />
-                {tab.label}
-              </button>
-            );
-          })}
+    <div className="flex flex-col gap-8">
+      {/* Top Bar: Tabs & Summary Pills */}
+      <div className="flex  justify-between flex-wrap items-center gap-6">
+        {/* Tab switcher — only show if user has teacher classes */}
+        {hasTeacherClasses && (
+          <RoleSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+        )}
+
+        {/* Dynamic Summary Pills */}
+        <div className="flex gap-3 flex-wrap items-center">
+          {activeTab === "student" ? (
+            <>
+              <SummaryPill label="Assigned" count={assigned.length} variant="navy" />
+              <SummaryPill label="Missing" count={missing.length} variant="red" />
+              <SummaryPill label="Done" count={done.length} variant="green" />
+            </>
+          ) : (
+            <>
+              <SummaryPill label="Active" count={teacherActive.length} variant="green" />
+              <SummaryPill label="Ended" count={teacherEnded.length} variant="navy" />
+            </>
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Student tab content */}
-      {activeTab === "student" && (
-        <>
-          {/* Summary badges */}
-          <div className="flex gap-3 flex-wrap">
-            <SummaryPill label="Assigned" count={assigned.length} variant="navy" />
-            <SummaryPill label="Missing" count={missing.length} variant="red" />
-            <SummaryPill label="Done" count={done.length} variant="green" />
-          </div>
-
-          <div className="flex flex-col gap-12">
+      {/* Tab content */}
+      <div className="flex flex-col gap-12">
+        {/* Student tab content */}
+        {activeTab === "student" && (
+          <>
             <TodoSection
               title="Assigned"
               icon={<Clock size={16} />}
@@ -113,20 +100,12 @@ export default function TodoPageClient({
               userId={userId}
               myGroupIds={myGroupIds}
             />
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {/* Teacher tab content */}
-      {activeTab === "teacher" && (
-        <>
-          {/* Summary badges */}
-          <div className="flex gap-3 flex-wrap">
-            <SummaryPill label="Active" count={teacherActive.length} variant="green" />
-            <SummaryPill label="Ended" count={teacherEnded.length} variant="navy" />
-          </div>
-
-          <div className="flex flex-col gap-12">
+        {/* Teacher tab content */}
+        {activeTab === "teacher" && (
+          <>
             {/* Active assignments */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between border-b border-border/60 pb-3">
@@ -173,9 +152,9 @@ export default function TodoPageClient({
                 </div>
               </div>
             )}
-          </div>
-        </>
-      )}
-    </>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, CheckCircle2, Circle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, Circle, Clock, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
+import { isPast } from "date-fns";
 
 type Assignment = {
   id: string;
@@ -16,11 +17,12 @@ type Assignment = {
 
 interface CalenderViewProps {
   assignments: Assignment[];
+  isTeacher?: boolean;
 }
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default function CalenderView({ assignments }: CalenderViewProps) {
+export default function CalenderView({ assignments, isTeacher }: CalenderViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // Move forward/back months
@@ -46,9 +48,7 @@ export default function CalenderView({ assignments }: CalenderViewProps) {
 
   // Get assignments for a given day
   const getAssignmentsForDay = (day: number) => {
-    // We adjust month to be 1-indexed and pad properly for local ISO comparison
     const targetDate = new Date(currentYear, currentMonth, day);
-    // get local date string YYYY-MM-DD
     const pad = (n: number) => n.toString().padStart(2, "0");
     const dateStr = `${targetDate.getFullYear()}-${pad(targetDate.getMonth() + 1)}-${pad(targetDate.getDate())}`;
 
@@ -132,22 +132,35 @@ export default function CalenderView({ assignments }: CalenderViewProps) {
               <div className="flex flex-col gap-1.5 overflow-y-auto overflow-x-hidden max-h-[85px] custom-scrollbar">
                 {dayAssignments.map((a) => {
                   const href = a.classes ? `/classes/${a.classes.id}/assignments/${a.id}` : '#';
+                  const ended = isPast(new Date(a.due_date));
+
+                  let variantClasses = "";
+                  let icon = null;
+
+                  if (isTeacher) {
+                    variantClasses = ended 
+                      ? "bg-slate-50 border-slate-200 text-slate-400" 
+                      : "bg-navy/[0.02] border-navy/10 text-navy";
+                    icon = ended 
+                      ? <AlertCircle size={13} className="opacity-40" /> 
+                      : <Clock size={13} className="opacity-70" />;
+                  } else {
+                    variantClasses = a.isDone
+                      ? "bg-green-50 border-green-200 text-green-700 hover:border-green-300"
+                      : "bg-white border-slate-200 text-slate-800 hover:border-slate-300";
+                    icon = a.isDone 
+                      ? <CheckCircle2 size={13} className="text-green-600 flex-shrink-0" />
+                      : <Circle size={13} className="text-orange-600 flex-shrink-0" />;
+                  }
 
                   return (
                     <Link
                       key={a.id}
                       href={href}
                       title={a.title}
-                      className={`px-2 py-1.5 rounded-md text-[11px] font-medium truncate border flex items-center gap-1.5 transition-shadow hover:shadow-sm ${a.isDone
-                          ? "bg-green-50 border-green-200 text-green-700 hover:border-green-300"
-                          : "bg-white border-slate-200 text-slate-800 hover:border-slate-300"
-                        }`}
+                      className={`px-2 py-1.5 rounded-md text-[11px] font-medium truncate border flex items-center gap-1.5 transition-shadow hover:shadow-sm ${variantClasses}`}
                     >
-                      {a.isDone ? (
-                        <CheckCircle2 size={13} className="text-green-600 flex-shrink-0" />
-                      ) : (
-                        <Circle size={13} className="text-orange-600 flex-shrink-0" />
-                      )}
+                      {icon}
                       <span className="truncate">{a.title}</span>
                     </Link>
                   );

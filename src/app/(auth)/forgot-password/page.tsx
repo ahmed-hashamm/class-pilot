@@ -2,12 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { FeatureButton } from '@/components/ui'
 import { requestPasswordReset } from '@/actions/AuthActions'
+import { AuthLayout } from '@/components/features/auth/AuthLayout'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -33,59 +32,53 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <Link href="/" className="flex items-center justify-center group">
-            <div className="relative w-32 h-32">
-              <Image
-                src="/logo.png"
-                alt="Class Pilot"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </Link>
-          <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email to receive a password reset link
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
-            )}
-            {message && (
-              <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">{message}</div>
-            )}
-            <FeatureButton
-              type="submit"
-              className="w-full"
-              loading={loading}
-              label="Send Reset Link"
-            />
-          </form>
-          <div className="mt-4 text-center text-sm">
-            Remembered your password?{' '}
-            <Link href="/login" className="text-blue-600 hover:underline">
-              Sign in
-            </Link>
+    <AuthLayout
+      title="Forgot Password?"
+      description="Enter your email address to receive a secure password reset link."
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-navy/40 ml-1">
+            Email Address
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="name@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="rounded-xl border-slate-200 focus:ring-navy/5 focus:border-navy"
+          />
+        </div>
+
+        {error && (
+          <div className="rounded-xl bg-red-50 border border-red-100 p-3 text-sm text-red-600 font-medium">
+            {error}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+
+        {message && (
+          <div className="rounded-xl bg-green-50 border border-green-100 p-3 text-sm text-green-600 font-medium">
+            {message}
+          </div>
+        )}
+
+        <FeatureButton
+          type="submit"
+          variant="primary"
+          className="w-full text-base font-semibold"
+          loading={loading}
+          label="Send Reset Link"
+        />
+
+        <div className="text-center text-sm text-slate-600">
+          Remembered your password?{' '}
+          <Link href="/login" className="text-navy font-bold hover:underline underline-offset-4">
+            Sign In
+          </Link>
+        </div>
+      </form>
+    </AuthLayout>
   )
 }

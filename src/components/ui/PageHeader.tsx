@@ -22,7 +22,7 @@ interface PageHeaderProps {
  */
 export function PageHeader({ title, description, icon, action, children, backHref, backLabel }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-8 mb-8">
+    <div className="flex flex-col gap-8 mb-4">
       {backHref && (
         <Link href={backHref}
           className="inline-flex items-center gap-1.5 text-[13px] font-semibold

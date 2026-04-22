@@ -17,3 +17,4 @@ export * from './textarea';
 export * from './select';
 export * from './ConfirmModal';
 export * from './PasswordInput';
+export * from './RoleSwitcher';

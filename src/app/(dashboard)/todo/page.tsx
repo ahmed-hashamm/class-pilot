@@ -7,7 +7,7 @@ export default async function TodoPage() {
   const { user, done, missing, assigned, myGroupIds, teacherActive, teacherEnded, hasTeacherClasses } = await getTodoPageData();
 
   return (
-    <div className="max-w-3xl mx-auto p-6 md:p-10 flex flex-col gap-6">
+    <div className="max-w-3xl mx-auto p-6 md:p-10 flex flex-col gap-4">
       <PageHeader
         title="My Assignments"
         description="Track your individual and team progress"

@@ -17,24 +17,24 @@ export function PasswordRequirements({ password = '' }: PasswordRequirementsProp
   ]
 
   return (
-    <div className="space-y-1.5 p-2 bg-gray-50 rounded-lg border border-gray-100">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-        Password Requirements
+    <div className="space-y-1 px-2 py-1.5 bg-gray-50/50 rounded-lg border border-gray-100">
+      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+        Requirements
       </p>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
         {requirements.map((req, index) => {
           const isMet = req.test(password)
           return (
-            <div key={index} className="flex items-center gap-2">
+            <div key={index} className="flex items-center gap-1.5">
               <div className={cn(
-                "w-4 h-4 rounded-full flex items-center justify-center transition-colors",
+                "w-3 h-3 rounded-full flex items-center justify-center transition-colors",
                 isMet ? "bg-green-100 text-green-600" : "bg-gray-200 text-gray-400"
               )}>
-                {isMet ? <Check size={10} strokeWidth={3} /> : <X size={10} strokeWidth={3} />}
+                {isMet ? <Check size={8} strokeWidth={4} /> : <X size={8} strokeWidth={4} />}
               </div>
               <span className={cn(
-                "text-xs transition-colors",
-                isMet ? "text-green-700 font-medium" : "text-gray-500"
+                "text-[10px] transition-colors leading-tight",
+                isMet ? "text-green-700 font-bold" : "text-gray-400 font-medium"
               )}>
                 {req.label}
               </span>
