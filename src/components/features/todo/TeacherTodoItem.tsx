@@ -57,7 +57,7 @@ export function TeacherTodoItem({ assignment }: TeacherTodoItemProps) {
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-navy/50">
               <FileText size={12} className="text-navy/30" />
-              {submissionCount} submitted
+              {submissionCount} submissions
             </span>
             {gradedCount > 0 && (
               <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
