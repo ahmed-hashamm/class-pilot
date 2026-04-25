@@ -45,7 +45,7 @@ const Footer = () => {
               Class Pilot
             </a>
             <p className="text-sm text-primary-foreground/60 leading-relaxed max-w-xs">
-              AI-powered lesson planning and classroom tools — built by teachers, for teachers.
+              Empowering educators and students with a next-generation classroom ecosystem for AI grading, collaboration, and communication.
             </p>
           </div>
 

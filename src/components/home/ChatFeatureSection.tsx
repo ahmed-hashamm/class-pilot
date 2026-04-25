@@ -11,15 +11,15 @@ const ChatFeatureSection = () => {
           <div>
             <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight text-navy">
               Talk, ask,<br />
-              debate — right<br />
+              debate — in your<br />
               <span className="relative inline-block">
-                under the task
+                class channels
                 <span className="absolute bottom-1 left-0 w-full h-1.5 bg-yellow rounded-full z-[-1]" />
               </span>
             </h2>
 
             <p className="mt-8 mb-10 max-w-lg leading-relaxed text-xl text-muted-foreground">
-              Every class and assignment features a dedicated discussion thread. Students can ask questions, share insights, and collaborate with peers—keeping all communication organized and perfectly in context.
+              Every class features dedicated discussion channels. Students can ask questions, share insights, and collaborate with peers—keeping all communication organized and accessible in one place.
             </p>
 
             <ActionButton buttonText="Explore Discussions" />
