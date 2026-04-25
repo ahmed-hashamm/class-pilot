@@ -22,7 +22,7 @@ export default function HowItWorks() {
                 buttonText="Get started free"
                 headingStart="Your classroom,"
                 headingHighlight="smarter"
-                text="Teaching tips, AI in education, product news, and study strategies — written by teachers and the Class Pilot team."
+                text="Discover how Class Pilot transforms everyday classroom management—from instant AI grading to seamless student collaboration—all in one intuitive platform."
             />
 
             <HowItWorksSteps />

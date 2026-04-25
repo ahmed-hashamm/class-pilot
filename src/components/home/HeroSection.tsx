@@ -45,7 +45,6 @@ const HeroSection = () => {
             <ActionButton buttonText="Get Started" />
           </div>
 
-          {/* Hero Image / Illustration */}
           <div className="relative z-10 flex justify-center lg:justify-end">
             <div className="relative w-full max-w-2xl aspect-[4/3]">
               <Image

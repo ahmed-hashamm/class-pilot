@@ -33,15 +33,15 @@ export const TEACHER_STEPS: Step[] = [
     {
         num: "02", flip: true, delay: "0.1s",
         title: "Post assignments & attach materials",
-        desc: "Write instructions, attach slides, PDFs, videos, or links, and set a due date — all from one screen. Every student sees it the moment you post. Schedule posts ahead of time or go live in real-time during class.",
-        tags: ["Rich attachments", "Due date reminders", "Scheduled posting"],
+        desc: "Write instructions, attach slides, PDFs or links, and set a due date — all from one screen. Every student receives instant access the moment you post, ensuring your class is always in sync.",
+        tags: ["Rich attachments", "Post Notifications", "Instant distribution"],
         diagram: <DiagramPostAssignment />,
     },
     {
         num: "03", flip: false, delay: "0.2s",
         title: "Grade manually — or let the AI do it",
         desc: "Every submission lands in one queue. Mark by hand with inline comments, or trigger AI-assisted grading: the AI scores each submission against your rubric and drafts personalised feedback per student. You review, approve, and return.",
-        tags: ["AI grading", "Rubric-based scoring", "Inline comments"],
+        tags: ["AI grading", "Rubric-based scoring", "Comments in Feedback"],
         diagram: <DiagramGrading />,
     },
 ];
@@ -87,7 +87,7 @@ export const DIFF_CARDS: DiffCard[] = [
     {
         badge: "Collaboration",
         title: "Group Projects",
-        desc: "Students collaborate in a shared live workspace — writing, editing, and commenting in real time. Teachers receive a unified submission with individual contribution tracking, eliminating duplicate work.",
+        desc: "Students collaborate in a shared live workspace. Teachers receive a unified submission eliminating redundant work.",
         icon: (
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                 <circle cx="8" cy="8.5" r="3" stroke="currentColor" strokeWidth="1.5" />
@@ -116,4 +116,4 @@ export const STATS: Stat[] = [
     { num: "80%", lbl: "reduction in manual marking time" },
     { num: "2×", lbl: "faster feedback turnaround" },
     { num: "100%", lbl: "AI accuracy based on class material" },
-];
+];

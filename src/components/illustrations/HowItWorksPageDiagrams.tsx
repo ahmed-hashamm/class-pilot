@@ -1,9 +1,9 @@
 "use client"
 import { DEMO_MEMBERS } from "@/lib/data/illustrations";
- /** Teacher — step 1: class setup */
- /* ─────────────────────────────────────────────────────────────────────────────
-   THEME CONSTANTS
-   Resolved from globals.css so SVGs always match exactly
+/** Teacher — step 1: class setup */
+/* ─────────────────────────────────────────────────────────────────────────────
+  THEME CONSTANTS
+  Resolved from globals.css so SVGs always match exactly
 ───────────────────────────────────────────────────────────────────────────── */
 const NAVY = "#043873";           // hsl(212 93% 23%)
 const NAVY_LIGHT = "#4F9CF9";           // hsl(215 94% 65%)
@@ -13,7 +13,7 @@ const NEAR_BLACK = "#171717";           // hsl(0 0% 9%)
 const BORDER_CLR = "#E5E5E5";           // hsl(0 0% 89.8%)
 const MUTED_TEXT = "#737373";           // hsl(0 0% 45.1%)
 const MUTED_BG = "#F5F5F5";           // hsl(0 0% 96.1%)
- export function DiagramCreateClass() {
+export function DiagramCreateClass() {
     return (
         <svg viewBox="0 0 260 180" fill="none" className="w-full">
             {/* shell */}
@@ -192,8 +192,8 @@ export function DiagramAIChat() {
             <text x="208" y="26" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="6.5" fontWeight="600" fill={NAVY}>Class notes only</text> */}
             {/* student bubble (right) */}
             <rect x="80" y="54" width="158" height="30" rx="10" fill={`${NAVY}12`} stroke={`${NAVY}20`} strokeWidth="1" />
-            <text x="159" y="65" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7.5" fill={NEAR_BLACK}>What is the role of the spindle</text>
-            <text x="159" y="76" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7.5" fill={NEAR_BLACK}>apparatus in mitosis?</text>
+            <text x="159" y="65" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7.5" fill={NEAR_BLACK}>Explain the role of the spindle</text>
+            <text x="159" y="76" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7.5" fill={NEAR_BLACK}>apparatus in mitosis from lecture 5</text>
             {/* AI bubble (left) */}
             <rect x="22" y="97" width="178" height="52" rx="10" fill={MUTED_BG} stroke={BORDER_CLR} strokeWidth="1" />
             <circle cx="35" cy="108" r="7" fill={NAVY} />
@@ -201,8 +201,6 @@ export function DiagramAIChat() {
             <rect x="48" y="102" width="142" height="5" rx="2" fill={BORDER_CLR} />
             <rect x="48" y="112" width="122" height="5" rx="2" fill={BORDER_CLR} />
             <rect x="48" y="122" width="100" height="5" rx="2" fill={BORDER_CLR} />
-            {/* citation */}
-            <text x="24" y="164" fontFamily="Inter,sans-serif" fontSize="6.5" fill={NAVY_LIGHT}>Source: Chapter 4 · Your class notes</text>
             {/* input */}
             <rect x="22" y="172" width="216" height="18" rx="9" fill={MUTED_BG} stroke={BORDER_CLR} strokeWidth="1" />
             <text x="34" y="184" fontFamily="Inter,sans-serif" fontSize="7" fill={MUTED_TEXT}>Ask anything from your class…</text>
@@ -230,23 +228,12 @@ export function DiagramGroupCollab() {
             <rect x="30" y="88" width="3" height="7" rx="1" fill={NAVY} />
             <rect x="30" y="101" width="132" height="4" rx="2" fill={BORDER_CLR} />
             <rect x="30" y="110" width="100" height="4" rx="2" fill={BORDER_CLR} />
-            {/* avatar row */}
-            {/* {members.map((m, i) => (
-                <g key={i}>
-                    <circle cx={30 + i * 17} cy={148} r={9}
-                        fill={i === 0 ? `${NAVY}22` : BORDER_CLR}
-                        stroke={i === 0 ? NAVY : BORDER_CLR} strokeWidth="1" />
-                    <text x={30 + i * 17} y={152} textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="7"
-                        fontWeight="600" fill={i === 0 ? NAVY : MUTED_TEXT}>{m}</text>
-                </g>
-            ))} */}
-            {/* contribution panel */}
+            {/* members panel */}
             <rect x="178" y="46" width="72" height="116" rx="8" fill={WHITE} stroke={BORDER_CLR} strokeWidth="1" />
             <text x="214" y="60" textAnchor="middle" fontFamily="Inter,sans-serif" fontSize="6.5" fontWeight="600" fill={MUTED_TEXT}>Group Members</text>
             {members.map((m, i) => (
                 <g key={i}>
                     <text x="184" y={76 + i * 22} fontFamily="Inter,sans-serif" fontSize="7" fill={MUTED_TEXT}>{m}</text>
-                    {/* <rect x="196" y={70 + i * 22} width={42 * bars[i]} height="6" rx="3" fill={NAVY_LIGHT} /> */}
                 </g>
             ))}
         </svg>

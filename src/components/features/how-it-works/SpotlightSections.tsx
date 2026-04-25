@@ -21,8 +21,7 @@ export function AssistantSpotlight() {
                         on-syllabus answers, every time.
                     </p>
                     <p className="text-[15px] text-muted-foreground leading-relaxed">
-                        Every answer is cited back to the source so students can verify it themselves.
-                        You stay in complete control of what the AI knows.
+                        Uploaded materials are automatically processed for the AI Assistant, and you can manage them manually with a single click. You maintain complete control over the AI's knowledge base.
                     </p>
                 </div>
                 <div className="cp-reveal cp-float" style={{ transitionDelay: "0.15s" }}>
