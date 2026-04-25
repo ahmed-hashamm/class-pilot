@@ -33,13 +33,13 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="relative z-10 max-w-2xl">
             <h1 className="text-4xl lg:text-5xl font-extrabold leading-[1.1] mb-8 tracking-tight">
-              Create, Learn &<br />
-              Collaborate — All in<br />
-              One Classroom
+              A Powerful Virtual<br />
+              Classroom Ecosystem<br />
+              for Modern Education
             </h1>
 
             <p className="text-xl text-primary-foreground/80 mb-10 max-w-lg leading-relaxed">
-              An awesome virtual classroom for teachers and students.
+              Empower your teaching and streamline learning with state-of-the-art tools for collaboration, grading, and engagement.
             </p>
 
             <ActionButton buttonText="Get Started" />

@@ -29,10 +29,10 @@ export default function HowItWorks() {
 
             <div className="bg-navy py-16 px-6 text-center cp-reveal">
                 <p className="font-bold italic text-[clamp(18px,3vw,30px)] leading-snug max-w-2xl mx-auto mb-4 text-white/90">
-                    "I used to spend hours everyday marking. Now it takes a fraction of the time and the feedback is more specific."
+                    "I used to spend hours every day marking. Now it takes a fraction of the time and the feedback is more specific."
                 </p>
                 <p className="text-sm text-white/50">
-                    <span className="text-yellow font-semibold">Mam Amna</span> · Ai & Ml Professor
+                    <span className="text-yellow font-semibold">Professor Amna</span> · AI & ML Department
                 </p>
             </div>
 

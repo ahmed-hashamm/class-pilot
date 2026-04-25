@@ -21,8 +21,8 @@ export const COOKIE_GROUPS: CookieGroup[] = [
     colour: "bg-navy text-white",
     desc: "Required for the Service to function. Cannot be disabled.",
     items: [
-      { name: "session_token", purpose: "Keeps you logged in across page loads. Expires when you log out or after 30 days of inactivity." },
-      { name: "csrf_token", purpose: "Protects against cross-site request forgery attacks. Session-scoped." },
+      { name: "sb-access-token", purpose: "Securely authenticates your session and keeps you logged in across page loads. Managed by Supabase." },
+      { name: "sb-refresh-token", purpose: "Maintains your authenticated session over time without requiring frequent log-ins. Managed by Supabase." },
     ],
   },
   {

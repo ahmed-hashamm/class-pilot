@@ -41,9 +41,7 @@ const LearningSection = () => {
               </span>
             </h2>
             <p className="text-primary-foreground/80 mb-8 mx-auto lg:mx-48 leading-relaxed">
-              Class Pilot was built for everyone that teaches and / or learns it all in one highly
-              intuitive, distraction-free platform. WhatsApp, Google Drive, LMSs, and scattered links. It because every big plan — class online, assignment, or AI — to that teaching
-              becomes easy.
+              Class Pilot provides a unified, distraction-free ecosystem for educators and students. Say goodbye to scattered links across WhatsApp, Google Drive, and outdated LMSs. We bring every lesson, assignment, and AI-powered insight into one intuitive workspace, ensuring that your focus remains entirely on education.
             </p>
             <ActionButton buttonText="All in one" />
           </div>

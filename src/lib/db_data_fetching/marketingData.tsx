@@ -75,7 +75,7 @@ export const DIFF_CARDS: DiffCard[] = [
     {
         badge: "AI",
         title: "AI-Assisted Grading",
-        desc: "The AI reads each submission, scores it against your rubric, and writes personalised feedback for every student. You review and approve in a single pass — a class of 30 graded in minutes, not hours.",
+        desc: "The AI reads each submission, scores it against your rubric, and writes personalised feedback for every student. Review and approve in a single pass — a class of 30 graded in minutes.",
         icon: (
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                 <circle cx="11" cy="11" r="9" stroke="currentColor" strokeWidth="1.5" />
@@ -87,7 +87,7 @@ export const DIFF_CARDS: DiffCard[] = [
     {
         badge: "Collaboration",
         title: "Group Projects",
-        desc: "Students collaborate in a shared live workspace — writing, editing, and commenting together in real time. Teachers see a single submission so that there is no repetition — saving them a lot of time.",
+        desc: "Students collaborate in a shared live workspace — writing, editing, and commenting in real time. Teachers receive a unified submission with individual contribution tracking, eliminating duplicate work.",
         icon: (
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                 <circle cx="8" cy="8.5" r="3" stroke="currentColor" strokeWidth="1.5" />
@@ -99,7 +99,7 @@ export const DIFF_CARDS: DiffCard[] = [
     {
         badge: "AI",
         title: "Class-Specific AI Assistant",
-        desc: "Every class gets its own AI tutor built from the materials you upload — lecture notes, textbooks, past papers. Students get accurate, on-syllabus answers cited back to your actual source material.",
+        desc: "Every class gets its own AI tutor built from your uploaded materials — lecture notes, textbooks, and past papers. Students get accurate, on-syllabus answers cited directly from your source material.",
         icon: (
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                 <rect x="2.5" y="5.5" width="17" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" />
@@ -112,8 +112,8 @@ export const DIFF_CARDS: DiffCard[] = [
 ];
 
 export const STATS: Stat[] = [
-    { num: "3 sec", lbl: "avg. AI grading time per submission" },
-    { num: "80%", lbl: "reduction in teacher marking time" },
+    { num: "3 sec", lbl: "average AI grading time per submission" },
+    { num: "80%", lbl: "reduction in manual marking time" },
     { num: "2×", lbl: "faster feedback turnaround" },
-    { num: "100%", lbl: "AI answers from your own class material" },
+    { num: "100%", lbl: "AI accuracy based on class material" },
 ];

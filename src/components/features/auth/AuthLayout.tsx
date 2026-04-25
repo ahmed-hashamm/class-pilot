@@ -128,10 +128,7 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
           </div>
 
           <p className="text-center text-[11px] text-slate-400 font-medium px-4">
-            By continuing, you agree to our{' '}
-            <Link href="/terms" className="text-navy hover:underline underline-offset-4 font-bold">Terms</Link>
-            {' '}and{' '}
-            <Link href="/privacy" className="text-navy hover:underline underline-offset-4 font-bold">Privacy</Link>.
+            By continuing, you agree to our <Link href="/terms" className="text-navy hover:underline underline-offset-4 font-bold">Terms & Privacy Policy</Link>.
           </p>
         </div>
       </div>

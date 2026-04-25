@@ -19,12 +19,10 @@ const ChatFeatureSection = () => {
             </h2>
 
             <p className="mt-8 mb-10 max-w-lg leading-relaxed text-xl text-muted-foreground">
-              Every class and assignment has its own discussion thread. Students
-              can ask questions, share answers, or clarify doubts — all from a
-              single file icon.
+              Every class and assignment features a dedicated discussion thread. Students can ask questions, share insights, and collaborate with peers—keeping all communication organized and perfectly in context.
             </p>
 
-            <ActionButton buttonText="Get On" />
+            <ActionButton buttonText="Explore Discussions" />
           </div>
 
           {/* Image */}

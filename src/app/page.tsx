@@ -17,7 +17,7 @@ export default function HomePage() {
         <FeatureSection
           title="Automatic Grading with"
           titleHighlight="AI"
-          description="Stop spending time marking assignments, class work, or assignments by hand. AI does what's automatic instantly."
+          description="Stop spending hours marking assignments and classwork by hand. AI automates the grading process, providing instant scores and personalized feedback drafts."
           buttonText="Learn More"
           imageSrc="/ai-grading.png"
           imagePosition="right"
@@ -25,9 +25,9 @@ export default function HomePage() {
         />
 
         <FeatureSection
-          title="Work together,"
-          titleHighlight="submit together"
-          description="From students to teams or whole classes — collaborate, submit, and manage everything in one place."
+          title="Seamless Collaboration,"
+          titleHighlight="unified submissions"
+          description="Empower students to work together in real time. Teams can collaborate on assignments and submit unified projects, drastically reducing repetitive grading for educators."
           buttonText="Try It Now"
           imageSrc="/group-work.png"
           imagePosition="left"

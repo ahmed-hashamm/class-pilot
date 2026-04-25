@@ -106,10 +106,11 @@ export const PRIVACY_SECTIONS = [
       "We use a small number of trusted third-party services to operate Class Pilot. Each of these processes your data only to the extent necessary:",
     ],
     list: [
-      "**Hosting:** Vercel — serves the application and stores data on secure infrastructure",
-      "**Authentication:** our own secure auth system — no third-party identity provider",
-      "**Email delivery:** Nodemailer / Resend — used only to send transactional emails",
-      "**AI processing:** OpenAI — used to power grading assistance and the Class AI Assistant. Data sent to OpenAI is governed by their data processing agreement and is not used to train their models under our enterprise agreement",
+      "**Hosting:** Vercel — serves the application on secure infrastructure",
+      "**Database & Authentication:** Supabase — securely stores application data and manages user authentication",
+      "**Email delivery:** Transactional email providers (e.g., Resend) — used only to send critical account notifications",
+      "**AI processing:** OpenAI — used to power grading assistance and the Class AI Assistant. Data sent to OpenAI is governed by an enterprise agreement and is not used to train their models",
+      "**Infrastructure & Security:** Upstash — provides rate-limiting to protect our services against abuse",
     ],
     paragraphsAfter: [
       "We may disclose your information if required by law, court order, or to protect the rights and safety of our users or the public.",
