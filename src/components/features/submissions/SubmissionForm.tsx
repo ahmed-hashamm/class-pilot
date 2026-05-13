@@ -93,6 +93,23 @@ export default function SubmissionForm({ assignment, classId, onClose, onSuccess
       return
     }
 
+    // Client-side validation for submission type
+    if (assignment.submission_type === 'file' && files.length === 0) {
+      setError('Please upload at least one file to submit this assignment.')
+      setLoading(false)
+      return
+    }
+    if (assignment.submission_type === 'text' && !content.trim()) {
+      setError('Please provide your response in the text area.')
+      setLoading(false)
+      return
+    }
+    if (assignment.submission_type === 'both' && files.length === 0 && !content.trim()) {
+      setError('Please provide either a message or a file to submit.')
+      setLoading(false)
+      return
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
@@ -116,7 +133,7 @@ export default function SubmissionForm({ assignment, classId, onClose, onSuccess
         uploadedFiles.push({ name: file.name, url: publicUrl, path: filePath })
       }
 
-      await submitAssignment({
+      const result = await submitAssignment({
         assignmentId: assignment.id,
         classId: classId || assignment.class_id,
         userId: user.id,
@@ -125,6 +142,10 @@ export default function SubmissionForm({ assignment, classId, onClose, onSuccess
         files: uploadedFiles,
         isGroupProject: assignment.is_group_project,
       })
+
+      if (result.error) {
+        throw new Error(result.error)
+      }
 
       toast.success("Work submitted successfully")
       onSuccess()

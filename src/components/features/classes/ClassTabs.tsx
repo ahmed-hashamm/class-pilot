@@ -63,7 +63,7 @@ export default function ClassTabs({
           );
         })}
 
-        <div className="shrink-0 ml-auto">
+        <div className="shrink-0 ml-auto hidden sm:block">
           <ClassSwitcher />
         </div>
       </div>

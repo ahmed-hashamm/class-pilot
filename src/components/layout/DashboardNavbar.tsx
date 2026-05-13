@@ -13,6 +13,7 @@ import { User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import CreateClassModal from "@/components/features/classes/modals/CreateClassModal";
 import { UserProfileDropdown } from "@/components/ui/UserProfileDropdown";
+import ClassSwitcher from "./ClassSwitcher";
 
 /**
  * Specialized navigation bar for the authenticated Dashboard.
@@ -87,6 +88,9 @@ const DashboardNavbar = () => {
 
         {/* Right Section: Actions & Profile */}
         <div className="flex items-center gap-2 sm:gap-6">
+          <div className="block sm:hidden">
+            <ClassSwitcher />
+          </div>
           {renderProfileArea()}
         </div>
       </div>
