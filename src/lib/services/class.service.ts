@@ -303,6 +303,17 @@ export const ClassService = {
     await supabase.from('group_projects').delete().eq('id', groupId)
   },
 
+  async isUserInGroup(groupId: string, userId: string): Promise<boolean> {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('project_members')
+      .select('id')
+      .eq('project_id', groupId)
+      .eq('user_id', userId)
+      .maybeSingle()
+    return !!data
+  },
+
   async deleteClass(classId: string, userId: string) {
     const supabase = await createClient()
 

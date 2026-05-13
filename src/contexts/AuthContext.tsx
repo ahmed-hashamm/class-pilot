@@ -161,7 +161,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    // Heartbeat: Refresh session every 15 minutes to prevent stale tokens
+    const heartbeat = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        // This will trigger TOKEN_REFRESHED event if token was refreshed
+        await supabase.auth.refreshSession()
+      }
+    }, 15 * 60 * 1000)
+
+    // Activity Listener: If user is active after 30 mins, force a check
+    let lastActivity = Date.now()
+    const handleActivity = () => {
+      const now = Date.now()
+      if (now - lastActivity > 30 * 60 * 1000) {
+        checkAuth()
+      }
+      lastActivity = now
+    }
+    window.addEventListener('mousedown', handleActivity)
+    window.addEventListener('keydown', handleActivity)
+
+    return () => {
+      subscription.unsubscribe()
+      clearInterval(heartbeat)
+      window.removeEventListener('mousedown', handleActivity)
+      window.removeEventListener('keydown', handleActivity)
+    }
   }, [checkAuth, supabase])
 
   const signOut = useCallback(async () => {

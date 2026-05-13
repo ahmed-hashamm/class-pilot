@@ -36,9 +36,8 @@ export default function StreamSidebarMobile({
   ] as const
 
   return (
-    <div className="flex flex-col gap-2 mb-3 lg:hidden">
-
-      <div className="flex items-center bg-white border-b-2 border-border shadow-sm -mx-4 overflow-hidden">
+    <div className="flex flex-col gap-2 mb-4 lg:hidden">
+      <div className="flex items-center bg-white border border-border rounded-xl shadow-sm overflow-hidden">
         {boxes.map((box, i) => {
           const isActive = activeBox === box.id
 
@@ -48,8 +47,8 @@ export default function StreamSidebarMobile({
                 <Button
                   variant="ghost"
                   onClick={() => setActiveBox(isActive ? null : box.id)}
-                  className={`w-full py-4 h-auto text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 relative rounded-none
-                    ${isActive ? 'text-navy' : 'text-navy/45 hover:text-navy/60'}`}
+                  className={`w-full py-3.5 h-auto text-[9px] font-black uppercase tracking-[0.15em] transition-all duration-300 relative rounded-none
+                    ${isActive ? 'text-navy bg-navy/5' : 'text-navy/45 hover:text-navy/60 hover:bg-gray-50'}`}
                 >
                   {box.label}
                   {isActive && (
@@ -64,7 +63,7 @@ export default function StreamSidebarMobile({
 
               {/* Consistent, sharp separator lines */}
               {i < boxes.length - 1 && (
-                <div className="h-6 border-l border-navy/[0.3] shrink-0" />
+                <div className="h-4 border-l border-border shrink-0" />
               )}
             </React.Fragment>
           )

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from "@tanstack/react-query"
 import { createAttendance } from '@/actions/ClassFeaturesActions'
 import { toast } from 'sonner'
 import { Calendar, Timer, SendHorizontal } from 'lucide-react'
@@ -21,6 +22,7 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
   const [isPinned, setIsPinned] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const handleCreate = async () => {
     if (!title.trim() || !date) {
@@ -46,6 +48,7 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
         setDeadline('')
         setIsPinned(false)
         if (onSuccess) onSuccess()
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
         router.refresh()
       }
     } catch (err: any) {

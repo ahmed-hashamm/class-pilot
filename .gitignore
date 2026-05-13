@@ -58,3 +58,5 @@ debug_types.ts
 # rules/config
 Gemini.md
 
+# gitignore
+.gitignore

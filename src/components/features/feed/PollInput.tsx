@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from "@tanstack/react-query"
 import { createPoll } from '@/actions/ClassFeaturesActions'
 import { toast } from 'sonner'
 import { Plus, Timer, SendHorizontal, X } from 'lucide-react'
@@ -31,6 +32,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
   const [isPinned, setIsPinned] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const handleCreate = async () => {
     const validOptions = options.map(o => o.trim()).filter(o => o !== '')
@@ -58,6 +60,7 @@ export default function PollInput({ classId, onSuccess }: PollInputProps) {
         setDeadline('')
         setIsPinned(false)
         if (onSuccess) onSuccess()
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
         router.refresh()
       }
     } catch (err: any) {

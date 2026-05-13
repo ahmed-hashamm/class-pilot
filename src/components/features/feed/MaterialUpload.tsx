@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from "@tanstack/react-query"
 import { SendHorizontal } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,6 +17,8 @@ import { PinToggle } from './PinToggle'
 import { FileUploadArea } from '@/components/ui/FileUploadArea'
 
 import { ALLOWED_FILE_TYPES } from "@/lib/data/materials";
+
+import { createMaterial } from '@/actions/ClassActions'
 
 export default function MaterialUpload({
   classId, userId, onSuccess,
@@ -30,6 +33,7 @@ export default function MaterialUpload({
   const [isPinned, setIsPinned] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const handleUpload = async () => {
     if (!files.length) return
@@ -43,7 +47,6 @@ export default function MaterialUpload({
     files.forEach((f) => formData.append('files', f))
 
     try {
-      const { createMaterial } = await import('@/actions/ClassActions')
       const result = await createMaterial(formData)
       if (result.error) {
         toast.error(result.error)
@@ -51,7 +54,8 @@ export default function MaterialUpload({
         toast.success("Materials uploaded successfully")
         resetForm()
         onSuccess()
-          ; (window as any).refreshFeed?.()
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
+        router.refresh()
 
         const materialId = (result.data as any)?.materialId
         if (materialId) {

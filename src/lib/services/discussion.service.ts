@@ -19,7 +19,7 @@ export const DiscussionService = {
   async getMessages(classId: string, topic: DiscussionTopic, limit = 50, offset = 0) {
     const { redisSafe } = await import('@/lib/redis')
     const cacheKey = `discussion:messages:${classId}:${topic}`
-    
+
     // Only cache the first page (offset 0) for performance
     if (offset === 0) {
       const cached = await redisSafe.get<any[]>(cacheKey)
@@ -134,5 +134,6 @@ export const DiscussionService = {
     }
   },
 }
+
 
 

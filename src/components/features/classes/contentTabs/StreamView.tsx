@@ -37,7 +37,7 @@ export default function StreamView({
   const isCodeHidden = settings?.showClassCode === false;
 
   return (
-    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 w-full mx-auto pt-0 lg:pt-4 pb-4">
+    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 w-full mx-auto pt-4 lg:pt-4 pb-4">
       {/* Mobile-Only Toggleable Sidebar */}
       <StreamSidebarMobile
         classId={classId}

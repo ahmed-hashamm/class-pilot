@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { submitPollResponse, closePoll } from "@/actions/ClassFeaturesActions";
 
@@ -12,6 +13,7 @@ export function usePoll({ item, userId }: UsePollProps) {
   const [closing, setClosing] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleClose = async () => {
     setClosing(true);
@@ -22,6 +24,7 @@ export function usePoll({ item, userId }: UsePollProps) {
       } else { 
         toast.success("Poll closed successfully"); 
         setShowCloseConfirm(false);
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", item.class_id || item.classId] });
         router.refresh(); 
       }
     } finally { setClosing(false); }
@@ -33,6 +36,7 @@ export function usePoll({ item, userId }: UsePollProps) {
       toast.error(res.error || "Could not submit vote");
     } else { 
       toast.success("Vote submitted successfully"); 
+      queryClient.invalidateQueries({ queryKey: ["streamFeed", item.class_id || item.classId] });
       router.refresh(); 
     }
   };

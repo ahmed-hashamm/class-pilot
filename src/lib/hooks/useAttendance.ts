@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { markAttendancePresent, closeAttendance } from "@/actions/ClassFeaturesActions";
 
@@ -12,6 +13,7 @@ export function useAttendance({ item, userId }: UseAttendanceProps) {
   const [loading, setLoading] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const alreadyPresent = item.attendance_records?.some((r: any) => r.user_id === userId);
 
@@ -24,6 +26,7 @@ export function useAttendance({ item, userId }: UseAttendanceProps) {
       } else {
         toast.success("Attendance closed"); 
         setShowCloseConfirm(false);
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", item.class_id || item.classId] });
         router.refresh(); 
       }
     } finally { setLoading(false); }
@@ -37,6 +40,7 @@ export function useAttendance({ item, userId }: UseAttendanceProps) {
         toast.error(res.error || "Failed");
       } else {
         toast.success("Marked as present"); 
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", item.class_id || item.classId] });
         router.refresh(); 
       }
     } finally { setLoading(false); }

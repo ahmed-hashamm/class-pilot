@@ -19,7 +19,7 @@ export interface BaseStreamItem {
   pinned?: boolean | null
 }
 
-export type StreamItem = 
+export type StreamItem =
   | (AnnouncementRow & { type: 'announcement'; users?: { full_name: string | null; email: string | null } | null })
   | (AssignmentRow & { type: 'assignment'; users?: { full_name: string | null; email: string | null } | null })
   | (MaterialRow & { type: 'material'; users?: { full_name: string | null } | null })
@@ -56,25 +56,25 @@ export async function getStreamFeed(classId: string): Promise<StreamItem[]> {
       .eq('class_id', classId)
       .order('pinned', { ascending: false })
       .order('created_at', { ascending: false }),
-    
+
     supabase
       .from('assignments')
       .select('*, users:created_by(full_name, email)')
       .eq('class_id', classId)
       .order('created_at', { ascending: false }),
-    
+
     supabase
       .from('materials')
       .select('*, users:created_by(full_name)')
       .eq('class_id', classId)
       .order('created_at', { ascending: false }),
-      
+
     supabase
       .from('polls')
       .select('*, users:created_by(full_name, email), poll_responses(*)')
       .eq('class_id', classId)
       .order('created_at', { ascending: false }),
-      
+
     supabase
       .from('attendances')
       .select('*, users:created_by(full_name, email), attendance_records(*)')
@@ -95,7 +95,7 @@ export async function getStreamFeed(classId: string): Promise<StreamItem[]> {
     const aPinned = a.pinned ? 1 : 0
     const bPinned = b.pinned ? 1 : 0
     if (aPinned !== bPinned) return bPinned - aPinned
-    
+
     return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
   })
 

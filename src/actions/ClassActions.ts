@@ -625,7 +625,14 @@ export async function submitAssignment({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id !== parsed.data.userId) return { data: null, error: "Unauthorized" }
 
-  // Deadline enforcement — reject submissions after due date
+  // 1. Prevent empty submissions
+  const hasFiles = files && files.length > 0
+  const hasContent = parsed.data.content && parsed.data.content.trim().length > 0
+  if (!hasFiles && !hasContent) {
+    return { data: null, error: "Please provide either a message or a file to submit your assignment." }
+  }
+
+  // 2. Deadline enforcement — reject submissions after due date
   const { data: assignmentData } = await supabase
     .from('assignments')
     .select('due_date')
@@ -637,6 +644,14 @@ export async function submitAssignment({
     const deadline = new Date(assignmentRow.due_date)
     if (new Date() > deadline) {
       return { data: null, error: "The deadline for this assignment has passed. Submissions are no longer accepted." }
+    }
+  }
+
+  // 3. Group membership check — if it's a group project, student MUST be in the group they claim
+  if (parsed.data.isGroupProject && parsed.data.groupId) {
+    const isInGroup = await ClassService.isUserInGroup(parsed.data.groupId, user.id)
+    if (!isInGroup) {
+      return { data: null, error: "You are not a member of the selected group. Please contact your teacher if this is an error." }
     }
   }
 

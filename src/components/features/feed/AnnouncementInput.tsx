@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from "@tanstack/react-query"
 import { Paperclip, Pin, SendHorizontal, Timer, FileText } from 'lucide-react'
 import { createAnnouncement } from '@/actions/ClassActions'
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ export default function AnnouncementInput({
   const [files, setFiles] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -53,7 +55,8 @@ export default function AnnouncementInput({
         toast.success("Announcement posted successfully");
         resetForm();
         if (onSuccess) onSuccess();
-        (window as any).refreshFeed?.();
+        queryClient.invalidateQueries({ queryKey: ["streamFeed", classId] });
+        router.refresh();
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to post announcement");
