@@ -36,18 +36,10 @@ export default function FeedActions({ classId, userId, activeAction, setActiveAc
                 <Icon size={16} />
                 <span className="relative z-10">{label}</span>
                 {isActive && (
-                  <motion.div
-                    layoutId="activeFeedAction"
-                    className="absolute inset-0 bg-navy-light/5 -z-0"
-                    transition={TAB_INDICATOR_TRANSITION}
-                  />
+                  <div className="absolute inset-0 bg-navy-light/5 -z-0" />
                 )}
                 {isActive && (
-                  <motion.div
-                    layoutId="feedUnderline"
-                    className="absolute bottom-0 left-0 right-0 h-1 bg-navy z-10"
-                    transition={TAB_INDICATOR_TRANSITION}
-                  />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-navy z-10" />
                 )}
               </Button>
             );
