@@ -67,7 +67,7 @@ export function UserProfileDropdown({ profile, onSignOut }: UserProfileDropdownP
 
       {/* Profile Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-[calc(100vw-4rem)] sm:w-72 max-w-sm bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100">
+        <div className="fixed left-4 right-4 top-[60px] md:absolute md:right-0 md:top-12 md:w-72 max-w-sm bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100">
           {/* User Info Header */}
           <div className="px-4 py-4 border-b border-gray-200 bg-gray-50/50">
             <div className="flex items-center gap-3">

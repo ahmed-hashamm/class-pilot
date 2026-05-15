@@ -68,7 +68,7 @@ export default function StickyNotes({ classId }: { classId: string }) {
           onKeyDown={handleKeyDown}
           placeholder="Write a note…"
           rows={3}
-          className="w-full resize-none text-[12px] bg-secondary border border-border
+          className="w-full resize-none text-[14px] bg-secondary border border-border
             rounded-xl p-2.5 text-foreground placeholder:text-muted-foreground
             focus:outline-none focus:ring-2 focus:ring-navy/20 focus:border-navy
             transition leading-relaxed"

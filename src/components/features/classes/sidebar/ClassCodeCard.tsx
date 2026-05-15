@@ -40,7 +40,7 @@ export default function ClassCodeCard({
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-2
             bg-secondary border border-border rounded-xl px-4 py-3">
-            <span className="font-black text-[20px] tracking-widest text-navy
+            <span className="font-black text-[18px] sm:text-[20px] tracking-widest text-navy
               font-mono leading-none">
               {classCode}
             </span>

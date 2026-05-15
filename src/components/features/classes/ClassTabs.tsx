@@ -38,7 +38,7 @@ export default function ClassTabs({
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full relative z-10">
+      <div className="flex overflow-x-auto sm:flex-wrap no-scrollbar items-center gap-2.5 sm:gap-4 w-full relative z-10 pb-0.5">
         {tabs.map((tab) => {
           if (tab.hide) return null;
           const Icon = tab.icon;

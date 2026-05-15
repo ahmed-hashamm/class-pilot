@@ -27,7 +27,7 @@ export default function DueSoonCard({ assignments }: DueSoonCardProps) {
             <li key={a.id}
               className="flex items-center justify-between gap-2
                  border border-border/60 rounded-lg px-3 py-2">
-              <span className="text-[11px] font-medium text-foreground truncate">
+              <span className="text-[11px] font-medium text-foreground truncate flex-1">
                 {a.title}
               </span>
               <span className="shrink-0 text-[10px] text-muted-foreground font-medium">

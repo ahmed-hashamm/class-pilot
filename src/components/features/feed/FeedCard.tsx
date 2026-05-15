@@ -94,9 +94,9 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
         variant="danger"
         isLoading={deleting}
       />
-      <div className={`bg-navy/5 hover:bg-white border rounded-md  hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 border-b-4 border-navy/90`}>
-        {/* Top glow on hover */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className={`bg-navy/5 md:hover:bg-white border rounded-md md:hover:shadow-md md:hover:-translate-y-0.5 transition-all duration-300 border-b-4 border-navy/90 group relative`}>
+        {/* Top glow on hover - Desktop only */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
         <div className="p-4 flex flex-col gap-3.5">
           <div className="flex items-start gap-4">
             <div className={`shrink-0 size-10 rounded-xl flex items-center justify-center shadow-sm ${theme.bgColor} ${theme.iconColor}`}>

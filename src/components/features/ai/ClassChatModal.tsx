@@ -32,10 +32,14 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
         <motion.span
           variants={{
             rest: { width: 0, opacity: 0, marginLeft: 0 },
-            hover: { width: 'auto', opacity: 1, marginLeft: 10 }
+            hover: { 
+              width: 'auto', 
+              opacity: 1, 
+              marginLeft: 10
+            }
           }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="text-[13px] font-bold tracking-wide overflow-hidden whitespace-nowrap"
+          className="text-[13px] font-bold tracking-wide overflow-hidden whitespace-nowrap hidden md:block"
         >
           Ask Class AI
         </motion.span>
@@ -67,7 +71,7 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
                 duration: 0.35,
                 ease: [0.4, 0, 0.2, 1]
               }}
-              className="relative w-full sm:max-w-lg h-[85vh]
+              className="relative w-full sm:max-w-lg h-[85dvh]
                 bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl
                 flex flex-col overflow-hidden"
             >

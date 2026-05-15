@@ -47,7 +47,7 @@ export default function StreamSidebarMobile({
                 <Button
                   variant="ghost"
                   onClick={() => setActiveBox(isActive ? null : box.id)}
-                  className={`w-full py-3.5 h-auto text-[9px] font-black uppercase tracking-[0.15em] transition-all duration-300 relative rounded-none
+                  className={`w-full py-3.5 h-auto text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 relative rounded-none
                     ${isActive ? 'text-navy bg-navy/5' : 'text-navy/45 hover:text-navy/60 hover:bg-gray-50'}`}
                 >
                   {box.label}
