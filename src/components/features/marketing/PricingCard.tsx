@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import * as Icons from "lucide-react";
+import { Badge } from "@/components/ui";
 
 interface Feature {
   iconName: string;
@@ -38,10 +39,9 @@ export default function PricingCard({
       <div className="bg-navy px-8 py-6 flex items-center justify-between flex-wrap gap-4">
         <div>
           {badgeText && (
-            <span className="inline-flex items-center gap-2 bg-yellow text-navy text-[10px]
-              font-bold tracking-widest uppercase rounded-full px-3 py-1 mb-2.5">
+            <Badge variant="premium" className="mb-2.5 text-yellow border-yellow/30">
               {badgeText}
-            </span>
+            </Badge>
           )}
           <h2 className="font-black text-white text-[32px] leading-none tracking-tight">
             {planName}

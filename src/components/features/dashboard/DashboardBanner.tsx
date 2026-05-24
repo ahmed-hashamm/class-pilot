@@ -26,6 +26,7 @@
 
 import WavePattern from "@/components/layout/WavePattern";
 import DashboardButtons from "./DashboardButtons";
+import { Badge } from "@/components/ui";
 
 /**
  * A bold, visual header for the user's dashboard.
@@ -58,12 +59,10 @@ export default function DashboardBanner({ userName, userId, role }: any) {
 
       <div className="relative w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16">
         {/* Eyebrow */}
-        <span className="inline-flex items-center gap-2 text-[11px] font-semibold
-          tracking-[.18em] uppercase bg-white/10 border border-white/20
-          rounded-full px-3 py-1 mb-4 text-white/70">
+        <Badge variant="premium" className="mb-4">
           <span className="size-1.5 rounded-full bg-yellow inline-block" />
           Dashboard
-        </span>
+        </Badge>
 
         {/* Greeting */}
         <h1 className="text-[clamp(26px,4vw,42px)] font-black tracking-tight leading-tight mb-1">

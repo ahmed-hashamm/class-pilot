@@ -3,6 +3,7 @@
 import BlogsPageClock from "@/components/illustrations/BlogsPageClock";
 import { MarketingHero } from "@/components/layout";
 import { useReveal } from "@/lib/hooks/useReveal";
+import { Badge } from "@/components/ui";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PAGE
@@ -34,11 +35,10 @@ export default function BlogPage() {
 
                 {/* Badge */}
                 <div className="cp-reveal" style={{ transitionDelay: "0.1s" }}>
-                    <span className="inline-flex items-center gap-2 bg-yellow text-navy text-[11px]
-                        font-bold tracking-widest uppercase rounded-full px-4 py-1.5 mb-6">
+                    <Badge variant="premium" className="text-navy border-navy/30 mb-6">
                         <span className="size-1.5 rounded-full bg-navy inline-block" />
                         Coming Soon
-                    </span>
+                    </Badge>
                 </div>
 
                 {/* Heading */}

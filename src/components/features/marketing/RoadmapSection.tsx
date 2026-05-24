@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui";
 
 interface RoadmapSectionProps {
   title: string;
@@ -21,10 +22,9 @@ export default function RoadmapSection({
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="cp-reveal">
-            <span className="inline-flex items-center gap-2 bg-yellow text-navy text-[10px]
-              font-bold tracking-widest uppercase rounded-full px-3 py-1 mb-4">
+            <Badge variant="premium" className="text-navy border-navy/30 mb-4">
               On the roadmap
-            </span>
+            </Badge>
             <h2 className="font-black text-[clamp(24px,3.5vw,38px)] leading-tight
               tracking-tight mb-5 text-foreground">
               {title}

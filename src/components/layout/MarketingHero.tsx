@@ -3,6 +3,7 @@
 import React from "react";
 import WavePattern from "./WavePattern";
 import Link from "next/link";
+import { Badge } from "@/components/ui";
 
 interface MarketingHeroProps {
     /** Small eyebrow label inside the pill — e.g. "The Class Pilot Blog" */
@@ -37,13 +38,13 @@ export default function MarketingHero({
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,_rgba(79,156,249,.15)_0%,_transparent_70%)]"
             />
 
-            <span
-                className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[.18em]
-          uppercase bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-6 text-white/80"
+            <Badge
+                variant="premium"
+                className="mb-6"
             >
                 <span className="size-2 rounded-full bg-yellow inline-block animate-pulse" />
                 {pageIntro}
-            </span>
+            </Badge>
 
             <h1
                 className="font-black text-[clamp(32px,3vw,60px)] leading-tight tracking-tight mb-4 max-w-2xl mx-auto"

@@ -19,7 +19,7 @@ export default function ClassPageSkeleton() {
         <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 relative pb-8">
           <div className="w-full">
             {/* Role badge skeleton */}
-            <div className="h-5 w-20 rounded-full bg-white/20 animate-pulse mb-4 border border-white/15" />
+            <div className="h-4 w-16 bg-white/20 animate-pulse mb-4 border-b border-white/15" />
             
             {/* Class name skeleton (Dynamic width) */}
             <div className="h-9 w-1/3 min-w-[200px] bg-white/20 rounded-xl animate-pulse mb-3" />

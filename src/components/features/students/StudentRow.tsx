@@ -2,6 +2,7 @@
 
 import { StudentAvatar } from "./StudentAvatar";
 import { Mail } from "lucide-react";
+import { Badge } from "@/components/ui";
 
 interface StudentRowProps {
   member: any;
@@ -40,14 +41,16 @@ export default function StudentRow({ member, role }: StudentRowProps) {
       </div>
 
       {/* Role badge */}
-      <span className={`shrink-0 text-[10px] font-bold tracking-widest uppercase
-        rounded-full px-2.5 py-0.5 border
-        ${role === "teacher"
-          ? "bg-navy/8 text-navy border-navy/15"
-          : "bg-navy-light/10 text-navy-light border-navy-light/20"
-        }`}>
+      <Badge
+        variant="premium"
+        className={
+          role === "teacher"
+            ? "text-navy border-navy/30"
+            : "text-navy-light border-navy-light/30"
+        }
+      >
         {role}
-      </span>
+      </Badge>
     </div>
   );
 }

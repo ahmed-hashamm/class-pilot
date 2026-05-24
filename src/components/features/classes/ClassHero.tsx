@@ -2,6 +2,7 @@
 
 import WavePattern from "@/components/layout/WavePattern";
 import ClassTabs from "./ClassTabs";
+import { Badge } from "@/components/ui";
 
 interface ClassHeroProps {
   className: string;
@@ -43,16 +44,17 @@ export default function ClassHero({
       <div className="w-full max-w-[1600px] mx-auto px-8 md:px-12 lg:px-16 relative pb-8">
         <div className="w-full">
           {/* Role badge */}
-          <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold
-            tracking-widest uppercase rounded-full px-2.5 py-1 mb-4 border
-            ${isTeacher
-              ? "bg-yellow/15 text-yellow border-yellow/30"
-              : "bg-navy-light/20 text-navy-light border-navy-light/30"
-            }`}>
-            <span className={`size-1.5 rounded-full inline-block
-              ${isTeacher ? "bg-yellow" : "bg-navy-light"}`} />
+          <Badge
+            variant="premium"
+            className={`mb-4 ${
+              isTeacher
+                ? "text-yellow border-yellow/30"
+                : "text-navy-light border-navy-light/30"
+            }`}
+          >
+            <span className={`size-1.5 rounded-full inline-block ${isTeacher ? "bg-yellow" : "bg-navy-light"}`} />
             {isTeacher ? "Teacher" : "Student"}
-          </span>
+          </Badge>
 
           {/* Class name */}
           <h1 className="font-black text-[clamp(22px,4vw,40px)] tracking-tight

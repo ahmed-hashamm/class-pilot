@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Users } from 'lucide-react'
 import { useState } from 'react'
+import { Badge } from '@/components/ui'
 
 /**
  * Displays the class name, current user role, student count, and teacher avatar.
@@ -47,16 +48,18 @@ export function ClassCardHeader({
             {name}
           </h3>
         </Link>
-
-        {/* Role badge */}
-        <span className={`inline-flex items-center text-[10px] font-bold
-          tracking-widest uppercase rounded-full px-2.5 py-0.5
-          ${isTeacher
-            ? 'bg-navy/8 text-navy border border-navy/15'
-            : 'bg-navy-light/12 text-navy-light border border-navy-light/25'
-          }`}>
-          {role}
-        </span>
+ 
+         {/* Role badge */}
+         <Badge
+           variant="premium"
+           className={
+             isTeacher
+               ? 'text-navy border-navy/30'
+               : 'text-navy-light border-navy-light/30'
+           }
+         >
+           {role}
+         </Badge>
 
         {/* Student count */}
         <div className="flex items-center gap-1 mt-2 text-[12px] text-muted-foreground">
