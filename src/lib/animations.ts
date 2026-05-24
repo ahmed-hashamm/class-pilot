@@ -72,32 +72,23 @@ export const MODAL_VARIANTS: Variants = {
  * Content Expansion (Accordions, Feed Actions)
  */
 export const HEIGHT_TRANSITION: Variants = {
-  initial: { opacity: 0, height: 0 },
+  initial: { opacity: 0, y: -8 },
   animate: { 
     opacity: 1,
-    height: "auto",
+    y: 0,
     transition: {
-      height: {
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1] // standard easing
-      },
-      opacity: {
-        duration: 0.2,
-        delay: 0.1
-      }
+      type: "spring",
+      stiffness: 380,
+      damping: 30,
+      opacity: { duration: 0.15 }
     }
   },
   exit: { 
     opacity: 0,
-    height: 0,
+    y: -8,
     transition: {
-      height: {
-        duration: 0.2,
-        ease: [0.4, 0, 1, 1]
-      },
-      opacity: {
-        duration: 0.1
-      }
+      duration: 0.15,
+      ease: "easeInOut"
     }
   },
 };
