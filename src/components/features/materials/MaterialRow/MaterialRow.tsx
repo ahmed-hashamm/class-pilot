@@ -65,7 +65,7 @@ export default function MaterialRow({
 
   return (
     <div className={cn(
-      "group relative bg-navy/5 hover:bg-white border rounded-md hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 border-b-4 border-navy/90 flex flex-col",
+      "group relative bg-navy/5 md:hover:bg-white border rounded-md md:hover:shadow-md md:hover:-translate-y-0.5 md:transition-all md:duration-500 transition-colors duration-200 border-b-4 border-navy/90 flex flex-col [transform:translateZ(0)]",
       isMenuOpen ? "z-50" : "z-10"
     )}>
 

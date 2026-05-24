@@ -128,7 +128,7 @@ export default function ClassCard({
         whileTap={{ scale: 0.985 }}
         transition={{ duration: 0.1 }}
         className={`group relative flex flex-col bg-white border border-border rounded-2xl
-        overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5
+        overflow-hidden md:transition-all md:duration-200 transition-colors duration-200 md:hover:shadow-md md:hover:-translate-y-0.5 [transform:translateZ(0)]
         ${(isLeaving || isDeleting) ? 'opacity-50 pointer-events-none' : ''}`}
       >
         {/* ── Top colour stripe — navy for teacher, navy-light for student ── */}

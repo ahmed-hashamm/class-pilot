@@ -22,9 +22,9 @@ export function TeacherTodoItem({ assignment }: TeacherTodoItemProps) {
   return (
     <Link
       href={`/classes/${assignment.classes?.id}/assignments/${assignment.id}`}
-      className="flex items-stretch group transition-all duration-300
-        bg-navy/5 hover:bg-white overflow-hidden
-        border rounded-md hover:shadow-md hover:-translate-y-0.5 border-b-4 border-navy/90"
+      className="flex items-stretch group md:transition-all md:duration-300 transition-colors duration-200 [transform:translateZ(0)]
+        bg-navy/5 md:hover:bg-white overflow-hidden
+        border rounded-md md:hover:shadow-md md:hover:-translate-y-0.5 border-b-4 border-navy/90"
     >
       <div className="flex flex-1 items-center justify-between gap-6 px-6 py-5">
         <div className="flex flex-col gap-1.5 min-w-0">

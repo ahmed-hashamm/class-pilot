@@ -55,9 +55,9 @@ export default function AssignmentCard({
   return (
     <Link
       href={`/classes/${classId}/assignments/${assignment.id}?from=work`}
-      className={`group relative flex flex-col bg-navy/5 hover:bg-white overflow-hidden
-        items-stretch transition-all duration-500
-       border rounded-md  hover:shadow-md hover:-translate-y-0.5 border-b-4 border-navy/90
+      className={`group relative flex flex-col bg-navy/5 md:hover:bg-white overflow-hidden
+        items-stretch md:transition-all md:duration-500 transition-colors duration-200 [transform:translateZ(0)]
+       border rounded-md md:hover:shadow-md md:hover:-translate-y-0.5 border-b-4 border-navy/90
         ${muted ? "opacity-80 grayscale-[0.1]" : ""}`}
     >
       {/* Top glow on hover */}
