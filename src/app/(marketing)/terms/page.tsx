@@ -76,7 +76,7 @@ export default function TermsAndPrivacyPage() {
               </P>
               <UL>
                 <LI>Email: <A href="mailto:support@theclasspilot.com">support@theclasspilot.com</A></LI>
-                <LI>Contact form: <A href="/contact">classpilot.edu/contact</A></LI>
+                <LI>Contact form: <A href="/contact">theclasspilot.com/contact</A></LI>
               </UL>
               <P>
                 We aim to resolve all concerns promptly and fairly. If you are not satisfied

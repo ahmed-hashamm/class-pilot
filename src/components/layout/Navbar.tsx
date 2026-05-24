@@ -104,7 +104,7 @@ const Navbar = () => {
                     initial="initial"
                     animate="animate"
                     exit="exit"
-                    className="fixed left-4 right-4 top-[60px] md:absolute md:top-12 md:right-0 md:w-72 md:h-max bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50"
+                    className="absolute right-0 top-12 w-72 max-w-[calc(100vw-2rem)] bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50"
                   >
                     {/* User Info Header */}
                     <div className="px-4 py-4 border-b border-gray-200 bg-gray-50">
