@@ -19,7 +19,7 @@ export default function StudentRow({ member, role }: StudentRowProps) {
       hover:bg-secondary/40 transition-colors group">
       <div className="flex items-center gap-3.5 min-w-0">
         {/* Avatar */}
-        <StudentAvatar 
+        <StudentAvatar
           name={name}
           src={avatar}
           role={role}
@@ -41,7 +41,7 @@ export default function StudentRow({ member, role }: StudentRowProps) {
       </div>
 
       {/* Role badge */}
-      <Badge
+      {/* <Badge
         variant="premium"
         className={
           role === "teacher"
@@ -50,7 +50,7 @@ export default function StudentRow({ member, role }: StudentRowProps) {
         }
       >
         {role}
-      </Badge>
+      </Badge> */}
     </div>
   );
 }

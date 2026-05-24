@@ -33,12 +33,12 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
           variants={{
             rest: { width: 0, opacity: 0, marginLeft: 0 },
             hover: { 
-              width: 'auto', 
+              width: 92, 
               opacity: 1, 
-              marginLeft: 10
+              marginLeft: 8
             }
           }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          transition={{ duration: 0.25, ease: 'easeInOut' }}
           className="text-[13px] font-bold tracking-wide overflow-hidden whitespace-nowrap hidden md:block"
         >
           Ask Class AI
@@ -56,20 +56,25 @@ export default function ClassChatModal({ classId }: ClassChatModalProps) {
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.2 }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
 
             {/* Modal */}
             <motion.div
-              variants={MODAL_VARIANTS}
+              variants={{
+                initial: { opacity: 0, y: 50 },
+                animate: { opacity: 1, y: 0 },
+                exit: { opacity: 0, y: 50 }
+              }}
               initial="initial"
               animate="animate"
               exit="exit"
               transition={{
-                duration: 0.35,
-                ease: [0.4, 0, 0.2, 1]
+                type: "spring",
+                damping: 30,
+                stiffness: 350
               }}
               className="relative w-full sm:max-w-lg h-[85dvh]
                 bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl
