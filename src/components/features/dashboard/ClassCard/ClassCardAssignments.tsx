@@ -20,26 +20,30 @@ export function ClassCardAssignments({ assignments }: ClassCardAssignmentsProps)
   }).slice(0, 3); // Limit to top 3
 
   return (
-    <div className="flex flex-col gap-1.5 flex-1 mb-5">
+    <div className="flex flex-col flex-1 mb-5">
       {upcomingAssignments.length > 0 ? (
-        upcomingAssignments.map((a: any) => (
-          <div key={a.id}
-            className="flex items-center justify-between gap-2 px-3 py-2
-              bg-secondary/50 rounded-lg border border-border/40 hover:border-border/80 transition-colors">
-            <span className="truncate text-[12px] font-medium text-foreground">
-              {a.title}
-            </span>
-            {a.due_date && (
-              <span className="shrink-0 text-[11px] text-muted-foreground font-medium">
-                {format(new Date(a.due_date), 'MMM d')}
-              </span>
-            )}
-          </div>
-        ))
+        <div className="bg-white/60 dark:bg-black/10 rounded-xl p-3 border border-border/40">
+          <ul className="flex flex-col gap-2.5">
+            {upcomingAssignments.map((a: any) => (
+              <li key={a.id} className="flex items-start justify-between gap-2">
+                <span className="truncate text-[13px] font-medium text-foreground relative pl-3 before:content-[''] before:absolute before:left-0 before:top-[6px] before:w-1.5 before:h-1.5 before:bg-navy/40 before:rounded-full">
+                  {a.title}
+                </span>
+                {a.due_date && (
+                  <span className="shrink-0 text-[11px] text-muted-foreground mt-0.5">
+                    {format(new Date(a.due_date), 'MMM d')}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : (
-        <p className="text-[12px] text-muted-foreground italic py-1 pl-1">
-          No upcoming deadlines
-        </p>
+        <div className="flex-1 flex flex-col justify-center">
+          <p className="text-[12px] text-muted-foreground italic py-1 pl-1">
+            No upcoming deadlines
+          </p>
+        </div>
       )}
     </div>
   )

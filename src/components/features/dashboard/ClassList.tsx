@@ -22,7 +22,7 @@ export default function ClassList({ dashboardData }: ClassListProps) {
       className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
     >
       {dashboardData.map((item: any) => (
-        <motion.div key={item.class_id} variants={STAGGER_ITEM}>
+        <motion.div key={item.class_id} variants={STAGGER_ITEM} className="h-full">
           <ClassCard
             classId={item.class_id}
             classData={item.classes}

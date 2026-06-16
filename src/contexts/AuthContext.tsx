@@ -10,6 +10,7 @@ interface UserProfile {
   email: string
   role: string
   avatar_url: string | null
+  auth_provider: string
 }
 
 interface AuthContextType {
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Get fallback info from user metadata (Google/OAuth or Signup)
         const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || null
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || null
+        const authProvider = user.app_metadata?.provider || 'email'
 
         // Build profile from metadata first as an immediate fallback
         const metadataProfile: UserProfile = {
@@ -53,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: user.email || '',
           role: 'user',
           avatar_url: avatarUrl,
+          auth_provider: authProvider,
         }
         
         // Fetch or create user profile
@@ -113,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               email: (profileData as any)?.email || metadataProfile.email,
               role: 'user',
               avatar_url: (profileData as any)?.avatar_url || metadataProfile.avatar_url,
+              auth_provider: metadataProfile.auth_provider,
             }
           : metadataProfile
 

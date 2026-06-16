@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const {
     loading, passwordLoading, uploading, initialLoading,
     fullName, avatarUrl, file,
-    displayAvatar, initials,
+    displayAvatar, initials, authProvider,
     setFullName, setFile, clearFile,
     handleAvatarUpload, handleSaveProfile, handleUpdatePassword, goBack
   } = useProfile()
@@ -62,10 +62,12 @@ export default function SettingsPage() {
           loading={loading}
         />
 
-        <SecuritySection
-          handleUpdatePassword={handleUpdatePassword}
-          passwordLoading={passwordLoading}
-        />
+        {authProvider === 'email' && (
+          <SecuritySection
+            handleUpdatePassword={handleUpdatePassword}
+            passwordLoading={passwordLoading}
+          />
+        )}
       </div>
 
       {/* Footer */}

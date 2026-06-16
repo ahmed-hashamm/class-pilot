@@ -127,12 +127,12 @@ export default function ClassCard({
       <motion.div 
         whileTap={{ scale: 0.985 }}
         transition={{ duration: 0.1 }}
-        className={`group relative flex flex-col bg-white border border-border rounded-2xl
-        overflow-hidden md:transition-all md:duration-200 transition-colors duration-200 md:hover:shadow-md md:hover:-translate-y-0.5 [transform:translateZ(0)]
+        className={`group relative flex flex-col h-full bg-navy/5 md:hover:bg-white border border-border rounded-xl
+        overflow-hidden md:transition-all md:duration-300 transition-colors duration-200 md:hover:shadow-md md:hover:-translate-y-0.5 border-b-4 ${isTeacher ? 'border-b-navy/90' : 'border-b-navy-light/90'} [transform:translateZ(0)]
         ${(isLeaving || isDeleting) ? 'opacity-50 pointer-events-none' : ''}`}
       >
-        {/* ── Top colour stripe — navy for teacher, navy-light for student ── */}
-        <div className={`h-1.5 w-full shrink-0 ${isTeacher ? 'bg-navy' : 'bg-navy-light'}`} />
+        {/* Top glow on hover - Desktop only */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-navy/50 to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
 
         <div className="flex flex-col flex-1 p-5">
           <ClassCardHeader

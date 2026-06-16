@@ -100,13 +100,6 @@ export default function RubricForm({ userId, initialData }: RubricFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 pb-32">
 
-      {/* AI Generator Panel */}
-      <AIGeneratorPanel
-        onSuccess={handleAIGenerationSuccess}
-        isGenerating={isGenerating}
-        setIsGenerating={setIsGenerating}
-      />
-
       {/* Rubric name */}
       <div className="bg-white border border-border rounded-2xl p-6 flex flex-col gap-2">
         <label htmlFor="name" className={labelClass}>Rubric name</label>
@@ -119,6 +112,13 @@ export default function RubricForm({ userId, initialData }: RubricFormProps) {
           className={`${inputClass} text-[16px] font-semibold`}
         />
       </div>
+
+      {/* AI Generator Panel */}
+      <AIGeneratorPanel
+        onSuccess={handleAIGenerationSuccess}
+        isGenerating={isGenerating}
+        setIsGenerating={setIsGenerating}
+      />
 
       {/* Criteria builder */}
       <RubricCriteriaList

@@ -19,6 +19,7 @@ interface ProfileState {
   avatarUrl: string | null
   file: File | null
   preview: string | null
+  authProvider: string
 }
 
 /**
@@ -40,6 +41,7 @@ export function useProfile() {
     avatarUrl: null,
     file: null,
     preview: null,
+    authProvider: 'email',
   })
 
   // Sync with AuthContext on mount or when authProfile changes
@@ -51,6 +53,7 @@ export function useProfile() {
           userId: authProfile.id,
           fullName: s.fullName || authProfile.name || '',
           avatarUrl: authProfile.avatar_url,
+          authProvider: authProfile.auth_provider || 'email',
           initialLoading: false,
         }))
       } else {
