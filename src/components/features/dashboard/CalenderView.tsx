@@ -28,9 +28,9 @@ export default function CalenderView({ assignments, isTeacher }: CalenderViewPro
 
   // Move forward/back months
   const nextMonth = () =>
-    setCurrentDate(safeDate(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   const prevMonth = () =>
-    setCurrentDate(safeDate(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
