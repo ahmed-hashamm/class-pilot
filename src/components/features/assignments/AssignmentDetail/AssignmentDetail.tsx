@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
+import { safeDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SubmissionForm } from "@/components/features/submissions";
 import { ConfirmModal } from "@/components/ui";
@@ -37,7 +38,7 @@ export default function AssignmentDetail({
   // Compute whether the deadline has passed
   const isPastDeadline = (() => {
     if (!assignment.due_date) return false;
-    return new Date() > new Date(assignment.due_date);
+    return new Date() > safeDate(assignment.due_date);
   })();
 
   return (

@@ -1,6 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
+import { safeDate } from "@/lib/utils";
 import { ClipboardList } from "lucide-react"
 import AttachmentButton from "@/components/features/classes/buttons/AttachmentButton"
 
@@ -39,7 +40,7 @@ export function SubmissionContent({
               <span className="hidden sm:inline text-border">·</span>
               <span className="truncate">
                 Submitted {submittedAt || createdAt
-                  ? format(new Date(submittedAt || createdAt || ""), "MMM d, h:mm a")
+                  ? format(safeDate(submittedAt || createdAt || ""), "MMM d, h:mm a")
                   : "Recently"}
               </span>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { safeDate } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, CheckCircle2, Circle, Clock, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
@@ -27,9 +28,9 @@ export default function CalenderView({ assignments, isTeacher }: CalenderViewPro
 
   // Move forward/back months
   const nextMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(safeDate(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   const prevMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(safeDate(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
@@ -132,7 +133,7 @@ export default function CalenderView({ assignments, isTeacher }: CalenderViewPro
               <div className="flex flex-col gap-1.5 overflow-y-auto overflow-x-hidden max-h-[85px] custom-scrollbar">
                 {dayAssignments.map((a) => {
                   const href = a.classes ? `/classes/${a.classes.id}/assignments/${a.id}` : '#';
-                  const ended = isPast(new Date(a.due_date));
+                  const ended = isPast(safeDate(a.due_date));
 
                   let variantClasses = "";
                   let icon = null;

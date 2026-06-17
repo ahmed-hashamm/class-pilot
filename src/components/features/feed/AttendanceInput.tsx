@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { safeDate } from "@/lib/utils";
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from "@tanstack/react-query"
 import { createAttendance } from '@/actions/ClassFeaturesActions'
@@ -36,7 +37,7 @@ export default function AttendanceInput({ classId, onSuccess }: AttendanceInputP
         classId,
         date,
         title,
-        deadline ? new Date(deadline).toISOString() : undefined,
+        deadline ? safeDate(deadline).toISOString() : undefined,
         isPinned
       )
 

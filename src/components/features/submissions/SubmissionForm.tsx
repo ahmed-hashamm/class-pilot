@@ -6,6 +6,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { safeDate } from "@/lib/utils";
 import { createClient } from '@/lib/supabase/client'
 import { submitAssignment } from '@/actions/ClassActions'
 import {
@@ -38,7 +39,7 @@ export default function SubmissionForm({ assignment, classId, onClose, onSuccess
   // Compute deadline status
   const isPastDeadline = (() => {
     if (!assignment.due_date) return false
-    return new Date() > new Date(assignment.due_date)
+    return new Date() > safeDate(assignment.due_date)
   })()
 
   useEffect(() => {

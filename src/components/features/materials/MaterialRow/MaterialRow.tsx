@@ -1,6 +1,7 @@
 "use client";
 
 import { Material } from "@/lib/types/schema";
+import { safeDate } from "@/lib/utils";
 import { CheckCircle2, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { useState, useRef, useEffect } from "react";
@@ -83,7 +84,7 @@ export default function MaterialRow({
 
             <div className="flex items-center gap-1.5 text-muted-foreground/35 text-[11px] font-medium">
               <Clock size={10} className="shrink-0" />
-              <span>Posted {material.created_at ? format(new Date(material.created_at), "MMM d") : "Recently"}</span>
+              <span>Posted {material.created_at ? format(safeDate(material.created_at), "MMM d") : "Recently"}</span>
             </div>
           </div>
 

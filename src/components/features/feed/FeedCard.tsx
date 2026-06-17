@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { safeDate } from "@/lib/utils";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Clock, Pin, MoreVertical, Pencil, Trash2, ArrowRight, Users, PinOff, PinIcon } from "lucide-react";
@@ -182,7 +183,7 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                   <span className="text-border font-extrabold">·</span>
                   <div className="flex items-center gap-1.5">
                     <Clock size={11} className="shrink-0" />
-                    {item.created_at ? format(new Date(item.created_at), "MMM d") : "Recently"}
+                    {item.created_at ? format(safeDate(item.created_at), "MMM d") : "Recently"}
                   </div>
                 </div>
 
@@ -197,10 +198,10 @@ const FeedCard = ({ item, classId, userId, isTeacher, children }: FeedCardProps)
                   )}
 
                   {isAssignment && item.due_date && (
-                    <div className="flex items-center gap-1.5 text-navy font-bold sm:ml-1.5" title={`Due: ${format(new Date(item.due_date), "MMM d, h:mm a")}`}>
+                    <div className="flex items-center gap-1.5 text-navy font-bold sm:ml-1.5" title={`Due: ${format(safeDate(item.due_date), "MMM d, h:mm a")}`}>
                       {item.is_group_project && <span className="text-border font-extrabold mr-1.5">·</span>}
                       <Clock size={12} className="text-rose-500" />
-                      <span>{format(new Date(item.due_date), "MMM d, h:mm a")}</span>
+                      <span>{format(safeDate(item.due_date), "MMM d, h:mm a")}</span>
                     </div>
                   )}
                 </div>

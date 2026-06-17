@@ -1,3 +1,4 @@
+import { safeDate } from "@/lib/utils";
 // 'use client'
 
 // import { Plus, Users2, ArrowRight, FolderOpen } from 'lucide-react'
@@ -98,7 +99,7 @@
 //       {/* Footer */}
 //       <div className="flex items-center justify-between pt-3 border-t border-border">
 //         <span className="text-[11px] text-muted-foreground font-medium">
-//           {new Date(project.created_at).toLocaleDateString('en-US', {
+//           {safeDate(project.created_at).toLocaleDateString('en-US', {
 //             month: 'short', day: 'numeric', year: 'numeric',
 //           })}
 //         </span>

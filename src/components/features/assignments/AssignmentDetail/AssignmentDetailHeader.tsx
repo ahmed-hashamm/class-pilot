@@ -1,4 +1,5 @@
 import { User, ClipboardList, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { safeDate } from "@/lib/utils";
 import { format, isPast } from "date-fns";
 import { Assignment } from "@/lib/types/schema";
 
@@ -15,7 +16,7 @@ export default function AssignmentDetailHeader({
   isTurnedIn, 
   isGraded 
 }: AssignmentDetailHeaderProps) {
-  const isExpired = assignment.due_date ? isPast(new Date(assignment.due_date)) : false;
+  const isExpired = assignment.due_date ? isPast(safeDate(assignment.due_date)) : false;
 
   const getStatus = () => {
     if (isTeacher) {
@@ -46,7 +47,7 @@ export default function AssignmentDetailHeader({
             </span>
             <span className="text-border hidden sm:inline">·</span>
             <span className="whitespace-nowrap">
-              Posted {assignment.created_at ? format(new Date(assignment.created_at), "MMM d, yyyy") : ""}
+              Posted {assignment.created_at ? format(safeDate(assignment.created_at), "MMM d, yyyy") : ""}
             </span>
           </div>
         </div>

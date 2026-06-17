@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { safeDate } from "@/lib/utils";
 import { isToday, isPast } from "date-fns";
 import {
   FileText,
@@ -33,7 +34,7 @@ export default function AssignmentCard({
   isTeacher = false,
   muted = false,
 }: AssignmentCardProps) {
-  const dueDate = assignment.due_date ? new Date(assignment.due_date) : null;
+  const dueDate = assignment.due_date ? safeDate(assignment.due_date) : null;
   const isOverdue = dueDate && isPast(dueDate) && !assignment.has_submitted;
 
   const getStatus = () => {

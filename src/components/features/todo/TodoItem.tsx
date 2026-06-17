@@ -1,4 +1,5 @@
 import { Users, Calendar as CalendarIcon } from "lucide-react";
+import { safeDate } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { TodoAssignment } from "@/lib/db_data_fetching/todo";
@@ -55,7 +56,7 @@ export function TodoItem({ assignment, status, userId, myGroupIds }: TodoItemPro
           </p>
           <p className="flex items-center gap-2 text-[12px] text-muted-foreground font-medium">
             <CalendarIcon size={12} className="text-navy/20" />
-            Due {assignment.due_date ? format(new Date(assignment.due_date), "MMM d, yyyy") : "No due date"}
+            Due {assignment.due_date ? format(safeDate(assignment.due_date), "MMM d, yyyy") : "No due date"}
           </p>
         </div>
 

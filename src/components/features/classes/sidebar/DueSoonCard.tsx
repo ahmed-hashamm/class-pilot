@@ -1,6 +1,7 @@
 "use client";
 
 import SidebarCard from "./SidebarCard";
+import { safeDate } from "@/lib/utils";
 
 interface DueSoonCardProps {
   assignments: { id: string; title: string; due_date: string | null }[];
@@ -8,8 +9,8 @@ interface DueSoonCardProps {
 
 export default function DueSoonCard({ assignments }: DueSoonCardProps) {
   const dueSoon = assignments
-    .filter((a) => a.due_date && new Date(a.due_date) >= new Date())
-    .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime())
+    .filter((a) => a.due_date && safeDate(a.due_date) >= new Date())
+    .sort((a, b) => safeDate(a.due_date!).getTime() - safeDate(b.due_date!).getTime())
     .slice(0, 5);
 
   return (
@@ -31,7 +32,7 @@ export default function DueSoonCard({ assignments }: DueSoonCardProps) {
                 {a.title}
               </span>
               <span className="shrink-0 text-[10px] text-muted-foreground font-medium">
-                {new Date(a.due_date!).toLocaleDateString('en-US', {
+                {safeDate(a.due_date!).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                 })}

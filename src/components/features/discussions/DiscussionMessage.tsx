@@ -1,6 +1,7 @@
 'use client'
 
 import { format } from 'date-fns'
+import { safeDate } from "@/lib/utils";
 import { Trash2, GraduationCap } from 'lucide-react'
 import { DiscussionMessage as DiscussionMessageType } from '@/lib/hooks/useDiscussion'
 import { cn } from '@/lib/utils'
@@ -50,7 +51,7 @@ export default function DiscussionMessage({ message, isOwn, isTeacher, onDelete 
             {isOwn ? 'You' : name}
           </span>
           <span className="text-[10px] text-muted-foreground/40 font-medium">
-            {format(new Date(message.created_at), 'h:mm a')}
+            {format(safeDate(message.created_at), 'h:mm a')}
           </span>
 
           {/* Delete Action - Visible on hover */}

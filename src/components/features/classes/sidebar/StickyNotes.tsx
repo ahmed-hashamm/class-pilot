@@ -1,4 +1,5 @@
 import { useState, useTransition, useEffect } from 'react'
+import { safeDate } from "@/lib/utils";
 import { Button } from '@/components/ui/button'
 import { X, Plus, StickyNote, Loader2 } from 'lucide-react'
 import SidebarCard from './SidebarCard'
@@ -106,7 +107,7 @@ export default function StickyNotes({ classId }: { classId: string }) {
                 {note.content}
               </p>
               <p className="text-[10px] text-muted-foreground mt-1.5 font-medium">
-                {new Date(note.created_at).toLocaleDateString('en-US', {
+                {safeDate(note.created_at).toLocaleDateString('en-US', {
                   month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                 })}
               </p>

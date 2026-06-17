@@ -1,4 +1,5 @@
 import { Clock, Star, ChevronRight } from "lucide-react";
+import { safeDate } from "@/lib/utils";
 import Image from "next/image";
 import { Assignment } from "@/lib/types/schema";
 import { useState } from "react";
@@ -19,7 +20,7 @@ export default function AssignmentFooter({ assignment }: AssignmentFooterProps) 
         {assignment.due_date && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary/60 text-navy/40 text-[10px] font-semibold">
             <Clock size={10} className="shrink-0 opacity-60" />
-            <span>Due {format(new Date(assignment.due_date), "MMM d, h:mm a")}</span>
+            <span>Due {format(safeDate(assignment.due_date), "MMM d, h:mm a")}</span>
           </div>
         )}
 

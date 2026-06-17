@@ -1,4 +1,5 @@
 import { Clock, Award, BookOpen, Users } from "lucide-react";
+import { safeDate } from "@/lib/utils";
 import { format } from "date-fns";
 import { Assignment } from "@/lib/types/schema";
 
@@ -24,7 +25,7 @@ export default function AssignmentDetailInfo({ assignment, submission }: Assignm
           </div>
         </div>
       )}
-      <InfoRow icon={<Clock size={14} />} label="Due Date" value={assignment.due_date ? format(new Date(assignment.due_date), "MMM d, h:mm a") : "No deadline"} />
+      <InfoRow icon={<Clock size={14} />} label="Due Date" value={assignment.due_date ? format(safeDate(assignment.due_date), "MMM d, h:mm a") : "No deadline"} />
       <InfoRow icon={<Award size={14} />} label="Total Value" value={`${assignment.points} points`} />
       <InfoRow icon={<BookOpen size={14} />} label="Type" value={assignment.submission_type === 'file' ? 'File Upload' : 'Text Entry'} />
       {assignment.is_group_project && (

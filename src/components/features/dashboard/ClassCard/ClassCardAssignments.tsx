@@ -1,6 +1,7 @@
 'use client'
 
 import { format, isAfter, startOfDay } from 'date-fns'
+import { safeDate } from "@/lib/utils";
 
 /**
  * Renders a compact list of the top 3 upcoming assignments.
@@ -15,8 +16,8 @@ export function ClassCardAssignments({ assignments }: ClassCardAssignmentsProps)
   const upcomingAssignments = (assignments || []).filter((a: any) => {
     if (!a.due_date) return true;
     // Include if due today or in the future
-    return isAfter(new Date(a.due_date), startOfDay(new Date())) ||
-      format(new Date(a.due_date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+    return isAfter(safeDate(a.due_date), startOfDay(new Date())) ||
+      format(safeDate(a.due_date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
   }).slice(0, 3); // Limit to top 3
 
   return (
@@ -31,7 +32,7 @@ export function ClassCardAssignments({ assignments }: ClassCardAssignmentsProps)
                 </span>
                 {a.due_date && (
                   <span className="shrink-0 text-[11px] text-muted-foreground mt-0.5">
-                    {format(new Date(a.due_date), 'MMM d')}
+                    {format(safeDate(a.due_date), 'MMM d')}
                   </span>
                 )}
               </li>

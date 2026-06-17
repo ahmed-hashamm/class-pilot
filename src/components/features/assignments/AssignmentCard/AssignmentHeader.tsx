@@ -1,4 +1,5 @@
 import { Clock, LucideIcon, FileText } from "lucide-react";
+import { safeDate } from "@/lib/utils";
 import { format } from "date-fns";
 import { Assignment } from "@/lib/types/schema";
 
@@ -30,7 +31,7 @@ export default function AssignmentHeader({ assignment, status, isTeacher = false
 
         <div className="flex items-center gap-1.5 text-muted-foreground/35 text-[11px] font-medium">
           <Clock size={10} className="shrink-0" />
-          <span>Posted {assignment.created_at ? format(new Date(assignment.created_at), "MMM d") : "Recently"}</span>
+          <span>Posted {assignment.created_at ? format(safeDate(assignment.created_at), "MMM d") : "Recently"}</span>
         </div>
       </div>
 

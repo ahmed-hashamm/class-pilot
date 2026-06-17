@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { safeDate } from "@/lib/utils";
 import { getAssignmentsByClass } from "@/lib/db_data_fetching/assignments";
 import AssignmentGroup from "./AssignmentGroup";
 import { 
@@ -40,8 +41,8 @@ export default function AssignmentsList({ classId, isTeacher, hideHeader = false
   });
 
   const now = new Date();
-  const upcoming = assignments.filter((a) => !a.due_date || new Date(a.due_date) >= now);
-  const past = assignments.filter((a) => a.due_date && new Date(a.due_date) < now);
+  const upcoming = assignments.filter((a) => !a.due_date || safeDate(a.due_date) >= now);
+  const past = assignments.filter((a) => a.due_date && safeDate(a.due_date) < now);
 
   const HeaderAction = isTeacher ? (
     <Link href={`/classes/${classId}/assignments/create`}>

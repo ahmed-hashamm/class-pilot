@@ -1,6 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
+import { safeDate } from "@/lib/utils";
 import Link from "next/link"
 import { Calendar, ArrowRight, Users, FileText } from "lucide-react"
 import { StudentAvatar } from "@/components/features/students/StudentAvatar"
@@ -124,7 +125,7 @@ function StatusTag({ label, icon, color = "bg-navy/5 text-navy border-navy/10" }
 function formatDate(dateStr: string) {
   if (!dateStr) return "Not submitted";
   try {
-    return format(new Date(dateStr), "MMM d, h:mm a");
+    return format(safeDate(dateStr), "MMM d, h:mm a");
   } catch (e) {
     return "Invalid Date";
   }
